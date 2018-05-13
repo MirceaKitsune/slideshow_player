@@ -1,5 +1,5 @@
 // Slideshow Viewer, Init
-// Public Domain / CC0, MirceaKitsune 2016
+// Public Domain / CC0, MirceaKitsune 2018
 
 // Set the user agent
 Object.defineProperty(navigator, "userAgent", {
@@ -14,9 +14,6 @@ var settings = {
 	keywords: "",
 	count: 0,
 	speed: 0
-};
-var player = {
-	playing: false
 };
 
 // Define plugins
@@ -37,16 +34,16 @@ var data_images = [];
 function images_clear() {
 	data_images = [];
 
-	playing = false;
-	interface_update_media_controls_play();
+	player_detach();
+	interface_update_media_controls_play(0);
 	interface_update_media_controls_label();
 }
 
 function images_add(item) {
 	data_images.push(item);
 
-	playing = false;
-	interface_update_media_controls_play();
+	player_detach();
+	interface_update_media_controls_play(2);
 	interface_update_media_controls_label();
 }
 

@@ -1,5 +1,5 @@
 // Slideshow Viewer, Interface
-// Public Domain / CC0, MirceaKitsune 2016
+// Public Domain / CC0, MirceaKitsune 2018
 
 function interface_load() {
 	images_clear();
@@ -27,8 +27,20 @@ function interface_load() {
 }
 
 function interface_play_stop() {
-	player.playing = !player.playing;
-	interface_update_media_controls_play();
+	if(player_available() == true) {
+		if(player_playing() == true) {
+			player_detach();
+			interface_update_media_controls_play(2);
+		}
+		else {
+			player_attach();
+			interface_update_media_controls_play(1);
+		}
+	}
+	else {
+		player_detach();
+		interface_update_media_controls_play(0);
+	}
 }
 
 function interface_update_controls_images_sites() {
@@ -56,20 +68,24 @@ function interface_update_controls_images_sites() {
 	}
 }
 
-function interface_update_media_controls_play() {
+function interface_update_media_controls_play(state) {
 	var play = document.getElementById("media_controls_play");
 
-	if(data_images.length == 0)
-		play.innerHTML = "✖";
-	else if(player.playing === true)
-		play.innerHTML = "■";
-	else
-		play.innerHTML = "▶";
+	switch(state) {
+		case 1:
+			play.innerHTML = "■";
+			break;
+		case 2:
+			play.innerHTML = "▶";
+			break;
+		default:
+			play.innerHTML = "✖";
+	}
 }
 
 function interface_update_media_controls_label() {
 	var total_images = data_images.length;
-	var seconds = total_images * settings.speed;
+	var seconds = (total_images + 1) * settings.speed;
 	var date = new Date(null);
 	date.setSeconds(seconds);
 	var date_string = date.toISOString().substr(11, 8);
@@ -84,6 +100,7 @@ function interface_update_media_controls_label() {
 function interface_init() {
 	// interface HTML: player
 	var player = document.createElement("div");
+	player.setAttribute("id", "player");
 	player.setAttribute("style", "position: absolute; top: 10%; left: 5%; width: 70%; height: 70%; background-color: #000000");
 	document.body.appendChild(player);
 

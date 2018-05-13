@@ -1,5 +1,5 @@
 // Slideshow Viewer, Plugins, e621
-// Public Domain / CC0, MirceaKitsune 2016
+// Public Domain / CC0, MirceaKitsune 2018
 
 // Image loading plugin for: https://e621.net
 // API documentation: https://e621.net/help/show/api
