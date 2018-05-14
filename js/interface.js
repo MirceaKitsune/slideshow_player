@@ -1,9 +1,31 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
-// interface, functions, plugin loader
-function interface_load() {
+var timer_refresh = null;
+
+// interface, functions, timer, settings
+function interface_timer_settings() {
+	player_detach();
+
+	// wait for a bit before reloading the settings
+	clearTimeout(timer_refresh);
+	timer_refresh = setTimeout(interface_load_settings, 0);
+}
+
+// interface, functions, timer, site
+function interface_timer_site() {
 	images_clear();
+
+	// wait for a bit before reloading the sites
+	// since plugins download data from external servers, low values may result in excessive network usage
+	// this should be balanced to give the user enough time to finish typing, without leaving them waiting for too long either
+	clearTimeout(timer_refresh);
+	timer_refresh = setTimeout(interface_load_site, 1000);
+}
+
+// interface, functions, loader, settings
+function interface_load_settings() {
+	player_detach();
 
 	var elements_settings = document.forms["controls_images_settings"].elements;
 	var elements_list = document.forms["controls_images_sites"].elements;
@@ -20,6 +42,12 @@ function interface_load() {
 
 	// evenly distribute the total image count to each source
 	settings.count = Math.floor(settings.count / settings.sites.length);
+}
+
+// interface, functions, loader, site
+function interface_load_site() {
+	interface_load_settings();
+	images_clear();
 
 	// load every selected plugin
 	for(var site in settings.sites)
@@ -52,7 +80,7 @@ function interface_update_controls_images_sites() {
 		sites_list_checkbox.setAttribute("title", "Whether to fetch images from the website " + item);
 		sites_list_checkbox.setAttribute("type", "checkbox");
 		sites_list_checkbox.setAttribute("name", item);
-		sites_list_checkbox.setAttribute("checked", true);
+		sites_list_checkbox.setAttribute("onclick", "interface_timer_site()");
 		sites_list.appendChild(sites_list_checkbox);
 
 		// interface HTML: controls, images, sites, list, label
@@ -136,6 +164,7 @@ function interface_init() {
 					controls_images_settings_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
 					controls_images_settings_keywords_input.setAttribute("type", "text");
 					controls_images_settings_keywords_input.setAttribute("value", "");
+					controls_images_settings_keywords_input.setAttribute("onkeyup", "interface_timer_site()");
 					controls_images_settings_keywords.appendChild(controls_images_settings_keywords_input);
 				}
 
@@ -153,6 +182,7 @@ function interface_init() {
 					controls_images_settings_count_input.setAttribute("step", "5");
 					controls_images_settings_count_input.setAttribute("min", "5");
 					controls_images_settings_count_input.setAttribute("max", "1000");
+					controls_images_settings_count_input.setAttribute("onkeyup", "interface_timer_site()");
 					controls_images_settings_count.appendChild(controls_images_settings_count_input);
 				}
 
@@ -170,6 +200,7 @@ function interface_init() {
 					controls_images_settings_duration_input.setAttribute("step", "1");
 					controls_images_settings_duration_input.setAttribute("min", "5");
 					controls_images_settings_duration_input.setAttribute("max", "100");
+					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_timer_settings()");
 					controls_images_settings_duration.appendChild(controls_images_settings_duration_input);
 				}
 
@@ -204,8 +235,9 @@ function interface_init() {
 			var media_controls_play = document.createElement("div");
 			media_controls_play.setAttribute("id", "media_controls_play");
 			media_controls_play.setAttribute("style",
-				"position: absolute; margin: 0 0 0 50%; top: 8px; left: -32px; width: 64px; height: 64px; border-radius: 100%; background-color: #000000; box-shadow: 0 0 4px #000000; " +
-				"text-align: center; line-height: 56px; font-size: 24px; color: #ffffff"
+				"position: absolute; margin: 0 0 0 50%; top: 8px; left: -32px; width: 64px; height: 64px; " +
+				"border-radius: 100%; border:2px solid black; box-shadow: 0 0 2px #000000; " +
+				"text-align: center; line-height: 56px; font-size: 24px; color: #000000"
 			);
 			media_controls_play.innerHTML = "✖";
 			media_controls.appendChild(media_controls_play);
@@ -225,13 +257,4 @@ function interface_init() {
 		media_music.setAttribute("style", "position: absolute; top: 0%; left: 85%; width: 15%; height: 100%; overflow: hidden");
 		media.appendChild(media_music);
 	}
-
-	// interface HTML: controls, load
-	var controls_load = document.createElement("button");
-	controls_load.setAttribute("id", "controls_load");
-	controls_load.setAttribute("title", "Applies the above settings and generates a new slideshow");
-	controls_load.setAttribute("style", "position:absolute; top: 90%; left: 0%; width: 100%; height: 10%");
-	controls_load.setAttribute("onclick", "interface_load()");
-	controls_load.innerHTML = "⟳ Load";
-	controls.appendChild(controls_load);
 }
