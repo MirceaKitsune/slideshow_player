@@ -98,6 +98,10 @@ function player_attach() {
 	player.index = 0;
 
 	interface_update_media_controls(2);
+
+	// shuffle the images each time before playing
+	if(settings.shuffle)
+		images_shuffle();
 }
 
 // player, HTML, destroy

@@ -16,7 +16,8 @@ var settings = {
 	sites: [],
 	keywords: "",
 	count: 0,
-	duration: 0
+	duration: 0,
+	shuffle: false
 };
 
 // plugins, global object
@@ -42,6 +43,14 @@ function images_clear() {
 
 	player_detach();
 	interface_update_media_controls(0);
+}
+
+// data, images, functions, shuffle
+function images_shuffle() {
+	for(var i = data_images.length - 1; i > 0; i--) {
+		var j = Math.floor(Math.random() * (i + 1));
+		[data_images[i], data_images[j]] = [data_images[j], data_images[i]];
+	}
 }
 
 // data, images, functions, add

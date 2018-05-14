@@ -23,6 +23,7 @@ function interface_load() {
 	settings.keywords = elements_settings["controls_images_settings_keywords"].value;
 	settings.count = Number(elements_settings["controls_images_settings_count"].value);
 	settings.duration = Number(elements_settings["controls_images_settings_duration"].value);
+	settings.shuffle = Boolean(elements_settings["controls_images_settings_shuffle"].checked);
 
 	// evenly distribute the total image count to each source
 	settings.count = Math.floor(settings.count / settings.sites.length);
@@ -55,7 +56,7 @@ function interface_update_controls_images_sites() {
 		// interface HTML: controls, images, sites, list, checkbox
 		var sites_list_checkbox = document.createElement("input");
 		sites_list_checkbox.setAttribute("id", "controls_images_list_sites_checkbox_" + item);
-		sites_list_checkbox.setAttribute("title", "Whether to fetch images from the website " + item);
+		sites_list_checkbox.setAttribute("title", "Whether to fetch images from " + item);
 		sites_list_checkbox.setAttribute("type", "checkbox");
 		sites_list_checkbox.setAttribute("name", item);
 		sites_list_checkbox.setAttribute("checked", true);
@@ -122,9 +123,15 @@ function interface_init() {
 		// interface HTML: controls, images
 		var controls_images = document.createElement("div");
 		controls_images.setAttribute("id", "controls_images");
-		controls_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 30%; overflow: auto; background-color: #ffffff");
+		controls_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 50%; overflow: auto; background-color: #ffffff");
 		controls.appendChild(controls_images);
 		{
+			// interface HTML: media, controls, title
+			var controls_images_title = document.createElement("p");
+			controls_images_title.setAttribute("style", "text-align: center");
+			controls_images_title.innerHTML = "<b>Image settings</b>";
+			controls_images.appendChild(controls_images_title);
+
 			// interface HTML: controls, images, settings
 			var controls_images_settings = document.createElement("form");
 			controls_images_settings.setAttribute("id", "controls_images_settings");
@@ -179,6 +186,25 @@ function interface_init() {
 					controls_images_settings_duration_input.setAttribute("max", "100");
 					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_refresh()");
 					controls_images_settings_duration.appendChild(controls_images_settings_duration_input);
+				}
+
+				// interface HTML: controls, images, settings, shuffle
+				var controls_images_settings_shuffle = document.createElement("p");
+				controls_images_settings_shuffle.innerHTML = "Shuffle:<br/>";
+				controls_images_settings.appendChild(controls_images_settings_shuffle);
+				{
+					// interface HTML: controls, images, settings, shuffle, input
+					var controls_images_settings_shuffle_input = document.createElement("input");
+					controls_images_settings_shuffle_input.setAttribute("id", "controls_images_settings_shuffle");
+					controls_images_settings_shuffle_input.setAttribute("title", "Whether to shuffle the images before playing");
+					controls_images_settings_shuffle_input.setAttribute("type", "checkbox");
+					controls_images_settings_shuffle_input.setAttribute("onclick", "interface_refresh()");
+					controls_images_settings_shuffle.appendChild(controls_images_settings_shuffle_input);
+
+					// interface HTML: controls, images, settings, shuffle, label
+					var controls_images_settings_shuffle_label = document.createElement("label");
+					controls_images_settings_shuffle_label.innerHTML = "Enabled<br/>";
+					controls_images_settings_shuffle.appendChild(controls_images_settings_shuffle_label);
 				}
 
 				// interface HTML: controls, images, sites
