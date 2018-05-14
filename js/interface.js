@@ -89,21 +89,25 @@ function interface_update_media_controls(state) {
 			play.innerHTML = "⟳";
 			play.setAttribute("onclick", "interface_load()");
 			label.innerHTML = "<b>Click to apply settings</b>";
+			document.title = "Slideshow Viewer";
 			break;
 		case 2:
 			play.innerHTML = "■";
 			play.setAttribute("onclick", "interface_play()");
 			label.innerHTML = label_status;
+			document.title = "Slideshow Viewer - " + total_images + " images (▶)";
 			break;
 		case 3:
 			play.innerHTML = "▶";
 			play.setAttribute("onclick", "interface_play()");
 			label.innerHTML = label_status;
+			document.title = "Slideshow Viewer - " + total_images + " images (■)";
 			break;
 		default:
 			play.innerHTML = "✖";
 			play.removeAttribute("onclick");
 			label.innerHTML = "<b>Not enough content to play</b>";
+			document.title = "Slideshow Viewer";
 	}
 }
 
