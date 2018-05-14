@@ -9,7 +9,7 @@ const RATE = 10;
 const IMG_SRC = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 const IMG_STYLE = "position: absolute; width: auto; height: auto; max-width: 100%; max-height: 100%";
 
-// global player variables
+// player, global object
 var player = {
 	preloading: false,
 	index: 0,

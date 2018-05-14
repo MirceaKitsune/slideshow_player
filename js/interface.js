@@ -24,6 +24,7 @@ function interface_load() {
 	settings.count = Number(elements_settings["controls_images_settings_count"].value);
 	settings.duration = Number(elements_settings["controls_images_settings_duration"].value);
 	settings.shuffle = Boolean(elements_settings["controls_images_settings_shuffle"].checked);
+	settings_cookie_set();
 
 	// evenly distribute the total image count to each source
 	settings.count = Math.floor(settings.count / settings.sites.length);
@@ -59,7 +60,8 @@ function interface_update_controls_images_sites() {
 		sites_list_checkbox.setAttribute("title", "Whether to fetch images from " + item);
 		sites_list_checkbox.setAttribute("type", "checkbox");
 		sites_list_checkbox.setAttribute("name", item);
-		sites_list_checkbox.setAttribute("checked", true);
+		if(settings.sites.indexOf(item) >= 0)
+			sites_list_checkbox.setAttribute("checked", true);
 		sites_list_checkbox.setAttribute("onclick", "interface_refresh()");
 		sites_list.appendChild(sites_list_checkbox);
 
@@ -89,25 +91,25 @@ function interface_update_media_controls(state) {
 			play.innerHTML = "⟳";
 			play.setAttribute("onclick", "interface_load()");
 			label.innerHTML = "<b>Click to apply settings</b>";
-			document.title = "Slideshow Viewer";
+			document.title = "Slideshow Player";
 			break;
 		case 2:
 			play.innerHTML = "■";
 			play.setAttribute("onclick", "interface_play()");
 			label.innerHTML = label_status;
-			document.title = "Slideshow Viewer - " + total_images + " images (▶)";
+			document.title = "Slideshow Player - " + total_images + " images (▶)";
 			break;
 		case 3:
 			play.innerHTML = "▶";
 			play.setAttribute("onclick", "interface_play()");
 			label.innerHTML = label_status;
-			document.title = "Slideshow Viewer - " + total_images + " images (■)";
+			document.title = "Slideshow Player - " + total_images + " images (■)";
 			break;
 		default:
 			play.innerHTML = "✖";
 			play.removeAttribute("onclick");
 			label.innerHTML = "<b>Not enough content to play</b>";
-			document.title = "Slideshow Viewer";
+			document.title = "Slideshow Player";
 	}
 }
 
@@ -151,7 +153,7 @@ function interface_init() {
 					controls_images_settings_keywords_input.setAttribute("id", "controls_images_settings_keywords");
 					controls_images_settings_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
 					controls_images_settings_keywords_input.setAttribute("type", "text");
-					controls_images_settings_keywords_input.setAttribute("value", "");
+					controls_images_settings_keywords_input.setAttribute("value", settings.keywords);
 					controls_images_settings_keywords_input.setAttribute("onkeyup", "interface_refresh()");
 					controls_images_settings_keywords.appendChild(controls_images_settings_keywords_input);
 				}
@@ -166,7 +168,7 @@ function interface_init() {
 					controls_images_settings_count_input.setAttribute("id", "controls_images_settings_count");
 					controls_images_settings_count_input.setAttribute("title", "The total number of images to be used in the slideshow");
 					controls_images_settings_count_input.setAttribute("type", "number");
-					controls_images_settings_count_input.setAttribute("value", "100");
+					controls_images_settings_count_input.setAttribute("value", settings.count);
 					controls_images_settings_count_input.setAttribute("step", "5");
 					controls_images_settings_count_input.setAttribute("min", "5");
 					controls_images_settings_count_input.setAttribute("max", "1000");
@@ -184,7 +186,7 @@ function interface_init() {
 					controls_images_settings_duration_input.setAttribute("id", "controls_images_settings_duration");
 					controls_images_settings_duration_input.setAttribute("title", "Number of seconds for which to display each image");
 					controls_images_settings_duration_input.setAttribute("type", "number");
-					controls_images_settings_duration_input.setAttribute("value", "10");
+					controls_images_settings_duration_input.setAttribute("value", settings.duration);
 					controls_images_settings_duration_input.setAttribute("step", "1");
 					controls_images_settings_duration_input.setAttribute("min", "5");
 					controls_images_settings_duration_input.setAttribute("max", "100");
@@ -202,6 +204,8 @@ function interface_init() {
 					controls_images_settings_shuffle_input.setAttribute("id", "controls_images_settings_shuffle");
 					controls_images_settings_shuffle_input.setAttribute("title", "Whether to shuffle the images before playing");
 					controls_images_settings_shuffle_input.setAttribute("type", "checkbox");
+					if(settings.shuffle === true)
+						controls_images_settings_shuffle_input.setAttribute("checked", true);
 					controls_images_settings_shuffle_input.setAttribute("onclick", "interface_refresh()");
 					controls_images_settings_shuffle.appendChild(controls_images_settings_shuffle_input);
 

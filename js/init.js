@@ -11,7 +11,23 @@ Object.defineProperty(navigator, "userAgent", {
 	}
 });
 
-// global system variables
+// settings, cookie, set
+function settings_cookie_set() {
+	var expire = 365 * 24 * 60 * 60; // year, hour, minute, second
+	var string = JSON.stringify(settings);
+	var time = new Date();
+	time.setTime(time.getTime() + 1 * expire * 1000);
+	document.cookie = "slideshowplayer" + "=" + string + "; expires=" + time.toUTCString();
+}
+
+// settings, cookie, get
+function settings_cookie_get() {
+	var table = document.cookie.match(new RegExp("slideshowplayer" + "=([^;]+)"));
+	if(table)
+		settings = JSON.parse(table[1]);
+}
+
+// settings, global object
 var settings = {
 	sites: [],
 	keywords: "",
@@ -19,6 +35,7 @@ var settings = {
 	duration: 0,
 	shuffle: false
 };
+settings_cookie_get();
 
 // plugins, global object
 var plugins = {};
