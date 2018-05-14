@@ -1,31 +1,15 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
-var timer_refresh = null;
-
-// interface, functions, timer, settings
-function interface_timer_settings() {
-	player_detach();
-
-	// wait for a bit before reloading the settings
-	clearTimeout(timer_refresh);
-	timer_refresh = setTimeout(interface_load_settings, 0);
-}
-
-// interface, functions, timer, site
-function interface_timer_site() {
+// interface, functions, refresh
+function interface_refresh() {
 	images_clear();
-
-	// wait for a bit before reloading the sites
-	// since plugins download data from external servers, low values may result in excessive network usage
-	// this should be balanced to give the user enough time to finish typing, without leaving them waiting for too long either
-	clearTimeout(timer_refresh);
-	timer_refresh = setTimeout(interface_load_site, 1000);
+	interface_update_media_controls(1);
 }
 
-// interface, functions, loader, settings
-function interface_load_settings() {
-	player_detach();
+// interface, functions, plugin loader
+function interface_load() {
+	images_clear();
 
 	var elements_settings = document.forms["controls_images_settings"].elements;
 	var elements_list = document.forms["controls_images_sites"].elements;
@@ -42,12 +26,6 @@ function interface_load_settings() {
 
 	// evenly distribute the total image count to each source
 	settings.count = Math.floor(settings.count / settings.sites.length);
-}
-
-// interface, functions, loader, site
-function interface_load_site() {
-	interface_load_settings();
-	images_clear();
 
 	// load every selected plugin
 	for(var site in settings.sites)
@@ -80,7 +58,8 @@ function interface_update_controls_images_sites() {
 		sites_list_checkbox.setAttribute("title", "Whether to fetch images from the website " + item);
 		sites_list_checkbox.setAttribute("type", "checkbox");
 		sites_list_checkbox.setAttribute("name", item);
-		sites_list_checkbox.setAttribute("onclick", "interface_timer_site()");
+		sites_list_checkbox.setAttribute("checked", true);
+		sites_list_checkbox.setAttribute("onclick", "interface_refresh()");
 		sites_list.appendChild(sites_list_checkbox);
 
 		// interface HTML: controls, images, sites, list, label
@@ -90,42 +69,40 @@ function interface_update_controls_images_sites() {
 	}
 }
 
-// interface, update HTML, play button
-function interface_update_media_controls_play(state) {
+// interface, update HTML, media controls
+function interface_update_media_controls(state) {
 	var play = document.getElementById("media_controls_play");
+	var label = document.getElementById("media_controls_label");
+
+	var total_images = data_images.length;
+	var total_seconds = total_images * settings.duration;
+	var total_date = new Date(null);
+	total_date.setSeconds(total_seconds);
+	var total_time = total_date.toISOString().substr(11, 8);
+	var label_status =
+		"<b>Total images:</b> " + total_images + "<br/>" +
+		"<b>Estimated time:</b> " + total_time;
 
 	switch(state) {
 		case 1:
-			play.innerHTML = "■";
-			play.setAttribute("onclick", "interface_play()");
+			play.innerHTML = "⟳";
+			play.setAttribute("onclick", "interface_load()");
+			label.innerHTML = "<b>Click to apply settings</b>";
 			break;
 		case 2:
+			play.innerHTML = "■";
+			play.setAttribute("onclick", "interface_play()");
+			label.innerHTML = label_status;
+			break;
+		case 3:
 			play.innerHTML = "▶";
 			play.setAttribute("onclick", "interface_play()");
+			label.innerHTML = label_status;
 			break;
 		default:
 			play.innerHTML = "✖";
 			play.removeAttribute("onclick");
-	}
-}
-
-// interface, update HTML, play label
-function interface_update_media_controls_label() {
-	var label = document.getElementById("media_controls_label");
-
-	if(data_images.length > 0) {
-		var total_images = data_images.length;
-		var total_seconds = total_images * settings.duration;
-		var total_date = new Date(null);
-		total_date.setSeconds(total_seconds);
-		var total_time = total_date.toISOString().substr(11, 8);
-
-		label.innerHTML =
-			"<b>Images loaded:</b> " + total_images + "<br/>" +
-			"<b>Estimated duration:</b> " + total_time;
-	}
-	else {
-		label.innerHTML = "No content loaded.";
+			label.innerHTML = "<b>Not enough content to play</b>";
 	}
 }
 
@@ -164,7 +141,7 @@ function interface_init() {
 					controls_images_settings_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
 					controls_images_settings_keywords_input.setAttribute("type", "text");
 					controls_images_settings_keywords_input.setAttribute("value", "");
-					controls_images_settings_keywords_input.setAttribute("onkeyup", "interface_timer_site()");
+					controls_images_settings_keywords_input.setAttribute("onkeyup", "interface_refresh()");
 					controls_images_settings_keywords.appendChild(controls_images_settings_keywords_input);
 				}
 
@@ -182,7 +159,7 @@ function interface_init() {
 					controls_images_settings_count_input.setAttribute("step", "5");
 					controls_images_settings_count_input.setAttribute("min", "5");
 					controls_images_settings_count_input.setAttribute("max", "1000");
-					controls_images_settings_count_input.setAttribute("onkeyup", "interface_timer_site()");
+					controls_images_settings_count_input.setAttribute("onkeyup", "interface_refresh()");
 					controls_images_settings_count.appendChild(controls_images_settings_count_input);
 				}
 
@@ -200,7 +177,7 @@ function interface_init() {
 					controls_images_settings_duration_input.setAttribute("step", "1");
 					controls_images_settings_duration_input.setAttribute("min", "5");
 					controls_images_settings_duration_input.setAttribute("max", "100");
-					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_timer_settings()");
+					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_refresh()");
 					controls_images_settings_duration.appendChild(controls_images_settings_duration_input);
 				}
 
@@ -231,7 +208,7 @@ function interface_init() {
 		media.appendChild(media_controls);
 		{
 			// interface HTML: media, controls, play
-			// updated by interface_update_media_controls_play
+			// updated by interface_update_media_controls
 			var media_controls_play = document.createElement("div");
 			media_controls_play.setAttribute("id", "media_controls_play");
 			media_controls_play.setAttribute("style",
@@ -243,11 +220,10 @@ function interface_init() {
 			media_controls.appendChild(media_controls_play);
 
 			// interface HTML: media, controls, label
-			// updated by interface_update_media_controls_label
+			// updated by interface_update_media_controls
 			var media_controls_label = document.createElement("p");
 			media_controls_label.setAttribute("id", "media_controls_label");
 			media_controls_label.setAttribute("style", "position: absolute; top: 50%; left: 0%; width: 100%; height: 50%; text-align: center");
-			media_controls_label.innerHTML = "No content loaded.";
 			media_controls.appendChild(media_controls_label);
 		}
 
@@ -257,4 +233,6 @@ function interface_init() {
 		media_music.setAttribute("style", "position: absolute; top: 0%; left: 85%; width: 15%; height: 100%; overflow: hidden");
 		media.appendChild(media_music);
 	}
+
+	interface_refresh();
 }

@@ -41,8 +41,7 @@ function images_clear() {
 	data_images = [];
 
 	player_detach();
-	interface_update_media_controls_play(0);
-	interface_update_media_controls_label();
+	interface_update_media_controls(0);
 }
 
 // data, images, functions, add
@@ -70,8 +69,7 @@ function images_add(item) {
 	data_images.push(item);
 
 	player_detach();
-	interface_update_media_controls_play(2);
-	interface_update_media_controls_label();
+	interface_update_media_controls(3);
 }
 
 // data, images, functions, read

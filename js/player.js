@@ -97,7 +97,7 @@ function player_attach() {
 	player.timer_next = setTimeout(player_next, 0);
 	player.index = 0;
 
-	interface_update_media_controls_play(1);
+	interface_update_media_controls(2);
 }
 
 // player, HTML, destroy
@@ -117,5 +117,5 @@ function player_detach() {
 	player.element_1 = null;
 	player.element_2 = null;
 
-	interface_update_media_controls_play(player_available() ? 2 : 0);
+	interface_update_media_controls(player_available() ? 3 : 0);
 }
