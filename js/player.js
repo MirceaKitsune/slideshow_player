@@ -11,7 +11,7 @@ const TRANSITION = 0.1;
 
 // to avoid broken image warnings, img elements are initialized using this fake 1x1px transparent gif
 const IMG_SRC = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
-const IMG_STYLE = "position: absolute; width: auto; height: auto; max-width: 100%; max-height: 100%";
+const IMG_STYLE = "position: absolute; width: auto; height: 100%; max-width: 100%; max-height: 100%";
 
 // player, global object
 var player = {
@@ -23,6 +23,26 @@ var player = {
 	element_1: null,
 	element_2: null
 };
+
+// player, functions, fullscreen
+function player_fullscreen() {
+	var element = document.getElementById("player");
+
+	// remove the tooltip once in fullscreen, as you can't position the cursor elsewhere to avoid it
+	element.removeAttribute("title");
+
+	var fullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+	if(fullscreen) {
+		var method_cancel = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msCancelFullScreen;
+		if(method_cancel)
+			method_cancel.call(document);
+	}
+	else {
+		var method_request = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullscreen;
+		if(method_request)
+			method_request.call(element);
+	}
+}
 
 // player, functions, image transitions
 function player_fade() {
@@ -89,6 +109,8 @@ function player_attach() {
 	var element = document.getElementById("player_area");
 	var play = document.createElement("div");
 	play.setAttribute("id", "player");
+	play.setAttribute("title", "Click to toggle fullscreen");
+	play.setAttribute("onclick", "player_fullscreen()");
 	play.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center; background-color: #000000");
 	element.appendChild(play);
 
