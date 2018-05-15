@@ -102,8 +102,9 @@ function interface_update_media_controls(state) {
 		case "none":
 			play.innerHTML = "✖";
 			play.removeAttribute("onclick");
-			label.innerHTML = "<b>Not enough content to play</b>";
+			label.innerHTML = "<b>Unable to play</b>";
 			document.title = "Slideshow Player";
+			break;
 		case "stop":
 			play.innerHTML = "■";
 			play.setAttribute("onclick", "interface_play()");

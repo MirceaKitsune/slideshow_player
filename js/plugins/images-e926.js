@@ -1,8 +1,8 @@
 // Slideshow Viewer, Plugins, e926
 // Public Domain / CC0, MirceaKitsune 2018
 
-// Image loading plugin for: https://inkbunny.net/
-// API documentation: https://wiki.inkbunny.net/wiki/API
+// Image loading plugin for: https://e926.net
+// API documentation: https://e926.net/help/show/api
 
 // convert each entry into an image object for the player
 function parse_e926(data) {
