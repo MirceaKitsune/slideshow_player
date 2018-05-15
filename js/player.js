@@ -5,6 +5,10 @@
 // lower values are smoother but use more browser resources
 const RATE = 10;
 
+// amount of time it takes to transition between images
+// 0 is instant, 1 makes the transition last throughout the full duration of the image
+const TRANSITION = 0.1;
+
 // to avoid broken image warnings, img elements are initialized using this fake 1x1px transparent gif
 const IMG_SRC = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 const IMG_STYLE = "position: absolute; width: auto; height: auto; max-width: 100%; max-height: 100%";
@@ -25,7 +29,7 @@ function player_fade() {
 	if(player.preloading === true || player.transition >= 1)
 		return;
 
-	player.transition = Math.min(player.transition + ((1 / 1000) * RATE), 1);
+	player.transition = Math.min(player.transition + (((1 / settings.duration) / (1000 * TRANSITION)) * RATE), 1);
 	player.element1.setAttribute("style", IMG_STYLE + "; opacity: " + (1 - player.transition));
 	player.element2.setAttribute("style", IMG_STYLE + "; opacity: " + (0 + player.transition));
 }
