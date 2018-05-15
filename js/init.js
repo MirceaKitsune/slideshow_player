@@ -88,14 +88,6 @@ function images_clear() {
 	data_images = [];
 }
 
-// data, images, functions, shuffle
-function images_shuffle() {
-	for(var i = data_images.length - 1; i > 0; i--) {
-		var j = Math.floor(Math.random() * (i + 1));
-		[data_images[i], data_images[j]] = [data_images[j], data_images[i]];
-	}
-}
-
 // data, images, functions, add
 function images_add(item) {
 	player_detach();
@@ -123,9 +115,12 @@ function images_add(item) {
 	data_images.push(item);
 }
 
-// data, images, functions, read
-function images_read(index) {
-	return data_images[index];
+// data, images, functions, shuffle
+function images_shuffle() {
+	for(var i = data_images.length - 1; i > 0; i--) {
+		var j = Math.floor(Math.random() * (i + 1));
+		[data_images[i], data_images[j]] = [data_images[j], data_images[i]];
+	}
 }
 
 // initialize the interface

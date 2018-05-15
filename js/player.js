@@ -26,6 +26,10 @@ var player = {
 
 // player, functions, image transitions
 function player_fade() {
+	// deactivate the fading function
+	if(player.transition >= 1)
+		clearInterval(player.timer_fade);
+
 	if(player.preloading === true || player.transition >= 1)
 		return;
 
@@ -51,6 +55,10 @@ function player_next() {
 		player_detach();
 		return;
 	}
+
+	// activate the fading function
+	clearInterval(player.timer_fade);
+	player.timer_fade = setInterval(player_fade, RATE);
 
 	// bump the index to the next image
 	++player.index;
@@ -97,7 +105,7 @@ function player_attach() {
 	play.appendChild(player.element2);
 
 	// set the interval and timeout functions
-	player.timer_fade = setInterval(player_fade, RATE);
+	// player.timer_fade = setInterval(player_fade, RATE);
 	player.timer_next = setTimeout(player_next, 0);
 	player.index = 0;
 
