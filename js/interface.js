@@ -4,7 +4,7 @@
 // interface, functions, refresh
 function interface_refresh() {
 	images_clear();
-	interface_update_media_controls(1);
+	interface_update_media_controls("reload");
 }
 
 // interface, functions, plugin loader
@@ -87,28 +87,39 @@ function interface_update_media_controls(state) {
 		"<b>Estimated time:</b> " + total_time;
 
 	switch(state) {
-		case 1:
+		case "busy":
+			play.innerHTML = "⧗";
+			play.setAttribute("onclick", "interface_load()");
+			label.innerHTML = "<b>Loading content</b>";
+			document.title = "Slideshow Player";
+			break;
+		case "reload":
 			play.innerHTML = "⟳";
 			play.setAttribute("onclick", "interface_load()");
 			label.innerHTML = "<b>Click to apply settings</b>";
 			document.title = "Slideshow Player";
 			break;
-		case 2:
+		case "none:":
+			play.innerHTML = "✖";
+			play.removeAttribute("onclick");
+			label.innerHTML = "<b>Not enough content to play</b>";
+			document.title = "Slideshow Player";
+		case "stop":
 			play.innerHTML = "■";
 			play.setAttribute("onclick", "interface_play()");
 			label.innerHTML = label_status;
 			document.title = "Slideshow Player - " + total_images + " images (▶)";
 			break;
-		case 3:
+		case "play":
 			play.innerHTML = "▶";
 			play.setAttribute("onclick", "interface_play()");
 			label.innerHTML = label_status;
 			document.title = "Slideshow Player - " + total_images + " images (■)";
 			break;
 		default:
-			play.innerHTML = "✖";
+			play.innerHTML = "?";
 			play.removeAttribute("onclick");
-			label.innerHTML = "<b>Not enough content to play</b>";
+			label.innerHTML = "<b>Error</b>";
 			document.title = "Slideshow Player";
 	}
 }

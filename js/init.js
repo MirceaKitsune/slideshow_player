@@ -42,13 +42,41 @@ var plugins = {};
 
 // plugins, functions, register
 function plugins_register(name, func) {
-	plugins[name] = func;
+	plugins[name] = {
+		func: func,
+		busy: false,
+		busy_timeout: null
+	};
 	interface_update_controls_images_sites();
 }
 
 // plugins, functions, load
 function plugins_load(name) {
-	plugins[name]();
+	plugins[name].func();
+}
+
+// plugins, busy check
+function plugins_busy() {
+	// return true if any plugin is busy
+	for(var plugin in plugins) {
+		if(plugins[plugin].busy === true)
+			return true;
+	}
+	return false;
+}
+
+// plugins, busy set
+function plugins_busy_set(name, busy) {
+	plugins[name].busy = busy;
+	player_detach();
+
+	// automatically mark the plugin as no longer busy after a given timeout
+	clearTimeout(plugins[name].busy_timeout);
+	if(busy === true) {
+		plugins[name].busy_timeout = setTimeout(function() {
+			plugins_busy_set(name, false);
+		}, 1000 * 10);
+	}
 }
 
 // data, global array
@@ -56,10 +84,8 @@ var data_images = [];
 
 // data, images, functions, clear
 function images_clear() {
-	data_images = [];
-
 	player_detach();
-	interface_update_media_controls(0);
+	data_images = [];
 }
 
 // data, images, functions, shuffle
@@ -72,6 +98,8 @@ function images_shuffle() {
 
 // data, images, functions, add
 function images_add(item) {
+	player_detach();
+
 	// check that this image doesn't already exist
 	for(image in data_images) {
 		if(data_images[image].image_url === item.image_url)
@@ -93,9 +121,6 @@ function images_add(item) {
 		return;
 
 	data_images.push(item);
-
-	player_detach();
-	interface_update_media_controls(3);
 }
 
 // data, images, functions, read

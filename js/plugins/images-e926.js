@@ -19,6 +19,8 @@ function parse_e926(data) {
 
 		images_add(this_image);
 	}
+
+	plugins_busy_set("e926", false);
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -27,6 +29,8 @@ function images_e926() {
 	script.type = "text/javascript";
 	script.src = "https://e926.net/post/index.json?tags=" + settings.keywords + "&limit=" + settings.count + "&callback=" + "parse_e926";
 	document.body.appendChild(script);
+
+	plugins_busy_set("e926", true);
 }
 
 // register the plugin

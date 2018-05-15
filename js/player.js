@@ -72,7 +72,7 @@ function player_next() {
 
 // player, check, available
 function player_available() {
-	return (data_images.length > 0 && player.index == 0);
+	return (data_images.length > 0 && player.index == 0 && !plugins_busy());
 }
 
 // player, HTML, create
@@ -101,7 +101,7 @@ function player_attach() {
 	player.timer_next = setTimeout(player_next, 0);
 	player.index = 0;
 
-	interface_update_media_controls(2);
+	interface_update_media_controls("stop");
 
 	// shuffle the images each time before playing
 	if(settings.shuffle)
@@ -125,5 +125,10 @@ function player_detach() {
 	player.element_1 = null;
 	player.element_2 = null;
 
-	interface_update_media_controls(player_available() ? 3 : 0);
+	if(plugins_busy())
+		interface_update_media_controls("busy");
+	else if(player_available())
+		interface_update_media_controls("play");
+	else
+		interface_update_media_controls("none");
 }
