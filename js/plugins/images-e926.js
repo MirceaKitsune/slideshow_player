@@ -1,8 +1,8 @@
 // Slideshow Viewer, Plugins, e926
 // Public Domain / CC0, MirceaKitsune 2018
 
-// Image loading plugin for: https://e926.net
-// API documentation: https://e926.net/help/show/api
+// Image loading plugin for: https://inkbunny.net/
+// API documentation: https://wiki.inkbunny.net/wiki/API
 
 // convert each entry into an image object for the player
 function parse_e926(data) {
@@ -27,7 +27,7 @@ function parse_e926(data) {
 function images_e926() {
 	var script = document.createElement("script");
 	script.type = "text/javascript";
-	script.src = "https://e926.net/post/index.json?tags=" + settings.keywords + "&limit=" + settings.count + "&callback=" + "parse_e926";
+	script.src = "https://e926.net/post/index.json?tags=" + settings.keywords + "&limit=" + settings.count + "&callback=parse_e926";
 	document.body.appendChild(script);
 
 	plugins_busy_set("e926", true);

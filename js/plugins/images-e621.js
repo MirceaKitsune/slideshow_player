@@ -27,7 +27,7 @@ function parse_e621(data) {
 function images_e621() {
 	var script = document.createElement("script");
 	script.type = "text/javascript";
-	script.src = "https://e621.net/post/index.json?tags=" + settings.keywords + "&limit=" + settings.count + "&callback=" + "parse_e621";
+	script.src = "https://e621.net/post/index.json?tags=" + settings.keywords + "&limit=" + settings.count + "&callback=parse_e621";
 	document.body.appendChild(script);
 
 	plugins_busy_set("e621", true);

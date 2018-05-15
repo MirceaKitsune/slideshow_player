@@ -99,7 +99,7 @@ function interface_update_media_controls(state) {
 			label.innerHTML = "<b>Click to apply settings</b>";
 			document.title = "Slideshow Player";
 			break;
-		case "none:":
+		case "none":
 			play.innerHTML = "✖";
 			play.removeAttribute("onclick");
 			label.innerHTML = "<b>Not enough content to play</b>";
