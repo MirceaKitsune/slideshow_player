@@ -1,16 +1,21 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
+// whether to also refresh the content when loading new settings
+// if any setting is intended to be read by plugins, make sure that changing its element sets this to true
+var interface_refresh_sites = false;
+
 // interface, functions, refresh
-function interface_refresh() {
-	images_clear();
+function interface_refresh(sites) {
+	if(sites === true)
+		interface_refresh_sites = true;
+
+	player_detach();
 	interface_update_media_controls("reload");
 }
 
 // interface, functions, plugin loader
 function interface_load() {
-	images_clear();
-
 	var elements_settings = document.forms["controls_images_settings"].elements;
 	var elements_list = document.forms["controls_images_sites"].elements;
 
@@ -20,10 +25,10 @@ function interface_load() {
 		if(elements_list[i].checked)
 			settings.sites.push(elements_list[i].name);
 	}
-	settings.keywords = elements_settings["controls_images_settings_keywords"].value;
+	settings.keywords = elements_settings["controls_images_settings_search_keywords"].value;
+	settings.nsfw = Boolean(elements_settings["controls_images_settings_search_nsfw"].checked);
 	settings.count = Number(elements_settings["controls_images_settings_count"].value);
 	settings.duration = Number(elements_settings["controls_images_settings_duration"].value);
-	settings.nsfw = Boolean(elements_settings["controls_images_settings_content_nsfw"].checked);
 	settings.loop = Boolean(elements_settings["controls_images_settings_play_loop"].checked);
 	settings.shuffle = Boolean(elements_settings["controls_images_settings_play_shuffle"].checked);
 	settings_cookie_set();
@@ -32,8 +37,13 @@ function interface_load() {
 	settings.count = Math.floor(settings.count / settings.sites.length);
 
 	// load every selected plugin
-	for(var site in settings.sites)
-		plugins_load(settings.sites[site]);
+	player_detach();
+	if(interface_refresh_sites === true) {
+		images_clear();
+		for(var site in settings.sites)
+			plugins_load(settings.sites[site]);
+		interface_refresh_sites = false;
+	}
 }
 
 // interface, functions, play button
@@ -64,7 +74,7 @@ function interface_update_controls_images_sites() {
 		sites_list_checkbox.setAttribute("name", item);
 		if(settings.sites.indexOf(item) >= 0)
 			sites_list_checkbox.setAttribute("checked", true);
-		sites_list_checkbox.setAttribute("onclick", "interface_refresh()");
+		sites_list_checkbox.setAttribute("onclick", "interface_refresh(true)");
 		sites_list.appendChild(sites_list_checkbox);
 
 		// interface HTML: controls, images, sites, list, label
@@ -157,19 +167,38 @@ function interface_init() {
 			controls_images_settings.setAttribute("id", "controls_images_settings");
 			controls_images.appendChild(controls_images_settings);
 			{
-				// interface HTML: controls, images, settings, keywords
-				var controls_images_settings_keywords = document.createElement("p");
-				controls_images_settings_keywords.innerHTML = "Keywords:<br/>";
-				controls_images_settings.appendChild(controls_images_settings_keywords);
+				// interface HTML: controls, images, settings, search
+				var controls_images_settings_search = document.createElement("p");
+				controls_images_settings_search.innerHTML = "Search:<br/>";
+				controls_images_settings.appendChild(controls_images_settings_search);
 				{
-					// interface HTML: controls, images, settings, keywords, input
-					var controls_images_settings_keywords_input = document.createElement("input");
-					controls_images_settings_keywords_input.setAttribute("id", "controls_images_settings_keywords");
-					controls_images_settings_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
-					controls_images_settings_keywords_input.setAttribute("type", "text");
-					controls_images_settings_keywords_input.setAttribute("value", settings.keywords);
-					controls_images_settings_keywords_input.setAttribute("onkeyup", "interface_refresh()");
-					controls_images_settings_keywords.appendChild(controls_images_settings_keywords_input);
+					// interface HTML: controls, images, settings, search, keywords, input
+					var controls_images_settings_search_keywords_input = document.createElement("input");
+					controls_images_settings_search_keywords_input.setAttribute("id", "controls_images_settings_search_keywords");
+					controls_images_settings_search_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
+					controls_images_settings_search_keywords_input.setAttribute("type", "text");
+					controls_images_settings_search_keywords_input.setAttribute("value", settings.keywords);
+					controls_images_settings_search_keywords_input.setAttribute("onkeyup", "interface_refresh(true)");
+					controls_images_settings_search.appendChild(controls_images_settings_search_keywords_input);
+
+					// interface HTML: controls, images, settings, search, br
+					var controls_images_settings_search_br = document.createElement("br");
+					controls_images_settings_search.appendChild(controls_images_settings_search_br);
+
+					// interface HTML: controls, images, settings, search, nsfw, input
+					var controls_images_settings_search_nsfw_input = document.createElement("input");
+					controls_images_settings_search_nsfw_input.setAttribute("id", "controls_images_settings_search_nsfw");
+					controls_images_settings_search_nsfw_input.setAttribute("title", "Include content that is not safe for work");
+					controls_images_settings_search_nsfw_input.setAttribute("type", "checkbox");
+					if(settings.nsfw === true)
+						controls_images_settings_search_nsfw_input.setAttribute("checked", true);
+					controls_images_settings_search_nsfw_input.setAttribute("onclick", "interface_refresh(true)");
+					controls_images_settings_search.appendChild(controls_images_settings_search_nsfw_input);
+
+					// interface HTML: controls, images, settings, search, nsfw, label
+					var controls_images_settings_search_nsfw_label = document.createElement("label");
+					controls_images_settings_search_nsfw_label.innerHTML = "NSFW<br/>";
+					controls_images_settings_search.appendChild(controls_images_settings_search_nsfw_label);
 				}
 
 				// interface HTML: controls, images, settings, count
@@ -186,7 +215,7 @@ function interface_init() {
 					controls_images_settings_count_input.setAttribute("step", "5");
 					controls_images_settings_count_input.setAttribute("min", "5");
 					controls_images_settings_count_input.setAttribute("max", "1000");
-					controls_images_settings_count_input.setAttribute("onkeyup", "interface_refresh()");
+					controls_images_settings_count_input.setAttribute("onkeyup", "interface_refresh(true)");
 					controls_images_settings_count.appendChild(controls_images_settings_count_input);
 				}
 
@@ -204,29 +233,8 @@ function interface_init() {
 					controls_images_settings_duration_input.setAttribute("step", "1");
 					controls_images_settings_duration_input.setAttribute("min", "5");
 					controls_images_settings_duration_input.setAttribute("max", "100");
-					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_refresh()");
+					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_refresh(false)");
 					controls_images_settings_duration.appendChild(controls_images_settings_duration_input);
-				}
-
-				// interface HTML: controls, images, settings, content
-				var controls_images_settings_content = document.createElement("p");
-				controls_images_settings_content.innerHTML = "Content:<br/>";
-				controls_images_settings.appendChild(controls_images_settings_content);
-				{
-					// interface HTML: controls, images, settings, content, nsfw, input
-					var controls_images_settings_content_nsfw_input = document.createElement("input");
-					controls_images_settings_content_nsfw_input.setAttribute("id", "controls_images_settings_content_nsfw");
-					controls_images_settings_content_nsfw_input.setAttribute("title", "Enable content that is not safe for work");
-					controls_images_settings_content_nsfw_input.setAttribute("type", "checkbox");
-					if(settings.nsfw === true)
-						controls_images_settings_content_nsfw_input.setAttribute("checked", true);
-					controls_images_settings_content_nsfw_input.setAttribute("onclick", "interface_refresh()");
-					controls_images_settings_content.appendChild(controls_images_settings_content_nsfw_input);
-
-					// interface HTML: controls, images, settings, content, nsfw, label
-					var controls_images_settings_content_nsfw_label = document.createElement("label");
-					controls_images_settings_content_nsfw_label.innerHTML = "NSFW<br/>";
-					controls_images_settings_content.appendChild(controls_images_settings_content_nsfw_label);
 				}
 
 				// interface HTML: controls, images, settings, play
@@ -241,7 +249,7 @@ function interface_init() {
 					controls_images_settings_play_loop_input.setAttribute("type", "checkbox");
 					if(settings.loop === true)
 						controls_images_settings_play_loop_input.setAttribute("checked", true);
-					controls_images_settings_play_loop_input.setAttribute("onclick", "interface_refresh()");
+					controls_images_settings_play_loop_input.setAttribute("onclick", "interface_refresh(false)");
 					controls_images_settings_play.appendChild(controls_images_settings_play_loop_input);
 
 					// interface HTML: controls, images, settings, play, loop, label
@@ -256,7 +264,7 @@ function interface_init() {
 					controls_images_settings_play_shuffle_input.setAttribute("type", "checkbox");
 					if(settings.shuffle === true)
 						controls_images_settings_play_shuffle_input.setAttribute("checked", true);
-					controls_images_settings_play_shuffle_input.setAttribute("onclick", "interface_refresh()");
+					controls_images_settings_play_shuffle_input.setAttribute("onclick", "interface_refresh(false)");
 					controls_images_settings_play.appendChild(controls_images_settings_play_shuffle_input);
 
 					// interface HTML: controls, images, settings, play, shuffle, label
@@ -318,5 +326,5 @@ function interface_init() {
 		media.appendChild(media_music);
 	}
 
-	interface_refresh();
+	interface_refresh(true);
 }
