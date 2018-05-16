@@ -41,6 +41,7 @@ settings_cookie_get();
 
 // plugins, global object
 var plugins = {};
+var plugins_settings = [];
 
 // plugins, functions, register
 function plugins_register(name, func) {
@@ -55,6 +56,15 @@ function plugins_register(name, func) {
 // plugins, functions, load
 function plugins_load(name) {
 	plugins[name].func();
+}
+
+// plugins, functions, settings, read
+function plugins_settings_read(name) {
+	// take note that this setting was used by a plugin
+	if(plugins_settings.indexOf(name) < 0)
+		plugins_settings.push(name);
+
+	return settings[name];
 }
 
 // plugins, busy check

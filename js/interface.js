@@ -2,12 +2,16 @@
 // Public Domain / CC0, MirceaKitsune 2018
 
 // whether to also refresh the content when loading new settings
-// if any setting is intended to be read by plugins, make sure that changing its element sets this to true
 var interface_refresh_sites = false;
 
 // interface, functions, refresh
-function interface_refresh(sites) {
-	if(sites === true)
+function interface_refresh(name) {
+	// don't do anything if plugins are still busy
+	if(plugins_busy())
+		return;
+
+	// refresh the content if this setting affects any plugins
+	if(name === true || plugins_settings.indexOf(name) >= 0)
 		interface_refresh_sites = true;
 
 	player_detach();
@@ -16,6 +20,10 @@ function interface_refresh(sites) {
 
 // interface, functions, plugin loader
 function interface_load() {
+	// don't do anything if plugins are still busy
+	if(plugins_busy())
+		return;
+
 	var elements_settings = document.forms["controls_images_settings"].elements;
 	var elements_list = document.forms["controls_images_sites"].elements;
 
@@ -178,7 +186,7 @@ function interface_init() {
 					controls_images_settings_search_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
 					controls_images_settings_search_keywords_input.setAttribute("type", "text");
 					controls_images_settings_search_keywords_input.setAttribute("value", settings.keywords);
-					controls_images_settings_search_keywords_input.setAttribute("onkeyup", "interface_refresh(true)");
+					controls_images_settings_search_keywords_input.setAttribute("onkeyup", "interface_refresh(\"keywords\")");
 					controls_images_settings_search.appendChild(controls_images_settings_search_keywords_input);
 
 					// interface HTML: controls, images, settings, search, br
@@ -192,7 +200,7 @@ function interface_init() {
 					controls_images_settings_search_nsfw_input.setAttribute("type", "checkbox");
 					if(settings.nsfw === true)
 						controls_images_settings_search_nsfw_input.setAttribute("checked", true);
-					controls_images_settings_search_nsfw_input.setAttribute("onclick", "interface_refresh(true)");
+					controls_images_settings_search_nsfw_input.setAttribute("onclick", "interface_refresh(\"nsfw\")");
 					controls_images_settings_search.appendChild(controls_images_settings_search_nsfw_input);
 
 					// interface HTML: controls, images, settings, search, nsfw, label
@@ -215,7 +223,7 @@ function interface_init() {
 					controls_images_settings_count_input.setAttribute("step", "5");
 					controls_images_settings_count_input.setAttribute("min", "5");
 					controls_images_settings_count_input.setAttribute("max", "1000");
-					controls_images_settings_count_input.setAttribute("onkeyup", "interface_refresh(true)");
+					controls_images_settings_count_input.setAttribute("onkeyup", "interface_refresh(\"count\")");
 					controls_images_settings_count.appendChild(controls_images_settings_count_input);
 				}
 
@@ -233,7 +241,7 @@ function interface_init() {
 					controls_images_settings_duration_input.setAttribute("step", "1");
 					controls_images_settings_duration_input.setAttribute("min", "5");
 					controls_images_settings_duration_input.setAttribute("max", "100");
-					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_refresh(false)");
+					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_refresh(\"duration\")");
 					controls_images_settings_duration.appendChild(controls_images_settings_duration_input);
 				}
 
@@ -249,7 +257,7 @@ function interface_init() {
 					controls_images_settings_play_loop_input.setAttribute("type", "checkbox");
 					if(settings.loop === true)
 						controls_images_settings_play_loop_input.setAttribute("checked", true);
-					controls_images_settings_play_loop_input.setAttribute("onclick", "interface_refresh(false)");
+					controls_images_settings_play_loop_input.setAttribute("onclick", "interface_refresh(\"loop\")");
 					controls_images_settings_play.appendChild(controls_images_settings_play_loop_input);
 
 					// interface HTML: controls, images, settings, play, loop, label
@@ -264,7 +272,7 @@ function interface_init() {
 					controls_images_settings_play_shuffle_input.setAttribute("type", "checkbox");
 					if(settings.shuffle === true)
 						controls_images_settings_play_shuffle_input.setAttribute("checked", true);
-					controls_images_settings_play_shuffle_input.setAttribute("onclick", "interface_refresh(false)");
+					controls_images_settings_play_shuffle_input.setAttribute("onclick", "interface_refresh(\"shuffle\")");
 					controls_images_settings_play.appendChild(controls_images_settings_play_shuffle_input);
 
 					// interface HTML: controls, images, settings, play, shuffle, label

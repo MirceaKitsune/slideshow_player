@@ -27,14 +27,14 @@ function parse_inkbunny(data) {
 function parse_inkbunny_rating(data) {
 	var script = document.createElement("script");
 	script.type = "text/javascript";
-	script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + settings.keywords + "&count_limit=" + settings.count + "&submissions_per_page=" + settings.count + "&callback=parse_inkbunny";
+	script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + plugins_settings_read("keywords") + "&count_limit=" + plugins_settings_read("count") + "&submissions_per_page=" + plugins_settings_read("count") + "&callback=parse_inkbunny";
 	document.body.appendChild(script);
 }
 
 // create a new session as guest, then call the rating api with its session id
 function parse_inkbunny_login(data) {
 	// whether or not to enable the NSFW tags
-	var nsfw = settings.nsfw === true ? "yes" : "no";
+	var nsfw = plugins_settings_read("nsfw") === true ? "yes" : "no";
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";
