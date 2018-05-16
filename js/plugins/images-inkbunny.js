@@ -33,9 +33,12 @@ function parse_inkbunny_rating(data) {
 
 // create a new session as guest, then call the rating api with its session id
 function parse_inkbunny_login(data) {
+	// whether or not to enable the NSFW tags
+	var nsfw = settings.nsfw === true ? "yes" : "no";
+
 	var script = document.createElement("script");
 	script.type = "text/javascript";
-	script.src = "https://inkbunny.net/api_userrating.php?output_mode=json&sid=" + data.sid + "&tag[2]=yes&tag[3]=yes&tag[4]=yes&tag[5]=yes&callback=parse_inkbunny_rating";
+	script.src = "https://inkbunny.net/api_userrating.php?output_mode=json&sid=" + data.sid + "&tag[2]=" + nsfw + "&tag[3]=" + nsfw + "&tag[4]=" + nsfw + "&tag[5]=" + nsfw + "&callback=parse_inkbunny_rating";
 	document.body.appendChild(script);
 }
 

@@ -33,6 +33,7 @@ var settings = {
 	keywords: "",
 	count: 0,
 	duration: 0,
+	nsfw: false,
 	shuffle: false
 };
 settings_cookie_get();

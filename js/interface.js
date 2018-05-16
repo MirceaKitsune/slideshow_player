@@ -23,6 +23,7 @@ function interface_load() {
 	settings.keywords = elements_settings["controls_images_settings_keywords"].value;
 	settings.count = Number(elements_settings["controls_images_settings_count"].value);
 	settings.duration = Number(elements_settings["controls_images_settings_duration"].value);
+	settings.nsfw = Boolean(elements_settings["controls_images_settings_nsfw"].checked);
 	settings.shuffle = Boolean(elements_settings["controls_images_settings_shuffle"].checked);
 	settings_cookie_set();
 
@@ -204,6 +205,27 @@ function interface_init() {
 					controls_images_settings_duration_input.setAttribute("max", "100");
 					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_refresh()");
 					controls_images_settings_duration.appendChild(controls_images_settings_duration_input);
+				}
+
+				// interface HTML: controls, images, settings, nsfw
+				var controls_images_settings_nsfw = document.createElement("p");
+				controls_images_settings_nsfw.innerHTML = "Content:<br/>";
+				controls_images_settings.appendChild(controls_images_settings_nsfw);
+				{
+					// interface HTML: controls, images, settings, nsfw, input
+					var controls_images_settings_nsfw_input = document.createElement("input");
+					controls_images_settings_nsfw_input.setAttribute("id", "controls_images_settings_nsfw");
+					controls_images_settings_nsfw_input.setAttribute("title", "Enable content that is not safe for work");
+					controls_images_settings_nsfw_input.setAttribute("type", "checkbox");
+					if(settings.nsfw === true)
+						controls_images_settings_nsfw_input.setAttribute("checked", true);
+					controls_images_settings_nsfw_input.setAttribute("onclick", "interface_refresh()");
+					controls_images_settings_nsfw.appendChild(controls_images_settings_nsfw_input);
+
+					// interface HTML: controls, images, settings, nsfw, label
+					var controls_images_settings_nsfw_label = document.createElement("label");
+					controls_images_settings_nsfw_label.innerHTML = "NSFW<br/>";
+					controls_images_settings_nsfw.appendChild(controls_images_settings_nsfw_label);
 				}
 
 				// interface HTML: controls, images, settings, shuffle
