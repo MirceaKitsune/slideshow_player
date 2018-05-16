@@ -186,7 +186,7 @@ function interface_init() {
 					controls_images_settings_search_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
 					controls_images_settings_search_keywords_input.setAttribute("type", "text");
 					controls_images_settings_search_keywords_input.setAttribute("value", settings.keywords);
-					controls_images_settings_search_keywords_input.setAttribute("onkeyup", "interface_refresh(\"keywords\")");
+					controls_images_settings_search_keywords_input.setAttribute("onclick", "interface_refresh(\"keywords\")");
 					controls_images_settings_search.appendChild(controls_images_settings_search_keywords_input);
 
 					// interface HTML: controls, images, settings, search, br
@@ -223,7 +223,7 @@ function interface_init() {
 					controls_images_settings_count_input.setAttribute("step", "5");
 					controls_images_settings_count_input.setAttribute("min", "5");
 					controls_images_settings_count_input.setAttribute("max", "1000");
-					controls_images_settings_count_input.setAttribute("onkeyup", "interface_refresh(\"count\")");
+					controls_images_settings_count_input.setAttribute("onclick", "interface_refresh(\"count\")");
 					controls_images_settings_count.appendChild(controls_images_settings_count_input);
 				}
 
@@ -241,7 +241,7 @@ function interface_init() {
 					controls_images_settings_duration_input.setAttribute("step", "1");
 					controls_images_settings_duration_input.setAttribute("min", "5");
 					controls_images_settings_duration_input.setAttribute("max", "100");
-					controls_images_settings_duration_input.setAttribute("onkeyup", "interface_refresh(\"duration\")");
+					controls_images_settings_duration_input.setAttribute("onclick", "interface_refresh(\"duration\")");
 					controls_images_settings_duration.appendChild(controls_images_settings_duration_input);
 				}
 
