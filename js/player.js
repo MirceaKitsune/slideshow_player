@@ -72,8 +72,19 @@ function player_next() {
 
 	// stop the slideshow here if this is the final image
 	if(player.index >= data_images.length) {
-		player_detach();
-		return;
+		if(settings.loop === true) {
+			player.index = 0;
+			player.element1.setAttribute("src", player.element2.getAttribute("src"));
+			player.element1.setAttribute("style", IMG_STYLE + "; opacity: 1");
+
+			// also shuffle the images again
+			if(settings.shuffle)
+				images_shuffle();
+		}
+		else {
+			player_detach();
+			return;
+		}
 	}
 
 	// activate the fading function

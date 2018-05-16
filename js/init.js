@@ -34,6 +34,7 @@ var settings = {
 	count: 0,
 	duration: 0,
 	nsfw: false,
+	loop: false,
 	shuffle: false
 };
 settings_cookie_get();

@@ -23,8 +23,9 @@ function interface_load() {
 	settings.keywords = elements_settings["controls_images_settings_keywords"].value;
 	settings.count = Number(elements_settings["controls_images_settings_count"].value);
 	settings.duration = Number(elements_settings["controls_images_settings_duration"].value);
-	settings.nsfw = Boolean(elements_settings["controls_images_settings_nsfw"].checked);
-	settings.shuffle = Boolean(elements_settings["controls_images_settings_shuffle"].checked);
+	settings.nsfw = Boolean(elements_settings["controls_images_settings_content_nsfw"].checked);
+	settings.loop = Boolean(elements_settings["controls_images_settings_play_loop"].checked);
+	settings.shuffle = Boolean(elements_settings["controls_images_settings_play_shuffle"].checked);
 	settings_cookie_set();
 
 	// evenly distribute the total image count to each source
@@ -207,46 +208,61 @@ function interface_init() {
 					controls_images_settings_duration.appendChild(controls_images_settings_duration_input);
 				}
 
-				// interface HTML: controls, images, settings, nsfw
-				var controls_images_settings_nsfw = document.createElement("p");
-				controls_images_settings_nsfw.innerHTML = "Content:<br/>";
-				controls_images_settings.appendChild(controls_images_settings_nsfw);
+				// interface HTML: controls, images, settings, content
+				var controls_images_settings_content = document.createElement("p");
+				controls_images_settings_content.innerHTML = "Content:<br/>";
+				controls_images_settings.appendChild(controls_images_settings_content);
 				{
-					// interface HTML: controls, images, settings, nsfw, input
-					var controls_images_settings_nsfw_input = document.createElement("input");
-					controls_images_settings_nsfw_input.setAttribute("id", "controls_images_settings_nsfw");
-					controls_images_settings_nsfw_input.setAttribute("title", "Enable content that is not safe for work");
-					controls_images_settings_nsfw_input.setAttribute("type", "checkbox");
+					// interface HTML: controls, images, settings, content, nsfw, input
+					var controls_images_settings_content_nsfw_input = document.createElement("input");
+					controls_images_settings_content_nsfw_input.setAttribute("id", "controls_images_settings_content_nsfw");
+					controls_images_settings_content_nsfw_input.setAttribute("title", "Enable content that is not safe for work");
+					controls_images_settings_content_nsfw_input.setAttribute("type", "checkbox");
 					if(settings.nsfw === true)
-						controls_images_settings_nsfw_input.setAttribute("checked", true);
-					controls_images_settings_nsfw_input.setAttribute("onclick", "interface_refresh()");
-					controls_images_settings_nsfw.appendChild(controls_images_settings_nsfw_input);
+						controls_images_settings_content_nsfw_input.setAttribute("checked", true);
+					controls_images_settings_content_nsfw_input.setAttribute("onclick", "interface_refresh()");
+					controls_images_settings_content.appendChild(controls_images_settings_content_nsfw_input);
 
-					// interface HTML: controls, images, settings, nsfw, label
-					var controls_images_settings_nsfw_label = document.createElement("label");
-					controls_images_settings_nsfw_label.innerHTML = "NSFW<br/>";
-					controls_images_settings_nsfw.appendChild(controls_images_settings_nsfw_label);
+					// interface HTML: controls, images, settings, content, nsfw, label
+					var controls_images_settings_content_nsfw_label = document.createElement("label");
+					controls_images_settings_content_nsfw_label.innerHTML = "NSFW<br/>";
+					controls_images_settings_content.appendChild(controls_images_settings_content_nsfw_label);
 				}
 
-				// interface HTML: controls, images, settings, shuffle
-				var controls_images_settings_shuffle = document.createElement("p");
-				controls_images_settings_shuffle.innerHTML = "Shuffle:<br/>";
-				controls_images_settings.appendChild(controls_images_settings_shuffle);
+				// interface HTML: controls, images, settings, play
+				var controls_images_settings_play = document.createElement("p");
+				controls_images_settings_play.innerHTML = "Options:<br/>";
+				controls_images_settings.appendChild(controls_images_settings_play);
 				{
-					// interface HTML: controls, images, settings, shuffle, input
-					var controls_images_settings_shuffle_input = document.createElement("input");
-					controls_images_settings_shuffle_input.setAttribute("id", "controls_images_settings_shuffle");
-					controls_images_settings_shuffle_input.setAttribute("title", "Whether to shuffle the images before playing");
-					controls_images_settings_shuffle_input.setAttribute("type", "checkbox");
-					if(settings.shuffle === true)
-						controls_images_settings_shuffle_input.setAttribute("checked", true);
-					controls_images_settings_shuffle_input.setAttribute("onclick", "interface_refresh()");
-					controls_images_settings_shuffle.appendChild(controls_images_settings_shuffle_input);
+					// interface HTML: controls, images, settings, play, loop, input
+					var controls_images_settings_play_loop_input = document.createElement("input");
+					controls_images_settings_play_loop_input.setAttribute("id", "controls_images_settings_play_loop");
+					controls_images_settings_play_loop_input.setAttribute("title", "Whether to loop through the images indefinitely");
+					controls_images_settings_play_loop_input.setAttribute("type", "checkbox");
+					if(settings.loop === true)
+						controls_images_settings_play_loop_input.setAttribute("checked", true);
+					controls_images_settings_play_loop_input.setAttribute("onclick", "interface_refresh()");
+					controls_images_settings_play.appendChild(controls_images_settings_play_loop_input);
 
-					// interface HTML: controls, images, settings, shuffle, label
-					var controls_images_settings_shuffle_label = document.createElement("label");
-					controls_images_settings_shuffle_label.innerHTML = "Enabled<br/>";
-					controls_images_settings_shuffle.appendChild(controls_images_settings_shuffle_label);
+					// interface HTML: controls, images, settings, play, loop, label
+					var controls_images_settings_play_loop_label = document.createElement("label");
+					controls_images_settings_play_loop_label.innerHTML = "Loop<br/>";
+					controls_images_settings_play.appendChild(controls_images_settings_play_loop_label);
+
+					// interface HTML: controls, images, settings, play, shuffle, input
+					var controls_images_settings_play_shuffle_input = document.createElement("input");
+					controls_images_settings_play_shuffle_input.setAttribute("id", "controls_images_settings_play_shuffle");
+					controls_images_settings_play_shuffle_input.setAttribute("title", "Whether to shuffle the images before playing");
+					controls_images_settings_play_shuffle_input.setAttribute("type", "checkbox");
+					if(settings.shuffle === true)
+						controls_images_settings_play_shuffle_input.setAttribute("checked", true);
+					controls_images_settings_play_shuffle_input.setAttribute("onclick", "interface_refresh()");
+					controls_images_settings_play.appendChild(controls_images_settings_play_shuffle_input);
+
+					// interface HTML: controls, images, settings, play, shuffle, label
+					var controls_images_settings_play_shuffle_label = document.createElement("label");
+					controls_images_settings_play_shuffle_label.innerHTML = "Shuffle<br/>";
+					controls_images_settings_play.appendChild(controls_images_settings_play_shuffle_label);
 				}
 
 				// interface HTML: controls, images, sites
