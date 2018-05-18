@@ -2,7 +2,7 @@
 // Public Domain / CC0, MirceaKitsune 2018
 
 // Image loading plugin for: https://inkbunny.net
-// API documentation: https://inkbunny.net/help/show/api
+// API documentation: https://wiki.inkbunny.net/wiki/API
 
 // convert each entry into an image object for the player
 function parse_inkbunny(data) {
@@ -25,9 +25,12 @@ function parse_inkbunny(data) {
 
 // change the rating, then call the image parser with the session id
 function parse_inkbunny_rating(data) {
+	var keywords = plugins_settings_read("keywords");
+	var count = Math.min(plugins_settings_read("count"), 100); // this site supports a maximum of 100 results per page
+
 	var script = document.createElement("script");
 	script.type = "text/javascript";
-	script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + plugins_settings_read("keywords") + "&count_limit=" + plugins_settings_read("count") + "&submissions_per_page=" + plugins_settings_read("count") + "&callback=parse_inkbunny";
+	script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + keywords + "&count_limit=" + count + "&submissions_per_page=" + count + "&callback=parse_inkbunny";
 	document.body.appendChild(script);
 }
 
