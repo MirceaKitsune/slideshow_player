@@ -86,6 +86,34 @@ function interface_update_controls_sites_list() {
 	}
 }
 
+// interface, update HTML, media images
+function interface_update_media_images(active) {
+	var prev = document.getElementById("media_images_previous");
+	var play = document.getElementById("media_images_play");
+	var next = document.getElementById("media_images_next");
+
+	if(active === true) {
+		prev.setAttribute("onclick", "player_goto(player.index - 1)");
+		prev.innerHTML = "|◀";
+
+		play.setAttribute("onclick", "player_play()");
+		play.innerHTML = player.stopped ? "▶" : "||";
+
+		next.setAttribute("onclick", "player_goto(player.index + 1)");
+		next.innerHTML = "▶|";
+	}
+	else {
+		prev.removeAttribute("onclick");
+		prev.innerHTML = "✖";
+
+		play.removeAttribute("onclick");
+		play.innerHTML = "✖";
+
+		next.removeAttribute("onclick");
+		next.innerHTML = "✖";
+	}
+}
+
 // interface, update HTML, media controls
 function interface_update_media_controls(state) {
 	var play = document.getElementById("media_controls_play");
@@ -102,44 +130,44 @@ function interface_update_media_controls(state) {
 
 	switch(state) {
 		case "busy":
-			play.setAttribute("class", "button button_color_blue");
-			play.innerHTML = "⧗";
+			play.setAttribute("class", "button_large button_color_blue");
 			play.setAttribute("onclick", "interface_load()");
+			play.innerHTML = "⧗";
 			label.innerHTML = "<b>Loading content</b>";
 			document.title = "Slideshow Player";
 			break;
 		case "reload":
-			play.setAttribute("class", "button button_color_cyan");
-			play.innerHTML = "⟳";
+			play.setAttribute("class", "button_large button_color_cyan");
 			play.setAttribute("onclick", "interface_load()");
+			play.innerHTML = "⟳";
 			label.innerHTML = "<b>Click to apply settings</b>";
 			document.title = "Slideshow Player";
 			break;
 		case "none":
-			play.setAttribute("class", "button button_color_red");
-			play.innerHTML = "✖";
+			play.setAttribute("class", "button_large button_color_red");
 			play.removeAttribute("onclick");
+			play.innerHTML = "✖";
 			label.innerHTML = "<b>Unable to play</b>";
 			document.title = "Slideshow Player";
 			break;
 		case "stop":
-			play.setAttribute("class", "button button_color_yellow");
-			play.innerHTML = "■";
+			play.setAttribute("class", "button_large button_color_yellow");
 			play.setAttribute("onclick", "interface_play()");
+			play.innerHTML = "■";
 			label.innerHTML = label_status;
 			document.title = "Slideshow Player - " + total_images + " images (▶)";
 			break;
 		case "play":
-			play.setAttribute("class", "button button_color_green");
-			play.innerHTML = "▶";
+			play.setAttribute("class", "button_large button_color_green");
 			play.setAttribute("onclick", "interface_play()");
+			play.innerHTML = "▶";
 			label.innerHTML = label_status;
 			document.title = "Slideshow Player - " + total_images + " images (■)";
 			break;
 		default:
-			play.setAttribute("class", "button button_color_pink");
-			play.innerHTML = "?";
+			play.setAttribute("class", "button_large button_color_pink");
 			play.removeAttribute("onclick");
+			play.innerHTML = "?";
 			label.innerHTML = "<b>Error</b>";
 			document.title = "Slideshow Player";
 	}
@@ -310,6 +338,34 @@ function interface_init() {
 		media_images.setAttribute("id", "media_images");
 		media_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 15%; height: 100%; overflow: hidden");
 		media.appendChild(media_images);
+		{
+			// interface HTML: media, images, previous
+			// updated by interface_update_media_images
+			var media_images_previous = document.createElement("div");
+			media_images_previous.setAttribute("id", "media_images_previous");
+			media_images_previous.setAttribute("class", "button_small button_color_black");
+			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px; left: -64px");
+			media_images_previous.innerHTML = "✖";
+			media_images.appendChild(media_images_previous);
+
+			// interface HTML: media, images, play
+			// updated by interface_update_media_images
+			var media_images_previous = document.createElement("div");
+			media_images_previous.setAttribute("id", "media_images_play");
+			media_images_previous.setAttribute("class", "button_medium button_color_black");
+			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
+			media_images_previous.innerHTML = "✖";
+			media_images.appendChild(media_images_previous);
+
+			// interface HTML: media, images, next
+			// updated by interface_update_media_images
+			var media_images_previous = document.createElement("div");
+			media_images_previous.setAttribute("id", "media_images_next");
+			media_images_previous.setAttribute("class", "button_small button_color_black");
+			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px; left: 32px");
+			media_images_previous.innerHTML = "✖";
+			media_images.appendChild(media_images_previous);
+		}
 
 		// interface HTML: media, controls
 		var media_controls = document.createElement("div");
@@ -321,8 +377,8 @@ function interface_init() {
 			// updated by interface_update_media_controls
 			var media_controls_play = document.createElement("div");
 			media_controls_play.setAttribute("id", "media_controls_play");
-			media_controls_play.setAttribute("class", "button button_color_pink");
-			media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px; left: -32px; width: 64px; height: 64px");
+			media_controls_play.setAttribute("class", "button_large button_color_pink");
+			media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
 			media_controls_play.innerHTML = "?";
 			media_controls.appendChild(media_controls_play);
 
