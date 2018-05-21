@@ -89,7 +89,7 @@ function plugins_busy_set(name, busy) {
 	if(busy === true) {
 		plugins[name].busy_timeout = setTimeout(function() {
 			plugins_busy_set(name, false);
-		}, 1000 * 10);
+		}, 1000 * 30);
 	}
 }
 

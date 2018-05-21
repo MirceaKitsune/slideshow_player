@@ -4,6 +4,19 @@
 // Image loading plugin for: https://inkbunny.net
 // API documentation: https://wiki.inkbunny.net/wiki/API
 
+// indicate that the plugin has finished working
+function parse_inkbunny_ready(data) {
+	plugins_busy_set("Inkbunny", false);
+}
+
+// close the temporary guest session
+function parse_inkbunny_logout(data) {
+	var script = document.createElement("script");
+	script.type = "text/javascript";
+	script.src = "https://inkbunny.net/api_logout.php?output_mode=json&sid=" + data.sid + "&callback=parse_inkbunny_ready";
+	document.body.appendChild(script);
+}
+
 // convert each entry into an image object for the player
 function parse_inkbunny(data) {
 	for(var entry in data.submissions) {
@@ -20,7 +33,7 @@ function parse_inkbunny(data) {
 		images_add(this_image);
 	}
 
-	plugins_busy_set("Inkbunny", false);
+	parse_inkbunny_logout(data);
 }
 
 // change the rating, then call the image parser with the session id
