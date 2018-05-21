@@ -91,26 +91,44 @@ function interface_update_media_images(active) {
 	var prev = document.getElementById("media_images_previous");
 	var play = document.getElementById("media_images_play");
 	var next = document.getElementById("media_images_next");
+	var label = document.getElementById("media_images_label");
 
 	if(active === true) {
-		prev.setAttribute("onclick", "player_goto(player.index - 1)");
+		prev.setAttribute("class", "button_size_small button_color_blue");
+		prev.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
 		prev.innerHTML = "|◀";
 
-		play.setAttribute("onclick", "player_play()");
-		play.innerHTML = player.stopped ? "▶" : "||";
+		if(player.images.stopped === true) {
+			play.setAttribute("class", "button_size_medium button_color_yellow");
+			play.setAttribute("onclick", "player_images_play()");
+			play.innerHTML = "▶";
+		}
+		else {
+			play.setAttribute("class", "button_size_medium button_color_green");
+			play.setAttribute("onclick", "player_images_play()");
+			play.innerHTML = "||";
+		}
 
-		next.setAttribute("onclick", "player_goto(player.index + 1)");
+		next.setAttribute("class", "button_size_small button_color_blue");
+		next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
 		next.innerHTML = "▶|";
+
+		label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
 	}
 	else {
+		prev.setAttribute("class", "button_size_small button_color_red");
 		prev.removeAttribute("onclick");
 		prev.innerHTML = "✖";
 
+		play.setAttribute("class", "button_size_medium button_color_red");
 		play.removeAttribute("onclick");
 		play.innerHTML = "✖";
 
+		next.setAttribute("class", "button_size_small button_color_red");
 		next.removeAttribute("onclick");
 		next.innerHTML = "✖";
+
+		label.innerHTML = "<b>Player stopped</b>";
 	}
 }
 
@@ -130,42 +148,42 @@ function interface_update_media_controls(state) {
 
 	switch(state) {
 		case "busy":
-			play.setAttribute("class", "button_large button_color_blue");
+			play.setAttribute("class", "button_size_large button_color_blue");
 			play.setAttribute("onclick", "interface_load()");
 			play.innerHTML = "⧗";
 			label.innerHTML = "<b>Loading content</b>";
 			document.title = "Slideshow Player";
 			break;
 		case "reload":
-			play.setAttribute("class", "button_large button_color_cyan");
+			play.setAttribute("class", "button_size_large button_color_cyan");
 			play.setAttribute("onclick", "interface_load()");
 			play.innerHTML = "⟳";
 			label.innerHTML = "<b>Click to apply settings</b>";
 			document.title = "Slideshow Player";
 			break;
 		case "none":
-			play.setAttribute("class", "button_large button_color_red");
+			play.setAttribute("class", "button_size_large button_color_red");
 			play.removeAttribute("onclick");
 			play.innerHTML = "✖";
 			label.innerHTML = "<b>Unable to play</b>";
 			document.title = "Slideshow Player";
 			break;
 		case "stop":
-			play.setAttribute("class", "button_large button_color_yellow");
+			play.setAttribute("class", "button_size_large button_color_green");
 			play.setAttribute("onclick", "interface_play()");
 			play.innerHTML = "■";
 			label.innerHTML = label_status;
 			document.title = "Slideshow Player - " + total_images + " images (▶)";
 			break;
 		case "play":
-			play.setAttribute("class", "button_large button_color_green");
+			play.setAttribute("class", "button_size_large button_color_yellow");
 			play.setAttribute("onclick", "interface_play()");
 			play.innerHTML = "▶";
 			label.innerHTML = label_status;
 			document.title = "Slideshow Player - " + total_images + " images (■)";
 			break;
 		default:
-			play.setAttribute("class", "button_large button_color_pink");
+			play.setAttribute("class", "button_size_large button_color_pink");
 			play.removeAttribute("onclick");
 			play.innerHTML = "?";
 			label.innerHTML = "<b>Error</b>";
@@ -336,15 +354,15 @@ function interface_init() {
 		// interface HTML: media, images
 		var media_images = document.createElement("div");
 		media_images.setAttribute("id", "media_images");
-		media_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 15%; height: 100%; overflow: hidden");
+		media_images.setAttribute("style", "position: absolute; margin: 0 0 0 0%; top: 0%; left: 0%; width: 192px; height: 100%");
 		media.appendChild(media_images);
 		{
 			// interface HTML: media, images, previous
 			// updated by interface_update_media_images
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_previous");
-			media_images_previous.setAttribute("class", "button_small button_color_black");
-			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px; left: -64px");
+			media_images_previous.setAttribute("class", "button_size_small button_color_black");
+			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px; left: -80px");
 			media_images_previous.innerHTML = "✖";
 			media_images.appendChild(media_images_previous);
 
@@ -352,7 +370,7 @@ function interface_init() {
 			// updated by interface_update_media_images
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_play");
-			media_images_previous.setAttribute("class", "button_medium button_color_black");
+			media_images_previous.setAttribute("class", "button_size_medium button_color_black");
 			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
 			media_images_previous.innerHTML = "✖";
 			media_images.appendChild(media_images_previous);
@@ -361,23 +379,30 @@ function interface_init() {
 			// updated by interface_update_media_images
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_next");
-			media_images_previous.setAttribute("class", "button_small button_color_black");
-			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px; left: 32px");
+			media_images_previous.setAttribute("class", "button_size_small button_color_black");
+			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px; left: 48px");
 			media_images_previous.innerHTML = "✖";
 			media_images.appendChild(media_images_previous);
+
+			// interface HTML: media, images, label
+			// updated by interface_update_media_controls
+			var media_images_label = document.createElement("p");
+			media_images_label.setAttribute("id", "media_images_label");
+			media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%; text-align: center");
+			media_images.appendChild(media_images_label);
 		}
 
 		// interface HTML: media, controls
 		var media_controls = document.createElement("div");
 		media_controls.setAttribute("id", "media_controls");
-		media_controls.setAttribute("style", "position: absolute; top: 0%; left: 35%; width: 30%; height: 100%; overflow: hidden");
+		media_controls.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 0%; left: -192px; width: 384px; height: 100%");
 		media.appendChild(media_controls);
 		{
 			// interface HTML: media, controls, play
 			// updated by interface_update_media_controls
 			var media_controls_play = document.createElement("div");
 			media_controls_play.setAttribute("id", "media_controls_play");
-			media_controls_play.setAttribute("class", "button_large button_color_pink");
+			media_controls_play.setAttribute("class", "button_size_large button_color_pink");
 			media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
 			media_controls_play.innerHTML = "?";
 			media_controls.appendChild(media_controls_play);
@@ -386,14 +411,14 @@ function interface_init() {
 			// updated by interface_update_media_controls
 			var media_controls_label = document.createElement("p");
 			media_controls_label.setAttribute("id", "media_controls_label");
-			media_controls_label.setAttribute("style", "position: absolute; top: 50%; left: 0%; width: 100%; height: 50%; text-align: center");
+			media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%; text-align: center");
 			media_controls.appendChild(media_controls_label);
 		}
 
 		// interface HTML: media, music
 		var media_music = document.createElement("div");
 		media_music.setAttribute("id", "media_music");
-		media_music.setAttribute("style", "position: absolute; top: 0%; left: 85%; width: 15%; height: 100%; overflow: hidden");
+		media_music.setAttribute("style", "position: absolute; margin: 0 0 0 100%; top: 0%; left: -192px; width: 192px; height: 100%");
 		media.appendChild(media_music);
 	}
 
