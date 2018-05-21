@@ -30,12 +30,14 @@ function settings_cookie_get() {
 // settings, global object
 var settings = {
 	sites: [],
-	keywords: "",
-	count: 0,
-	duration: 0,
-	nsfw: false,
-	loop: false,
-	shuffle: false
+	images: {
+		keywords: "",
+		count: 0,
+		duration: 0,
+		nsfw: false,
+		loop: false,
+		shuffle: false
+	}
 };
 settings_cookie_get();
 
@@ -50,7 +52,7 @@ function plugins_register(name, func) {
 		busy: false,
 		busy_timeout: null
 	};
-	interface_update_controls_images_sites();
+	interface_update_controls_sites_list();
 }
 
 // plugins, functions, load
@@ -58,13 +60,13 @@ function plugins_load(name) {
 	plugins[name].func();
 }
 
-// plugins, functions, settings, read
-function plugins_settings_read(name) {
+// plugins, functions, settings, images, read
+function plugins_settings_images_read(name) {
 	// take note that this setting was used by a plugin
 	if(plugins_settings.indexOf(name) < 0)
 		plugins_settings.push(name);
 
-	return settings[name];
+	return settings.images[name];
 }
 
 // plugins, busy check
@@ -98,6 +100,7 @@ var data_images = [];
 function images_clear() {
 	player_detach();
 	data_images = [];
+	interface_update_media_controls("none");
 }
 
 // data, images, functions, add

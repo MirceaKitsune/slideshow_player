@@ -53,7 +53,7 @@ function player_fade() {
 	if(player.preloading === true || player.transition >= 1)
 		return;
 
-	player.transition = Math.min(player.transition + (((1 / settings.duration) / (1000 * TRANSITION)) * RATE), 1);
+	player.transition = Math.min(player.transition + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
 	player.element1.setAttribute("style", IMG_STYLE + "; opacity: " + (1 - player.transition));
 	player.element2.setAttribute("style", IMG_STYLE + "; opacity: " + (0 + player.transition));
 }
@@ -67,18 +67,18 @@ function player_next() {
 		return;
 	}
 	else {
-		player.timer_next = setTimeout(player_next, settings.duration * 1000);
+		player.timer_next = setTimeout(player_next, settings.images.duration * 1000);
 	}
 
 	// stop the slideshow here if this is the final image
 	if(player.index >= data_images.length) {
-		if(settings.loop === true) {
+		if(settings.images.loop === true) {
 			player.index = 0;
 			player.element1.setAttribute("src", player.element2.getAttribute("src"));
 			player.element1.setAttribute("style", IMG_STYLE + "; opacity: 1");
 
 			// also shuffle the images again
-			if(settings.shuffle)
+			if(settings.images.shuffle)
 				images_shuffle();
 		}
 		else {
@@ -145,7 +145,7 @@ function player_attach() {
 	interface_update_media_controls("stop");
 
 	// shuffle the images each time before playing
-	if(settings.shuffle)
+	if(settings.images.shuffle)
 		images_shuffle();
 }
 

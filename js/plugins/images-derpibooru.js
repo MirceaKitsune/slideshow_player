@@ -29,9 +29,9 @@ function images_derpibooru() {
 	var url_prefix = "https://json2jsonp.com/?url=";
 	var url_sufix = "&callback=parse_derpibooru";
 
-	var keywords = plugins_settings_read("keywords"); // load the keywords
-	var count = Math.min(plugins_settings_read("count"), 50); // this site supports a maximum of 50 results per page
-	var filter_id = plugins_settings_read("nsfw") ? "56027" : "100073"; // pick the appropriate filter from: https://www.derpibooru.org/filters
+	var keywords = plugins_settings_images_read("keywords"); // load the keywords
+	var count = Math.min(plugins_settings_images_read("count"), 50); // this site supports a maximum of 50 results per page
+	var filter_id = plugins_settings_images_read("nsfw") ? "56027" : "100073"; // pick the appropriate filter from: https://www.derpibooru.org/filters
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";

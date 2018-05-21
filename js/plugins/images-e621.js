@@ -25,9 +25,9 @@ function parse_e621(data) {
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
-	var domain = plugins_settings_read("nsfw") === true ? "e621" : "e926"; // e926 is the SFW version of e621
-	var keywords = plugins_settings_read("keywords");
-	var count = Math.min(plugins_settings_read("count"), 320); // this site supports a maximum of 320 results per page
+	var domain = plugins_settings_images_read("nsfw") === true ? "e621" : "e926"; // e926 is the SFW version of e621
+	var keywords = plugins_settings_images_read("keywords");
+	var count = Math.min(plugins_settings_images_read("count"), 320); // this site supports a maximum of 320 results per page
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";

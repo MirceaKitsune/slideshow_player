@@ -25,8 +25,8 @@ function parse_inkbunny(data) {
 
 // change the rating, then call the image parser with the session id
 function parse_inkbunny_rating(data) {
-	var keywords = plugins_settings_read("keywords");
-	var count = Math.min(plugins_settings_read("count"), 100); // this site supports a maximum of 100 results per page
+	var keywords = plugins_settings_images_read("keywords");
+	var count = Math.min(plugins_settings_images_read("count"), 100); // this site supports a maximum of 100 results per page
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";
@@ -37,7 +37,7 @@ function parse_inkbunny_rating(data) {
 // create a new session as guest, then call the rating api with its session id
 function parse_inkbunny_login(data) {
 	// whether or not to enable the NSFW tags
-	var nsfw = plugins_settings_read("nsfw") === true ? "yes" : "no";
+	var nsfw = plugins_settings_images_read("nsfw") === true ? "yes" : "no";
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";

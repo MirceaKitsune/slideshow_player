@@ -1,0 +1,54 @@
+.button {
+	border-radius: 100%;
+	text-align: center;
+	line-height: 56px;
+	font-size: 24px;
+}
+
+.button_color_black {
+	color: #000000;
+	border: 2px solid #000000;
+	box-shadow: 0 0 2px #000000;
+}
+
+.button_color_white {
+	color: #ffffff;
+	border: 2px solid #ffffff;
+	box-shadow: 0 0 2px #ffffff;
+}
+
+.button_color_red {
+	color: #aa0000;
+	border: 2px solid #220000;
+	box-shadow: 0 0 2px #440000;
+}
+
+.button_color_yellow {
+	color: #aaaa00;
+	border: 2px solid #222200;
+	box-shadow: 0 0 2px #444400;
+}
+
+.button_color_green {
+	color: #00aa00;
+	border: 2px solid #002200;
+	box-shadow: 0 0 2px #004400;
+}
+
+.button_color_cyan {
+	color: #00aaaa;
+	border: 2px solid #002222;
+	box-shadow: 0 0 2px #004444;
+}
+
+.button_color_blue {
+	color: #0000aa;
+	border: 2px solid #000022;
+	box-shadow: 0 0 2px #000044;
+}
+
+.button_color_pink {
+	color: #aa00aa;
+	border: 2px solid #220022;
+	box-shadow: 0 0 2px #440044;
+}
