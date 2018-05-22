@@ -88,6 +88,8 @@ function interface_update_controls_sites_list() {
 
 // interface, update HTML, media images
 function interface_update_media_images(active) {
+	var ready = (player.images.index > 0 && player.images.transition >= 1 && player.images.preloading !== true);
+
 	var prev = document.getElementById("media_images_previous");
 	var play = document.getElementById("media_images_play");
 	var next = document.getElementById("media_images_next");
@@ -96,7 +98,7 @@ function interface_update_media_images(active) {
 	var thumb_image = document.getElementById("media_images_thumb_image");
 	var info = document.getElementById("media_images_info");
 
-	if(active === true) {
+	if(active === true && ready === true) {
 		prev.setAttribute("class", "button_size_small button_color_blue");
 		prev.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
 		prev.innerHTML = "|◀";
@@ -115,19 +117,6 @@ function interface_update_media_images(active) {
 		next.setAttribute("class", "button_size_small button_color_blue");
 		next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
 		next.innerHTML = "▶|";
-
-		if(player.images.index > 0) {
-			label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
-			thumb.setAttribute("href", data_images[player.images.index - 1].url);
-			thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
-			info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
-		}
-		else {
-			label.innerHTML = "<b>? / " + data_images.length + "</b>";
-			thumb.removeAttribute("href");
-			thumb_image.setAttribute("src",  BLANK);
-			info.innerHTML = "";
-		}
 	}
 	else {
 		prev.setAttribute("class", "button_size_small button_color_red");
@@ -141,7 +130,21 @@ function interface_update_media_images(active) {
 		next.setAttribute("class", "button_size_small button_color_red");
 		next.removeAttribute("onclick");
 		next.innerHTML = "✖";
+	}
 
+	if(active === true && ready !== true) {
+		label.innerHTML = "<b>? / " + data_images.length + "</b>";
+		thumb.removeAttribute("href");
+		thumb_image.setAttribute("src", BLANK);
+		info.innerHTML = "<font size=\"1\"><b>Loading image</b></font>";
+	}
+	else if(active === true) {
+		label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
+		thumb.setAttribute("href", data_images[player.images.index - 1].url);
+		thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
+		info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
+	}
+	else {
 		label.innerHTML = "<b>Player stopped</b>";
 		thumb.removeAttribute("href");
 		thumb_image.setAttribute("src", BLANK);

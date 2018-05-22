@@ -127,6 +127,9 @@ function player_images_skip(index) {
 
 	clearTimeout(player.images.timer_next);
 	player.images.timer_next = setTimeout(player_images_next, 0);
+
+	// update the image thumbnail and info
+	interface_update_media_images(true);
 }
 
 // player, images, play
