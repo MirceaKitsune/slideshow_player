@@ -120,13 +120,13 @@ function interface_update_media_images(active) {
 			label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
 			thumb.setAttribute("href", data_images[player.images.index - 1].url);
 			thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
-			info.innerHTML = "<font size=\"1\">" + data_images[player.images.index - 1].title + " by " + data_images[player.images.index - 1].author + "</font>";
+			info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
 		}
 		else {
 			label.innerHTML = "<b>? / " + data_images.length + "</b>";
 			thumb.removeAttribute("href");
 			thumb_image.setAttribute("src",  BLANK);
-			info.innerHTML = "<font size=\"1\">No data available</font>";
+			info.innerHTML = "";
 		}
 	}
 	else {
@@ -365,7 +365,7 @@ function interface_init() {
 
 	// interface HTML: media
 	var media = document.createElement("div");
-	media.setAttribute("style", "position: absolute; top: 80%; left: 5%; width: 70%; height: 20%");
+	media.setAttribute("style", "position: absolute; top: 80%; left: 5%; width: 70%; height: 20%; overflow: hidden");
 	document.body.appendChild(media);
 	{
 		// interface HTML: media, images
@@ -379,7 +379,7 @@ function interface_init() {
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_previous");
 			media_images_previous.setAttribute("class", "button_size_small button_color_black");
-			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px; left: -80px");
+			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
 			media_images_previous.innerHTML = "✖";
 			media_images.appendChild(media_images_previous);
 
@@ -395,7 +395,7 @@ function interface_init() {
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_next");
 			media_images_previous.setAttribute("class", "button_size_small button_color_black");
-			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px; left: 48px");
+			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
 			media_images_previous.innerHTML = "✖";
 			media_images.appendChild(media_images_previous);
 

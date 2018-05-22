@@ -48,6 +48,9 @@ function player_images_fullscreen() {
 
 // player, images, transition
 function player_images_fade() {
+	if(player.images.preloading === true)
+		return;
+
 	// check if the transition has finished
 	if(player.images.transition >= 1) {
 		// deactivate the fading function
