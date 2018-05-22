@@ -10,12 +10,11 @@ function parse_derpibooru(data) {
 		var this_data = data.search[entry];
 		var this_image = {};
 
-		this_image.image_url = "https:" + this_data.representations.large; // representations.full is better but occasionally causes errors
-		this_image.image_thumb = "https:" + this_data.representations.thumb;
-		this_image.image_page = this_data.representations.full; // API doesn't provide a page link, use the image instead
-		this_image.author_name = this_data.uploader;
-		this_image.author_thumb = "";
-		this_image.author_page = "";
+		this_image.src = "https:" + String(this_data.representations.large); // representations.full is better but occasionally causes errors
+		this_image.thumb = "https:" + String(this_data.representations.thumb);
+		this_image.title = String(this_data.file_name); // API doesn't provide the title, use the file name instead
+		this_image.author = String(this_data.uploader);
+		this_image.url = "https:" + String(this_data.representations.full); // API doesn't provide a page link, use the image instead
 
 		images_add(this_image);
 	}

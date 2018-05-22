@@ -9,8 +9,7 @@ const RATE = 10;
 // 0 is instant, 1 makes the transition last throughout the full duration of the image
 const TRANSITION = 0.1;
 
-// to avoid broken image warnings, img elements are initialized using this fake 1x1px transparent gif
-const IMG_SRC = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+// default image style
 const IMG_STYLE = "position: absolute; width: auto; height: 100%; max-width: 100%; max-height: 100%";
 
 // player, global object
@@ -49,12 +48,16 @@ function player_images_fullscreen() {
 
 // player, images, transition
 function player_images_fade() {
-	// deactivate the fading function
-	if(player.images.transition >= 1)
+	// check if the transition has finished
+	if(player.images.transition >= 1) {
+		// deactivate the fading function
 		clearInterval(player.images.timer_fade);
 
-	if(player.images.preloading === true || player.images.transition >= 1)
+		// update the image thumbnail and info
+		interface_update_media_images(true);
+
 		return;
+	}
 
 	player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
 	player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: " + (1 - player.images.transition));
@@ -103,18 +106,15 @@ function player_images_next() {
 
 	// apply the current and next image
 	if(player.images.index > 1) {
-		player.images.element1.setAttribute("src", data_images[player.images.index - 2].image_url);
+		player.images.element1.setAttribute("src", data_images[player.images.index - 2].src);
 		player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: " + (player.images.transition < 0 ? 0 : 1));
 	}
 	if(player.images.index > 0) {
-		player.images.element2.setAttribute("src", data_images[player.images.index - 1].image_url);
+		player.images.element2.setAttribute("src", data_images[player.images.index - 1].src);
 		player.images.element2.setAttribute("style", IMG_STYLE + "; opacity: " + (player.images.transition < 0 ? 1 : 0));
 		player.images.element2.setAttribute("onload", "player.images.preloading = false");
 		player.images.element2.setAttribute("onerror", "player_detach()");
 	}
-
-	// update the images panel of the interface
-	interface_update_media_images(true);
 }
 
 // player, images, skip
@@ -137,7 +137,7 @@ function player_images_play() {
 		player.images.stopped = true;
 	}
 
-	// update the images panel of the interface
+	// update the pause button
 	interface_update_media_images(true);
 }
 
@@ -165,13 +165,13 @@ function player_attach() {
 	// configure the 1st element
 	player.images.element1 = document.createElement("img");
 	player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: 1");
-	player.images.element1.setAttribute("src", IMG_SRC);
+	player.images.element1.setAttribute("src", BLANK);
 	play.appendChild(player.images.element1);
 
 	// configure the 2nd element
 	player.images.element2 = document.createElement("img");
 	player.images.element2.setAttribute("style", IMG_STYLE + "; opacity: 0");
-	player.images.element2.setAttribute("src", IMG_SRC);
+	player.images.element2.setAttribute("src", BLANK);
 	play.appendChild(player.images.element2);
 
 	// set the interval and timeout functions
@@ -180,12 +180,12 @@ function player_attach() {
 	player.images.index = 0;
 	player.images.stopped = false;
 
-	interface_update_media_images(true);
-	interface_update_media_controls("stop");
-
 	// shuffle the images each time before playing
 	if(settings.images.shuffle)
 		images_shuffle();
+
+	interface_update_media_images(true);
+	interface_update_media_controls("stop");
 }
 
 // player, HTML, destroy

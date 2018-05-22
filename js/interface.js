@@ -63,7 +63,7 @@ function interface_play() {
 		player_detach();
 }
 
-// interface, update HTML, image sites
+// interface, update HTML, sites
 function interface_update_controls_sites_list() {
 	var sites_list = document.getElementById("controls_sites_list");
 	sites_list.innerHTML = "<b>Sites:<b/><br/>";
@@ -92,6 +92,9 @@ function interface_update_media_images(active) {
 	var play = document.getElementById("media_images_play");
 	var next = document.getElementById("media_images_next");
 	var label = document.getElementById("media_images_label");
+	var thumb = document.getElementById("media_images_thumb");
+	var thumb_image = document.getElementById("media_images_thumb_image");
+	var info = document.getElementById("media_images_info");
 
 	if(active === true) {
 		prev.setAttribute("class", "button_size_small button_color_blue");
@@ -113,7 +116,18 @@ function interface_update_media_images(active) {
 		next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
 		next.innerHTML = "▶|";
 
-		label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
+		if(player.images.index > 0) {
+			label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
+			thumb.setAttribute("href", data_images[player.images.index - 1].url);
+			thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
+			info.innerHTML = "<font size=\"1\">" + data_images[player.images.index - 1].title + " by " + data_images[player.images.index - 1].author + "</font>";
+		}
+		else {
+			label.innerHTML = "<b>? / " + data_images.length + "</b>";
+			thumb.removeAttribute("href");
+			thumb_image.setAttribute("src",  BLANK);
+			info.innerHTML = "<font size=\"1\">No data available</font>";
+		}
 	}
 	else {
 		prev.setAttribute("class", "button_size_small button_color_red");
@@ -129,6 +143,9 @@ function interface_update_media_images(active) {
 		next.innerHTML = "✖";
 
 		label.innerHTML = "<b>Player stopped</b>";
+		thumb.removeAttribute("href");
+		thumb_image.setAttribute("src", BLANK);
+		info.innerHTML = "";
 	}
 }
 
@@ -212,7 +229,7 @@ function interface_init() {
 			// interface HTML: media, images, title
 			var controls_images_title = document.createElement("p");
 			controls_images_title.setAttribute("style", "text-align: center");
-			controls_images_title.innerHTML = "<big><b>Image settings</b></big>";
+			controls_images_title.innerHTML = "<font size=\"4\"><b>Image settings</b></font>";
 			controls_images.appendChild(controls_images_title);
 
 			// interface HTML: controls, images, search
@@ -334,7 +351,7 @@ function interface_init() {
 			// interface HTML: controls, sites, title
 			var controls_sites_title = document.createElement("p");
 			controls_sites_title.setAttribute("style", "text-align: center");
-			controls_sites_title.innerHTML = "<big><b>Sources</b></big>";
+			controls_sites_title.innerHTML = "<font size=\"4\"><b>Sources</b></font>";
 			controls_sites.appendChild(controls_sites_title);
 
 			// interface HTML: controls, sites, list
@@ -352,13 +369,13 @@ function interface_init() {
 	document.body.appendChild(media);
 	{
 		// interface HTML: media, images
+		// updated by interface_update_media_images
 		var media_images = document.createElement("div");
 		media_images.setAttribute("id", "media_images");
 		media_images.setAttribute("style", "position: absolute; margin: 0 0 0 0%; top: 0%; left: 0%; width: 192px; height: 100%");
 		media.appendChild(media_images);
 		{
 			// interface HTML: media, images, previous
-			// updated by interface_update_media_images
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_previous");
 			media_images_previous.setAttribute("class", "button_size_small button_color_black");
@@ -367,7 +384,6 @@ function interface_init() {
 			media_images.appendChild(media_images_previous);
 
 			// interface HTML: media, images, play
-			// updated by interface_update_media_images
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_play");
 			media_images_previous.setAttribute("class", "button_size_medium button_color_black");
@@ -376,7 +392,6 @@ function interface_init() {
 			media_images.appendChild(media_images_previous);
 
 			// interface HTML: media, images, next
-			// updated by interface_update_media_images
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_next");
 			media_images_previous.setAttribute("class", "button_size_small button_color_black");
@@ -385,21 +400,41 @@ function interface_init() {
 			media_images.appendChild(media_images_previous);
 
 			// interface HTML: media, images, label
-			// updated by interface_update_media_controls
 			var media_images_label = document.createElement("p");
 			media_images_label.setAttribute("id", "media_images_label");
 			media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%; text-align: center");
 			media_images.appendChild(media_images_label);
+
+			// interface HTML: media, images, thumb
+			var media_images_thumb = document.createElement("a");
+			media_images_thumb.setAttribute("id", "media_images_thumb");
+			media_images_thumb.setAttribute("target", "_blank");
+			media_images.appendChild(media_images_thumb);
+			{
+				// interface HTML: media, images, thumb, image
+				var media_images_thumb_image = document.createElement("img");
+				media_images_thumb_image.setAttribute("id", "media_images_thumb_image");
+				media_images_thumb_image.setAttribute("class", "thumbnail");
+				media_images_thumb_image.setAttribute("src", BLANK);
+				media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
+				media_images_thumb.appendChild(media_images_thumb_image);
+			}
+
+			// interface HTML: media, images, info
+			var media_images_info = document.createElement("p");
+			media_images_info.setAttribute("id", "media_images_info");
+			media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%; text-align: center");
+			media_images.appendChild(media_images_info);
 		}
 
 		// interface HTML: media, controls
+		// updated by interface_update_media_controls
 		var media_controls = document.createElement("div");
 		media_controls.setAttribute("id", "media_controls");
 		media_controls.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 0%; left: -192px; width: 384px; height: 100%");
 		media.appendChild(media_controls);
 		{
 			// interface HTML: media, controls, play
-			// updated by interface_update_media_controls
 			var media_controls_play = document.createElement("div");
 			media_controls_play.setAttribute("id", "media_controls_play");
 			media_controls_play.setAttribute("class", "button_size_large button_color_pink");
@@ -408,7 +443,6 @@ function interface_init() {
 			media_controls.appendChild(media_controls_play);
 
 			// interface HTML: media, controls, label
-			// updated by interface_update_media_controls
 			var media_controls_label = document.createElement("p");
 			media_controls_label.setAttribute("id", "media_controls_label");
 			media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%; text-align: center");

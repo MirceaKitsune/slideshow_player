@@ -23,12 +23,11 @@ function parse_inkbunny(data) {
 		var this_data = data.submissions[entry];
 		var this_image = {};
 
-		this_image.image_url = this_data.file_url_full;
-		this_image.image_thumb = this_data.thumbnail_url_huge;
-		this_image.image_page = "";
-		this_image.author_name = this_data.username;
-		this_image.author_thumb = "";
-		this_image.author_page = "";
+		this_image.src = String(this_data.file_url_full);
+		this_image.thumb = String(this_data.thumbnail_url_huge || this_data.file_url_preview); // some entries don't provide a thumbnail, use the file preview if so
+		this_image.title = String(this_data.title);
+		this_image.author = String(this_data.username);
+		this_image.url = String(this_data.file_url_full); // API doesn't provide the page URL, use the image file instead
 
 		images_add(this_image);
 	}

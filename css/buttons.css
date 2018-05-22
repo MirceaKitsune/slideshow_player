@@ -1,3 +1,11 @@
+.thumbnail {
+	border-radius: 100%;
+	text-align: center;
+	width: 80px;
+	height: 80px;
+	left: -40px;
+}
+
 .button_size_small {
 	border-radius: 100%;
 	text-align: center;

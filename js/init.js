@@ -1,6 +1,9 @@
 // Slideshow Viewer, Init
 // Public Domain / CC0, MirceaKitsune 2018
 
+// to avoid broken image warnings, img elements are initialized using this fake 1x1px transparent gif
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+
 // valid extensions
 const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif"];
 
@@ -109,15 +112,27 @@ function images_add(item) {
 
 	// check that this image doesn't already exist
 	for(image in data_images) {
-		if(data_images[image].image_url === item.image_url)
+		if(data_images[image].src === item.src)
 			return;
 	}
+
+	// check that all mandatory fields are set
+	if(typeof item.src !== "string")
+		return;
+	if(typeof item.thumb !== "string")
+		return;
+	if(typeof item.title !== "string")
+		return;
+	if(typeof item.author !== "string")
+		return;
+	if(typeof item.url !== "string")
+		return;
 
 	// check that the extension is a valid image
 	var valid_ext = false;
 	for(extension in EXTENSIONS_IMG) {
 		var check_ext = EXTENSIONS_IMG[extension];
-		var str_url = item.image_url;
+		var str_url = item.src;
 		var str_ext = str_url.substring(str_url.length, str_url.length - check_ext.length).toLowerCase();
 		if(str_ext === check_ext) {
 			valid_ext = true;

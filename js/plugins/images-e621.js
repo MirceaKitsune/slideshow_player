@@ -10,12 +10,11 @@ function parse_e621(data) {
 		var this_data = data[entry];
 		var this_image = {};
 
-		this_image.image_url = this_data.file_url;
-		this_image.image_thumb = this_data.preview_url;
-		this_image.image_page = this_data.source;
-		this_image.author_name = this_data.artist;
-		this_image.author_thumb = "";
-		this_image.author_page = "";
+		this_image.src = String(this_data.file_url);
+		this_image.thumb = String(this_data.preview_url);
+		this_image.title = String(this_data.source); // API doesn't provide the title, use the file name instead
+		this_image.author = String(this_data.artist);
+		this_image.url = String(this_data.source);
 
 		images_add(this_image);
 	}
