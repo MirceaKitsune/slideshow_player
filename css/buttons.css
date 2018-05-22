@@ -7,7 +7,7 @@
 }
 
 .button_size_small {
-	border-radius: 100%;
+	border-radius: 40%;
 	text-align: center;
 	line-height: 28px;
 	font-size: 8px;
@@ -18,7 +18,7 @@
 }
 
 .button_size_medium {
-	border-radius: 100%;
+	border-radius: 40%;
 	text-align: center;
 	line-height: 40px;
 	font-size: 16px;
@@ -29,7 +29,7 @@
 }
 
 .button_size_large {
-	border-radius: 100%;
+	border-radius: 40%;
 	text-align: center;
 	line-height: 56px;
 	font-size: 24px;
@@ -43,46 +43,54 @@
 	color: #000000;
 	border: 2px solid #000000;
 	box-shadow: 0 0 2px #000000;
+	text-shadow: 0 0 2px #000000;
 }
 
 .button_color_white {
 	color: #ffffff;
-	border: 2px solid #ffffff;
-	box-shadow: 0 0 2px #ffffff;
+	border: 2px solid #666666;
+	box-shadow: 0 0 2px #aaaaaa;
+	text-shadow: 0 0 2px #ffffff;
 }
 
 .button_color_red {
-	color: #aa0000;
-	border: 2px solid #220000;
-	box-shadow: 0 0 2px #440000;
+	color: #cc0000;
+	border: 2px solid #660000;
+	box-shadow: 0 0 2px #aa8888;
+	text-shadow: 0 0 2px #ff8888;
 }
 
 .button_color_yellow {
-	color: #aaaa00;
-	border: 2px solid #222200;
-	box-shadow: 0 0 2px #444400;
+	color: #cccc00;
+	border: 2px solid #666600;
+	box-shadow: 0 0 2px #aaaa88;
+	text-shadow: 0 0 2px #ffff88;
 }
 
 .button_color_green {
-	color: #00aa00;
-	border: 2px solid #002200;
-	box-shadow: 0 0 2px #004400;
+	color: #00cc00;
+	border: 2px solid #006600;
+	box-shadow: 0 0 2px #88aa88;
+	text-shadow: 0 0 2px #88ff88;
 }
 
 .button_color_cyan {
-	color: #00aaaa;
-	border: 2px solid #002222;
-	box-shadow: 0 0 2px #004444;
+	color: #00cccc;
+	border: 2px solid #006666;
+	box-shadow: 0 0 2px #88aaaa;
+	text-shadow: 0 0 2px #88ffff;
 }
 
 .button_color_blue {
-	color: #0000aa;
-	border: 2px solid #000022;
-	box-shadow: 0 0 2px #000044;
+	color: #0000cc;
+	border: 2px solid #000066;
+	box-shadow: 0 0 2px #8888aa;
+	text-shadow: 0 0 2px #8888ff;
 }
 
 .button_color_pink {
-	color: #aa00aa;
-	border: 2px solid #220022;
-	box-shadow: 0 0 2px #440044;
+	color: #cc00cc;
+	border: 2px solid #660066;
+	box-shadow: 0 0 2px #aa88aa;
+	text-shadow: 0 0 2px #ff88ff;
 }

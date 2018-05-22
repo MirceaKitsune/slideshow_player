@@ -133,19 +133,19 @@ function interface_update_media_images(active) {
 	}
 
 	if(active === true && ready !== true) {
-		label.innerHTML = "<b>? / " + data_images.length + "</b>";
+		label.innerHTML = "<font size=\"2\"><b>? / " + data_images.length + "</b></font>";
 		thumb.removeAttribute("href");
 		thumb_image.setAttribute("src", BLANK);
 		info.innerHTML = "<font size=\"1\"><b>Loading image</b></font>";
 	}
 	else if(active === true) {
-		label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
+		label.innerHTML = "<font size=\"2\"><b>" + player.images.index + " / " + data_images.length + "</b></font>";
 		thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
 		info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
 	}
 	else {
-		label.innerHTML = "<b>Player stopped</b>";
+		label.innerHTML = "<font size=\"2\"><b>Player stopped</b></font>";
 		thumb.removeAttribute("href");
 		thumb_image.setAttribute("src", BLANK);
 		info.innerHTML = "";
@@ -221,7 +221,7 @@ function interface_init() {
 
 	// interface HTML: controls
 	var controls = document.createElement("div");
-	controls.setAttribute("style", "position: absolute; top: 0%; left: 80%; width: 20%; height: 100%; background-color: #c0c0c0; overflow: auto");
+	controls.setAttribute("style", "position: absolute; top: 0%; left: 80%; width: 20%; height: 100%; background-color: #dfdfdf; overflow: auto");
 	document.body.appendChild(controls);
 	{
 		// interface HTML: controls, images
@@ -419,7 +419,7 @@ function interface_init() {
 				media_images_thumb_image.setAttribute("id", "media_images_thumb_image");
 				media_images_thumb_image.setAttribute("class", "thumbnail");
 				media_images_thumb_image.setAttribute("src", BLANK);
-				media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
+				media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
 				media_images_thumb.appendChild(media_images_thumb_image);
 			}
 

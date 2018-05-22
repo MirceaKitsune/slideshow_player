@@ -34,9 +34,9 @@ function settings_cookie_get() {
 var settings = {
 	sites: [],
 	images: {
-		keywords: "",
-		count: 0,
-		duration: 0,
+		keywords: "art",
+		count: 100,
+		duration: 10,
 		nsfw: false,
 		loop: false,
 		shuffle: false
