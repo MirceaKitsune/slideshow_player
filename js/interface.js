@@ -41,6 +41,12 @@ function interface_load() {
 	settings.images.shuffle = Boolean(elements_settings["controls_images_play_shuffle"].checked);
 	settings_cookie_set();
 
+	// limit the settings to acceptable values
+	// should match the limits defined on the corresponding HTML elements
+	settings.images.keywords = settings.images.keywords.substring(0, 100);
+	settings.images.count = Math.max(Math.min(settings.images.count, 1000), 5);
+	settings.images.duration = Math.max(Math.min(settings.images.duration, 100), 5);
+
 	// evenly distribute the total image count to each source
 	settings.images.count = Math.floor(settings.images.count / settings.sites.length);
 
@@ -246,6 +252,7 @@ function interface_init() {
 				controls_images_search_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
 				controls_images_search_keywords_input.setAttribute("type", "text");
 				controls_images_search_keywords_input.setAttribute("value", settings.images.keywords);
+				controls_images_search_keywords_input.setAttribute("maxlength", "100");
 				controls_images_search_keywords_input.setAttribute("onclick", "interface_refresh(\"keywords\")");
 				controls_images_search.appendChild(controls_images_search_keywords_input);
 
