@@ -191,7 +191,7 @@ document.onkeydown = function(event) {
 			break;
 		case KEY_KEYCODE_IMAGES_OPEN:
 			var element = document.getElementById("media_images_thumb");
-			if(typeof element.href === "string")
+			if(typeof element.href === "string" && element.href !== "")
 				window.open(element.href, "_blank");
 			break;
 	}

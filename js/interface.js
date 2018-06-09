@@ -94,7 +94,7 @@ function interface_update_controls_sites_list() {
 
 // interface, update HTML, media images
 function interface_update_media_images(active) {
-	var ready = (player.images.index > 0 && player.images.transition >= 1 && player.images.preloading !== true);
+	var ready = player_active() && !player_busy();
 
 	var prev = document.getElementById("media_images_previous");
 	var play = document.getElementById("media_images_play");
@@ -451,7 +451,7 @@ function interface_init() {
 			// interface HTML: media, controls, play
 			var media_controls_play = document.createElement("div");
 			media_controls_play.setAttribute("id", "media_controls_play");
-			media_controls_play.setAttribute("title", "Play / Stop (" + KEY_LABEL_PLAY + ")");
+			media_controls_play.setAttribute("title", "Toggle player / Refresh settings (" + KEY_LABEL_PLAY + ")");
 			media_controls_play.setAttribute("class", "button_size_large button_color_pink");
 			media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
 			media_controls_play.innerHTML = "?";

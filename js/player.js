@@ -157,6 +157,11 @@ function player_active() {
 	return (player.images.index > 0);
 }
 
+// player, is busy
+function player_busy() {
+	return (player.images.transition < 1 || player.images.preloading === true);
+}
+
 // player, HTML, create
 function player_attach() {
 	// create the player element
