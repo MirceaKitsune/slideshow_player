@@ -29,6 +29,7 @@ function images_derpibooru() {
 	var url_sufix = "&callback=parse_derpibooru";
 
 	var keywords = plugins_settings_images_read("keywords"); // load the keywords
+	keywords = keywords.replace(" ", ","); // json2jsonp.com returns an error when spaces are included in the URL, convert spaces to commas
 	var count = Math.min(plugins_settings_images_read("count"), 50); // this site supports a maximum of 50 results per page
 	var filter_id = plugins_settings_images_read("nsfw") ? "56027" : "100073"; // pick the appropriate filter from: https://www.derpibooru.org/filters
 
