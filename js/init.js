@@ -7,6 +7,18 @@ const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAI
 // valid extensions
 const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif"];
 
+// shortcut definitions
+const KEY_KEYCODE_PLAY = 13;
+const KEY_KEYCODE_IMAGES_PREVIOUS = 37;
+const KEY_KEYCODE_IMAGES_PLAY = 8;
+const KEY_KEYCODE_IMAGES_NEXT = 39;
+const KEY_KEYCODE_IMAGES_OPEN = 9;
+const KEY_LABEL_PLAY = "Enter";
+const KEY_LABEL_IMAGES_PREVIOUS = "Left arrow";
+const KEY_LABEL_IMAGES_PLAY = "Backspace";
+const KEY_LABEL_IMAGES_NEXT = "Right arrow";
+const KEY_LABEL_IMAGES_OPEN = "Tab";
+
 // set the user agent
 Object.defineProperty(navigator, "userAgent", {
 	get: function() {
@@ -150,6 +162,38 @@ function images_shuffle() {
 	for(var i = data_images.length - 1; i > 0; i--) {
 		var j = Math.floor(Math.random() * (i + 1));
 		[data_images[i], data_images[j]] = [data_images[j], data_images[i]];
+	}
+}
+
+// bind shortcut keys to the events of their corresponding elements
+document.onkeydown = function(event) {
+	var event_key = event.keyCode;
+	switch(event_key) {
+		case KEY_KEYCODE_PLAY:
+			var element = document.getElementById("media_controls_play");
+			if(typeof element.onclick === "function")
+				element.onclick.apply(element);
+			break;
+		case KEY_KEYCODE_IMAGES_PREVIOUS:
+			var element = document.getElementById("media_images_previous");
+			if(typeof element.onclick === "function")
+				element.onclick.apply(element);
+			break;
+		case KEY_KEYCODE_IMAGES_PLAY:
+			var element = document.getElementById("media_images_play");
+			if(typeof element.onclick === "function")
+				element.onclick.apply(element);
+			break;
+		case KEY_KEYCODE_IMAGES_NEXT:
+			var element = document.getElementById("media_images_next");
+			if(typeof element.onclick === "function")
+				element.onclick.apply(element);
+			break;
+		case KEY_KEYCODE_IMAGES_OPEN:
+			var element = document.getElementById("media_images_thumb");
+			if(typeof element.href === "string")
+				window.open(element.href, "_blank");
+			break;
 	}
 }
 

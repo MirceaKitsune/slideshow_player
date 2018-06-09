@@ -388,26 +388,29 @@ function interface_init() {
 			// interface HTML: media, images, previous
 			var media_images_previous = document.createElement("div");
 			media_images_previous.setAttribute("id", "media_images_previous");
+			media_images_previous.setAttribute("title", "Previous image (" + KEY_LABEL_IMAGES_PREVIOUS + ")");
 			media_images_previous.setAttribute("class", "button_size_small button_color_black");
 			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
 			media_images_previous.innerHTML = "✖";
 			media_images.appendChild(media_images_previous);
 
 			// interface HTML: media, images, play
-			var media_images_previous = document.createElement("div");
-			media_images_previous.setAttribute("id", "media_images_play");
-			media_images_previous.setAttribute("class", "button_size_medium button_color_black");
-			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
-			media_images_previous.innerHTML = "✖";
-			media_images.appendChild(media_images_previous);
+			var media_images_play = document.createElement("div");
+			media_images_play.setAttribute("id", "media_images_play");
+			media_images_play.setAttribute("title", "Play / Pause image (" + KEY_LABEL_IMAGES_PLAY + ")");
+			media_images_play.setAttribute("class", "button_size_medium button_color_black");
+			media_images_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
+			media_images_play.innerHTML = "✖";
+			media_images.appendChild(media_images_play);
 
 			// interface HTML: media, images, next
-			var media_images_previous = document.createElement("div");
-			media_images_previous.setAttribute("id", "media_images_next");
-			media_images_previous.setAttribute("class", "button_size_small button_color_black");
-			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
-			media_images_previous.innerHTML = "✖";
-			media_images.appendChild(media_images_previous);
+			var media_images_next = document.createElement("div");
+			media_images_next.setAttribute("id", "media_images_next");
+			media_images_next.setAttribute("title", "Next image (" + KEY_LABEL_IMAGES_NEXT + ")");
+			media_images_next.setAttribute("class", "button_size_small button_color_black");
+			media_images_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
+			media_images_next.innerHTML = "✖";
+			media_images.appendChild(media_images_next);
 
 			// interface HTML: media, images, label
 			var media_images_label = document.createElement("p");
@@ -418,6 +421,7 @@ function interface_init() {
 			// interface HTML: media, images, thumb
 			var media_images_thumb = document.createElement("a");
 			media_images_thumb.setAttribute("id", "media_images_thumb");
+			media_images_thumb.setAttribute("title", "Open image (" + KEY_LABEL_IMAGES_OPEN + ")");
 			media_images_thumb.setAttribute("target", "_blank");
 			media_images.appendChild(media_images_thumb);
 			{
@@ -447,6 +451,7 @@ function interface_init() {
 			// interface HTML: media, controls, play
 			var media_controls_play = document.createElement("div");
 			media_controls_play.setAttribute("id", "media_controls_play");
+			media_controls_play.setAttribute("title", "Play / Stop (" + KEY_LABEL_PLAY + ")");
 			media_controls_play.setAttribute("class", "button_size_large button_color_pink");
 			media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
 			media_controls_play.innerHTML = "?";
