@@ -1,6 +1,11 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
+// attached and detached positions of the media bar
+// detached is relative to the document body, attached is relative to the player window
+const STYLE_MEDIA_POSITION_ATTACHED = "top: 80%; left: 2.5%; width: 95%; height: 20%";
+const STYLE_MEDIA_POSITION_DETACHED = "top: 80%; left: 5%; width: 70%; height: 20%";
+
 // whether to also refresh the content when loading new settings
 var interface_refresh_sites = false;
 
@@ -92,6 +97,28 @@ function interface_update_controls_sites_list() {
 	}
 }
 
+// interface, update HTML, attach / detach media
+function interface_attach_media(attached) {
+	var media = document.getElementById("media");
+	var parent_body = document.body;
+	var parent_player = document.getElementById("player");
+
+	if(attached) {
+		if(parent_body && parent_body.contains(media))
+			parent_body.removeChild(media);
+		media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_MEDIA_POSITION_ATTACHED);
+		if(parent_player)
+			parent_player.appendChild(media);
+	}
+	else {
+		if(parent_player && parent_player.contains(media))
+			parent_player.removeChild(media);
+		media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_MEDIA_POSITION_DETACHED);
+		if(parent_body)
+			parent_body.appendChild(media);
+	}
+}
+
 // interface, update HTML, media images
 function interface_update_media_images(active) {
 	var ready = player_active() && !player_busy();
@@ -162,6 +189,7 @@ function interface_update_media_images(active) {
 function interface_update_media_controls(state) {
 	var play = document.getElementById("media_controls_play");
 	var label = document.getElementById("media_controls_label");
+	var fullscreen = document.getElementById("media_controls_fullscreen");
 
 	var total_images = data_images.length;
 	var total_seconds = total_images * settings.images.duration;
@@ -178,6 +206,9 @@ function interface_update_media_controls(state) {
 			play.setAttribute("onclick", "interface_load()");
 			play.innerHTML = "⧗";
 			label.innerHTML = "<b>Loading content</b>";
+			fullscreen.setAttribute("class", "button_size_small button_color_red");
+			fullscreen.removeAttribute("onclick");
+			fullscreen.innerHTML = "✖";
 			document.title = "Slideshow Player";
 			break;
 		case "reload":
@@ -185,6 +216,9 @@ function interface_update_media_controls(state) {
 			play.setAttribute("onclick", "interface_load()");
 			play.innerHTML = "⟳";
 			label.innerHTML = "<b>Click to apply settings</b>";
+			fullscreen.setAttribute("class", "button_size_small button_color_red");
+			fullscreen.removeAttribute("onclick");
+			fullscreen.innerHTML = "✖";
 			document.title = "Slideshow Player";
 			break;
 		case "none":
@@ -192,6 +226,9 @@ function interface_update_media_controls(state) {
 			play.removeAttribute("onclick");
 			play.innerHTML = "✖";
 			label.innerHTML = "<b>Unable to play</b>";
+			fullscreen.setAttribute("class", "button_size_small button_color_red");
+			fullscreen.removeAttribute("onclick");
+			fullscreen.innerHTML = "✖";
 			document.title = "Slideshow Player";
 			break;
 		case "stop":
@@ -199,6 +236,9 @@ function interface_update_media_controls(state) {
 			play.setAttribute("onclick", "interface_play()");
 			play.innerHTML = "■";
 			label.innerHTML = label_status;
+			fullscreen.setAttribute("class", "button_size_small button_color_blue");
+			fullscreen.setAttribute("onclick", "player_images_fullscreen_toggle()");
+			fullscreen.innerHTML = "▭";
 			document.title = "Slideshow Player - " + total_images + " images (▶)";
 			break;
 		case "play":
@@ -206,6 +246,9 @@ function interface_update_media_controls(state) {
 			play.setAttribute("onclick", "interface_play()");
 			play.innerHTML = "▶";
 			label.innerHTML = label_status;
+			fullscreen.setAttribute("class", "button_size_small button_color_red");
+			fullscreen.removeAttribute("onclick");
+			fullscreen.innerHTML = "✖";
 			document.title = "Slideshow Player - " + total_images + " images (■)";
 			break;
 		default:
@@ -213,6 +256,9 @@ function interface_update_media_controls(state) {
 			play.removeAttribute("onclick");
 			play.innerHTML = "?";
 			label.innerHTML = "<b>Error</b>";
+			fullscreen.setAttribute("class", "button_size_small button_color_red");
+			fullscreen.removeAttribute("onclick");
+			fullscreen.innerHTML = "✖";
 			document.title = "Slideshow Player";
 	}
 }
@@ -374,8 +420,10 @@ function interface_init() {
 	}
 
 	// interface HTML: media
+	// updated by interface_attach_media
 	var media = document.createElement("div");
-	media.setAttribute("style", "position: absolute; top: 80%; left: 5%; width: 70%; height: 20%; overflow: hidden");
+	media.setAttribute("id", "media");
+	media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_MEDIA_POSITION_DETACHED);
 	document.body.appendChild(media);
 	{
 		// interface HTML: media, images
@@ -415,6 +463,7 @@ function interface_init() {
 			// interface HTML: media, images, label
 			var media_images_label = document.createElement("p");
 			media_images_label.setAttribute("id", "media_images_label");
+			media_images_label.setAttribute("class", "text");
 			media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%; text-align: center");
 			media_images.appendChild(media_images_label);
 
@@ -437,6 +486,7 @@ function interface_init() {
 			// interface HTML: media, images, info
 			var media_images_info = document.createElement("p");
 			media_images_info.setAttribute("id", "media_images_info");
+			media_images_info.setAttribute("class", "text");
 			media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%; text-align: center");
 			media_images.appendChild(media_images_info);
 		}
@@ -460,8 +510,18 @@ function interface_init() {
 			// interface HTML: media, controls, label
 			var media_controls_label = document.createElement("p");
 			media_controls_label.setAttribute("id", "media_controls_label");
+			media_controls_label.setAttribute("class", "text");
 			media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%; text-align: center");
 			media_controls.appendChild(media_controls_label);
+
+			// interface HTML: media, controls, fullscreen
+			var media_controls_fullscreen = document.createElement("div");
+			media_controls_fullscreen.setAttribute("id", "media_controls_fullscreen");
+			media_controls_fullscreen.setAttribute("title", "Fullscreen");
+			media_controls_fullscreen.setAttribute("class", "button_size_small button_color_red");
+			media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 128px");
+			media_controls_fullscreen.innerHTML = "✖";
+			media_controls.appendChild(media_controls_fullscreen);
 		}
 
 		// interface HTML: media, music

@@ -1,3 +1,7 @@
+.text {
+	text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff, 0 0 4px #ffffff;
+}
+
 .thumbnail {
 	border-radius: 100%;
 	text-align: center;
@@ -44,6 +48,7 @@
 	border: 2px solid #000000;
 	box-shadow: 0 0 2px #000000;
 	text-shadow: 0 0 2px #000000;
+	background-color: #ffffff;
 }
 
 .button_color_white {
@@ -51,6 +56,7 @@
 	border: 2px solid #666666;
 	box-shadow: 0 0 2px #aaaaaa;
 	text-shadow: 0 0 2px #ffffff;
+	background-color: #000000;
 }
 
 .button_color_red {
@@ -58,6 +64,7 @@
 	border: 2px solid #660000;
 	box-shadow: 0 0 2px #aa8888;
 	text-shadow: 0 0 2px #ff8888;
+	background-color: #ffffff;
 }
 
 .button_color_yellow {
@@ -65,6 +72,7 @@
 	border: 2px solid #666600;
 	box-shadow: 0 0 2px #aaaa88;
 	text-shadow: 0 0 2px #ffff88;
+	background-color: #ffffff;
 }
 
 .button_color_green {
@@ -72,6 +80,7 @@
 	border: 2px solid #006600;
 	box-shadow: 0 0 2px #88aa88;
 	text-shadow: 0 0 2px #88ff88;
+	background-color: #ffffff;
 }
 
 .button_color_cyan {
@@ -79,6 +88,7 @@
 	border: 2px solid #006666;
 	box-shadow: 0 0 2px #88aaaa;
 	text-shadow: 0 0 2px #88ffff;
+	background-color: #ffffff;
 }
 
 .button_color_blue {
@@ -86,6 +96,7 @@
 	border: 2px solid #000066;
 	box-shadow: 0 0 2px #8888aa;
 	text-shadow: 0 0 2px #8888ff;
+	background-color: #ffffff;
 }
 
 .button_color_pink {
@@ -93,4 +104,5 @@
 	border: 2px solid #660066;
 	box-shadow: 0 0 2px #aa88aa;
 	text-shadow: 0 0 2px #ff88ff;
+	background-color: #ffffff;
 }

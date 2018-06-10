@@ -26,23 +26,43 @@ var player = {
 	}
 };
 
-// player, images, fullscreen
-function player_images_fullscreen() {
+// player, images, timer for fullscreen
+var timer_fullscreen = null;
+
+// player, images, timer function for fullscreen
+function player_images_fullscreen_timer() {
+	// check whether fullscreen was exited without informing the code
+	// if so, detach the media bar then clear the timer for this check
+	if(!player_images_fullscreen_has()) {
+		interface_attach_media(false);
+		clearInterval(timer_fullscreen);
+	}
+}
+
+// player, images, has fullscreen
+function player_images_fullscreen_has() {
+	return (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+}
+
+// player, images, toggle fullscreen
+function player_images_fullscreen_toggle() {
 	var element = document.getElementById("player");
 
-	// remove the tooltip once in fullscreen, as you can't position the cursor elsewhere to avoid it
-	element.removeAttribute("title");
-
-	var fullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-	if(fullscreen) {
+	if(player_images_fullscreen_has()) {
 		var method_cancel = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msCancelFullScreen;
 		if(method_cancel)
 			method_cancel.call(document);
+
+		interface_attach_media(false);
+		clearInterval(timer_fullscreen);
 	}
 	else {
 		var method_request = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullscreen;
 		if(method_request)
 			method_request.call(element);
+
+		interface_attach_media(true);
+		timer_fullscreen = setInterval(player_images_fullscreen_timer, 100);
 	}
 }
 
@@ -164,12 +184,13 @@ function player_busy() {
 
 // player, HTML, create
 function player_attach() {
+	// detach the media bar from the player
+	interface_attach_media(false);
+
 	// create the player element
 	var element = document.getElementById("player_area");
 	var play = document.createElement("div");
 	play.setAttribute("id", "player");
-	play.setAttribute("title", "Click to toggle fullscreen");
-	play.setAttribute("onclick", "player_images_fullscreen()");
 	play.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center; background-color: #000000");
 	element.appendChild(play);
 
@@ -201,6 +222,9 @@ function player_attach() {
 
 // player, HTML, destroy
 function player_detach() {
+	// detach the media bar from the player
+	interface_attach_media(false);
+
 	// destroy the player element
 	var element = document.getElementById("player_area");
 	var play = document.getElementById("player");
