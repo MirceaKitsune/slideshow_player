@@ -1,6 +1,9 @@
 // Slideshow Viewer, Player
 // Public Domain / CC0, MirceaKitsune 2018
 
+// distance (in pixels) under which to fade in the media bar as the mouse nears it (fullscreen)
+const FULLSCREEN_MOUSE_FADE = 64;
+
 // update rate in miliseconds (1000 = 1 second)
 // lower values are smoother but use more browser resources
 const RATE = 10;
@@ -28,8 +31,8 @@ var player = {
 
 // player, images, fullscreen settings
 var fullscreen_timer = null;
-var fullscreen_mouse_height = 0;
-var fullscreen_mouse_active = false;
+var fullscreen_mouse_start = 0;
+var fullscreen_mouse_end = 0;
 
 // player, images, timer function for fullscreen
 function player_images_fullscreen_timer() {
@@ -45,16 +48,9 @@ function player_images_fullscreen_has() {
 
 // player, images, fullscreen mouse movement
 function player_images_fullscreen_mouse(event) {
-	if(event.clientY >= fullscreen_mouse_height && fullscreen_mouse_active === false) {
-		var media = document.getElementById("media");
-		media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_ATTACHED);
-		fullscreen_mouse_active = true;
-	}
-	else if(event.clientY < fullscreen_mouse_height && fullscreen_mouse_active === true) {
-		var media = document.getElementById("media");
-		media.setAttribute("style", "position: absolute; overflow: hidden; display: none; " + STYLE_POSITION_MEDIA_ATTACHED);
-		fullscreen_mouse_active = false;
-	}
+	var media = document.getElementById("media");
+	var opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
+	media.setAttribute("style", "position: absolute; overflow: hidden; z-index: 1; opacity: " + opacity + "; " + STYLE_POSITION_MEDIA_ATTACHED);
 }
 
 // player, images, toggle fullscreen
@@ -81,8 +77,8 @@ function player_images_fullscreen_toggle(force_to) {
 		}
 
 		// set mouse properties
-		fullscreen_mouse_height = 0;
-		fullscreen_mouse_active = false;
+		fullscreen_mouse_start = 0;
+		fullscreen_mouse_end = 0;
 
 		// stop the periodic fullscreen check
 		clearInterval(fullscreen_timer);
@@ -105,8 +101,8 @@ function player_images_fullscreen_toggle(force_to) {
 		}
 
 		// set mouse properties
-		fullscreen_mouse_height = player.offsetHeight - media.offsetHeight;
-		fullscreen_mouse_active = false;
+		fullscreen_mouse_start = player.offsetHeight - media.offsetHeight - FULLSCREEN_MOUSE_FADE;
+		fullscreen_mouse_end = player.offsetHeight - media.offsetHeight;
 
 		// start the periodic fullscreen check
 		fullscreen_timer = setInterval(player_images_fullscreen_timer, 100);
