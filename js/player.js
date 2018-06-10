@@ -26,8 +26,10 @@ var player = {
 	}
 };
 
-// player, images, timer for fullscreen
-var timer_fullscreen = null;
+// player, images, fullscreen settings
+var fullscreen_timer = null;
+var fullscreen_mouse_height = 0;
+var fullscreen_mouse_active = false;
 
 // player, images, timer function for fullscreen
 function player_images_fullscreen_timer() {
@@ -39,6 +41,20 @@ function player_images_fullscreen_timer() {
 // player, images, has fullscreen
 function player_images_fullscreen_has() {
 	return (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+}
+
+// player, images, fullscreen mouse movement
+function player_images_fullscreen_mouse(event) {
+	if(event.clientY >= fullscreen_mouse_height && fullscreen_mouse_active === false) {
+		var media = document.getElementById("media");
+		media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_ATTACHED);
+		fullscreen_mouse_active = true;
+	}
+	else if(event.clientY < fullscreen_mouse_height && fullscreen_mouse_active === true) {
+		var media = document.getElementById("media");
+		media.setAttribute("style", "position: absolute; overflow: hidden; display: none; " + STYLE_POSITION_MEDIA_ATTACHED);
+		fullscreen_mouse_active = false;
+	}
 }
 
 // player, images, toggle fullscreen
@@ -57,14 +73,19 @@ function player_images_fullscreen_toggle(force_to) {
 
 		// detach player and media bar
 		player.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_DETACHED);
+		player.removeAttribute("onmousemove");
 		if(body && player && player.contains(media)) {
 			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_DETACHED);
 			player.removeChild(media);
 			body.appendChild(media);
 		}
 
+		// set mouse properties
+		fullscreen_mouse_height = 0;
+		fullscreen_mouse_active = false;
+
 		// stop the periodic fullscreen check
-		clearInterval(timer_fullscreen);
+		clearInterval(fullscreen_timer);
 	}
 	else {
 		// request fullscreen mode
@@ -76,14 +97,19 @@ function player_images_fullscreen_toggle(force_to) {
 
 		// attach player and media bar
 		player.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_ATTACHED);
+		player.setAttribute("onmousemove", "player_images_fullscreen_mouse(event)");
 		if(player && body && body.contains(media)) {
 			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_ATTACHED);
 			body.removeChild(media);
 			player.appendChild(media);
 		}
 
+		// set mouse properties
+		fullscreen_mouse_height = player.offsetHeight - media.offsetHeight;
+		fullscreen_mouse_active = false;
+
 		// start the periodic fullscreen check
-		timer_fullscreen = setInterval(player_images_fullscreen_timer, 100);
+		fullscreen_timer = setInterval(player_images_fullscreen_timer, 100);
 	}
 }
 
