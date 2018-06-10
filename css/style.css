@@ -1,5 +1,7 @@
 .text {
 	text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff, 0 0 4px #ffffff;
+	z-index: 1;
+	pointer-events: none;
 }
 
 .thumbnail {
@@ -8,6 +10,8 @@
 	width: 80px;
 	height: 80px;
 	left: -40px;
+	z-index: 1;
+	pointer-events: all;
 }
 
 .button_size_small {
@@ -19,6 +23,8 @@
 	height: 32px;
 	left: -16px;
 	cursor: pointer;
+	z-index: 1;
+	pointer-events: all;
 }
 
 .button_size_medium {
@@ -30,6 +36,8 @@
 	height: 48px;
 	left: -24px;
 	cursor: pointer;
+	z-index: 1;
+	pointer-events: all;
 }
 
 .button_size_large {
@@ -41,6 +49,8 @@
 	height: 64px;
 	left: -32px;
 	cursor: pointer;
+	z-index: 1;
+	pointer-events: all;
 }
 
 .button_color_black {

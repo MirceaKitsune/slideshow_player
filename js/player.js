@@ -31,12 +31,9 @@ var timer_fullscreen = null;
 
 // player, images, timer function for fullscreen
 function player_images_fullscreen_timer() {
-	// check whether fullscreen was exited without informing the code
-	// if so, detach the media bar then clear the timer for this check
-	if(!player_images_fullscreen_has()) {
-		interface_attach_media(false);
-		clearInterval(timer_fullscreen);
-	}
+	// check whether fullscreen was exited without informing the code and detach if so
+	if(!player_images_fullscreen_has())
+		player_images_fullscreen_toggle(false);
 }
 
 // player, images, has fullscreen
@@ -45,23 +42,47 @@ function player_images_fullscreen_has() {
 }
 
 // player, images, toggle fullscreen
-function player_images_fullscreen_toggle() {
-	var element = document.getElementById("player");
+function player_images_fullscreen_toggle(force_to) {
+	var body = document.body;
+	var player = document.getElementById("player_area");
+	var media = document.getElementById("media");
 
-	if(player_images_fullscreen_has()) {
+	if(typeof force_to === "boolean" ? !force_to : player_images_fullscreen_has()) {
+		// cancel fullscreen mode
 		var method_cancel = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msCancelFullScreen;
 		if(method_cancel)
 			method_cancel.call(document);
+		// else
+			// return;
 
-		interface_attach_media(false);
+		// detach player and media bar
+		player.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_DETACHED);
+		if(body && player && player.contains(media)) {
+			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_DETACHED);
+			player.removeChild(media);
+			body.appendChild(media);
+		}
+
+		// stop the periodic fullscreen check
 		clearInterval(timer_fullscreen);
 	}
 	else {
-		var method_request = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullscreen;
+		// request fullscreen mode
+		var method_request = player.requestFullScreen || player.webkitRequestFullScreen || player.mozRequestFullScreen || player.msRequestFullscreen;
 		if(method_request)
-			method_request.call(element);
+			method_request.call(player);
+		else
+			return;
 
-		interface_attach_media(true);
+		// attach player and media bar
+		player.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_ATTACHED);
+		if(player && body && body.contains(media)) {
+			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_ATTACHED);
+			body.removeChild(media);
+			player.appendChild(media);
+		}
+
+		// start the periodic fullscreen check
 		timer_fullscreen = setInterval(player_images_fullscreen_timer, 100);
 	}
 }
@@ -184,14 +205,11 @@ function player_busy() {
 
 // player, HTML, create
 function player_attach() {
-	// detach the media bar from the player
-	interface_attach_media(false);
-
 	// create the player element
 	var element = document.getElementById("player_area");
 	var play = document.createElement("div");
 	play.setAttribute("id", "player");
-	play.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center; background-color: #000000");
+	play.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center");
 	element.appendChild(play);
 
 	// configure the 1st element
@@ -222,15 +240,12 @@ function player_attach() {
 
 // player, HTML, destroy
 function player_detach() {
-	// detach the media bar from the player
-	interface_attach_media(false);
-
 	// destroy the player element
 	var element = document.getElementById("player_area");
 	var play = document.getElementById("player");
 	if(document.body.contains(play)) {
 		element.removeChild(play);
-		element.innerHTML = "";
+		play.innerHTML = "";
 	}
 
 	// unset the interval and timeout functions
