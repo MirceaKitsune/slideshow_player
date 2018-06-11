@@ -427,7 +427,7 @@ function interface_init() {
 			var media_images_label = document.createElement("p");
 			media_images_label.setAttribute("id", "media_images_label");
 			media_images_label.setAttribute("class", "text_black");
-			media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%; text-align: center");
+			media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%");
 			media_images.appendChild(media_images_label);
 
 			// interface HTML: media, images, thumb
@@ -450,7 +450,7 @@ function interface_init() {
 			var media_images_info = document.createElement("p");
 			media_images_info.setAttribute("id", "media_images_info");
 			media_images_info.setAttribute("class", "text_black");
-			media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%; text-align: center");
+			media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%");
 			media_images.appendChild(media_images_info);
 		}
 
@@ -474,7 +474,7 @@ function interface_init() {
 			var media_controls_label = document.createElement("p");
 			media_controls_label.setAttribute("id", "media_controls_label");
 			media_controls_label.setAttribute("class", "text_black");
-			media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%; text-align: center");
+			media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%");
 			media_controls.appendChild(media_controls_label);
 
 			// interface HTML: media, controls, fullscreen

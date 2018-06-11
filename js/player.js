@@ -25,7 +25,8 @@ var player = {
 		timer_fade: null,
 		timer_next: null,
 		element_1: null,
-		element_2: null
+		element_2: null,
+		element_icon: null
 	}
 };
 
@@ -137,6 +138,7 @@ function player_images_fade() {
 	player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
 	player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: " + (1 - player.images.transition));
 	player.images.element2.setAttribute("style", IMG_STYLE + "; opacity: " + (0 + player.images.transition));
+	player.images.element_icon.innerHTML = "";
 }
 
 // player, images, switching
@@ -180,6 +182,7 @@ function player_images_next() {
 	player.images.preloading = true;
 
 	// apply the current and next image
+	player.images.element_icon.innerHTML = "⧗";
 	if(player.images.index > 1) {
 		player.images.element1.setAttribute("src", data_images[player.images.index - 2].src);
 		player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: " + (player.images.transition < 0 ? 0 : 1));
@@ -255,6 +258,12 @@ function player_attach() {
 	player.images.element2.setAttribute("src", BLANK);
 	play.appendChild(player.images.element2);
 
+	// icon indicator
+	player.images.element_icon = document.createElement("div");
+	player.images.element_icon.setAttribute("class", "text_black");
+	player.images.element_icon.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 48px; height: 48px; z-index: 1; line-height: 32px; font-size: 48px");
+	play.appendChild(player.images.element_icon);
+
 	// set the interval and timeout functions
 	// player.images.timer_fade = setInterval(player_images_fade, RATE);
 	player.images.timer_next = setTimeout(player_images_next, 0);
@@ -286,6 +295,7 @@ function player_detach() {
 	player.images.stopped = false;
 	player.images.element_1 = null;
 	player.images.element_2 = null;
+	player.images.element_icon = null;
 
 	interface_update_media_images(false);
 	if(plugins_busy())
