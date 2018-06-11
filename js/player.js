@@ -50,7 +50,7 @@ function player_images_fullscreen_has() {
 function player_images_fullscreen_mouse(event) {
 	var media = document.getElementById("media");
 	var opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
-	media.setAttribute("style", "position: absolute; overflow: hidden; z-index: 1; opacity: " + opacity + "; " + STYLE_POSITION_MEDIA_ATTACHED);
+	media.setAttribute("style", "position: absolute; overflow: hidden; z-index: 1; opacity: " + opacity + "; " + STYLE_POSITION_MEDIA_ATTACHED + "; " + STYLE_BACKGROUND_MEDIA_ATTACHED);
 }
 
 // player, images, toggle fullscreen
@@ -58,6 +58,9 @@ function player_images_fullscreen_toggle(force_to) {
 	var body = document.body;
 	var player = document.getElementById("player_area");
 	var media = document.getElementById("media");
+	var media_images_label = document.getElementById("media_images_label");
+	var media_images_info = document.getElementById("media_images_info");
+	var media_controls_label = document.getElementById("media_controls_label");
 
 	if(typeof force_to === "boolean" ? !force_to : player_images_fullscreen_has()) {
 		// cancel fullscreen mode
@@ -71,7 +74,10 @@ function player_images_fullscreen_toggle(force_to) {
 		player.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_DETACHED);
 		player.removeAttribute("onmousemove");
 		if(body && player && player.contains(media)) {
-			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_DETACHED);
+			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_DETACHED + "; " + STYLE_BACKGROUND_MEDIA_DETACHED);
+			media_images_label.setAttribute("class", "text_black");
+			media_images_info.setAttribute("class", "text_black");
+			media_controls_label.setAttribute("class", "text_black");
 			player.removeChild(media);
 			body.appendChild(media);
 		}
@@ -95,7 +101,10 @@ function player_images_fullscreen_toggle(force_to) {
 		player.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_ATTACHED);
 		player.setAttribute("onmousemove", "player_images_fullscreen_mouse(event)");
 		if(player && body && body.contains(media)) {
-			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_ATTACHED);
+			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_ATTACHED + "; " + STYLE_BACKGROUND_MEDIA_ATTACHED);
+			media_images_label.setAttribute("class", "text_white");
+			media_images_info.setAttribute("class", "text_white");
+			media_controls_label.setAttribute("class", "text_white");
 			body.removeChild(media);
 			player.appendChild(media);
 		}

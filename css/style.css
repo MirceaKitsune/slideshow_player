@@ -1,5 +1,13 @@
-.text {
+.text_black {
+	color: #000000;
 	text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff, 0 0 4px #ffffff;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.text_white {
+	color: #ffffff;
+	text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000, 0 0 4px #000000;
 	z-index: 1;
 	pointer-events: none;
 }
@@ -19,6 +27,7 @@
 	text-align: center;
 	line-height: 28px;
 	font-size: 8px;
+	font-weight: bold;
 	width: 32px;
 	height: 32px;
 	left: -16px;
@@ -32,6 +41,7 @@
 	text-align: center;
 	line-height: 40px;
 	font-size: 16px;
+	font-weight: bold;
 	width: 48px;
 	height: 48px;
 	left: -24px;
@@ -45,6 +55,7 @@
 	text-align: center;
 	line-height: 56px;
 	font-size: 24px;
+	font-weight: bold;
 	width: 64px;
 	height: 64px;
 	left: -32px;

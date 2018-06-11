@@ -1,13 +1,15 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
-// attached and detached positions of the player and media bar
+// attached and detached styles of the player and media bar
 // player: always relative to the document body
 // media: relative to the document body when detached, relative to the player window when attached
 const STYLE_POSITION_PLAYER_ATTACHED = "top: 0%; left: 0%; width: 100%; height: 100%";
 const STYLE_POSITION_PLAYER_DETACHED = "top: 10%; left: 5%; width: 70%; height: 70%";
-const STYLE_POSITION_MEDIA_ATTACHED = "top: 80%; left: 2.5%; width: 95%; height: 20%";
+const STYLE_POSITION_MEDIA_ATTACHED = "top: 80%; left: 0%; width: 100%; height: 20%";
 const STYLE_POSITION_MEDIA_DETACHED = "top: 80%; left: 5%; width: 70%; height: 20%";
+const STYLE_BACKGROUND_MEDIA_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000c0)";
+const STYLE_BACKGROUND_MEDIA_DETACHED = "background-image: linear-gradient(to right, #00000000, #00000005, #00000000)";
 
 // whether to also refresh the content when loading new settings
 var interface_refresh_sites = false;
@@ -135,15 +137,15 @@ function interface_update_media_images(active) {
 	else {
 		prev.setAttribute("class", "button_size_small button_color_red");
 		prev.removeAttribute("onclick");
-		prev.innerHTML = "✖";
+		prev.innerHTML = "∅";
 
 		play.setAttribute("class", "button_size_medium button_color_red");
 		play.removeAttribute("onclick");
-		play.innerHTML = "✖";
+		play.innerHTML = "∅";
 
 		next.setAttribute("class", "button_size_small button_color_red");
 		next.removeAttribute("onclick");
-		next.innerHTML = "✖";
+		next.innerHTML = "∅";
 	}
 
 	if(active === true && ready !== true) {
@@ -198,7 +200,7 @@ function interface_update_media_controls(state) {
 		case "none":
 			play.setAttribute("class", "button_size_large button_color_red");
 			play.removeAttribute("onclick");
-			play.innerHTML = "✖";
+			play.innerHTML = "∅";
 			label.innerHTML = "<b>Unable to play</b>";
 			document.title = "Slideshow Player";
 			break;
@@ -219,7 +221,7 @@ function interface_update_media_controls(state) {
 		default:
 			play.setAttribute("class", "button_size_large button_color_pink");
 			play.removeAttribute("onclick");
-			play.innerHTML = "?";
+			play.innerHTML = "✖";
 			label.innerHTML = "<b>Error</b>";
 			document.title = "Slideshow Player";
 	}
@@ -384,7 +386,7 @@ function interface_init() {
 	// interface HTML: media
 	var media = document.createElement("div");
 	media.setAttribute("id", "media");
-	media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_DETACHED);
+	media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_DETACHED + "; " + STYLE_BACKGROUND_MEDIA_DETACHED);
 	document.body.appendChild(media);
 	{
 		// interface HTML: media, images
@@ -400,7 +402,7 @@ function interface_init() {
 			media_images_previous.setAttribute("title", "Previous image (" + KEY_LABEL_IMAGES_PREVIOUS + ")");
 			media_images_previous.setAttribute("class", "button_size_small button_color_pink");
 			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
-			media_images_previous.innerHTML = "?";
+			media_images_previous.innerHTML = "✖";
 			media_images.appendChild(media_images_previous);
 
 			// interface HTML: media, images, play
@@ -409,7 +411,7 @@ function interface_init() {
 			media_images_play.setAttribute("title", "Play / Pause image (" + KEY_LABEL_IMAGES_PLAY + ")");
 			media_images_play.setAttribute("class", "button_size_medium button_color_pink");
 			media_images_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
-			media_images_play.innerHTML = "?";
+			media_images_play.innerHTML = "✖";
 			media_images.appendChild(media_images_play);
 
 			// interface HTML: media, images, next
@@ -418,13 +420,13 @@ function interface_init() {
 			media_images_next.setAttribute("title", "Next image (" + KEY_LABEL_IMAGES_NEXT + ")");
 			media_images_next.setAttribute("class", "button_size_small button_color_pink");
 			media_images_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
-			media_images_next.innerHTML = "?";
+			media_images_next.innerHTML = "✖";
 			media_images.appendChild(media_images_next);
 
 			// interface HTML: media, images, label
 			var media_images_label = document.createElement("p");
 			media_images_label.setAttribute("id", "media_images_label");
-			media_images_label.setAttribute("class", "text");
+			media_images_label.setAttribute("class", "text_black");
 			media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%; text-align: center");
 			media_images.appendChild(media_images_label);
 
@@ -447,7 +449,7 @@ function interface_init() {
 			// interface HTML: media, images, info
 			var media_images_info = document.createElement("p");
 			media_images_info.setAttribute("id", "media_images_info");
-			media_images_info.setAttribute("class", "text");
+			media_images_info.setAttribute("class", "text_black");
 			media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%; text-align: center");
 			media_images.appendChild(media_images_info);
 		}
@@ -465,13 +467,13 @@ function interface_init() {
 			media_controls_play.setAttribute("title", "Toggle player / Refresh settings (" + KEY_LABEL_PLAY + ")");
 			media_controls_play.setAttribute("class", "button_size_large button_color_pink");
 			media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
-			media_controls_play.innerHTML = "?";
+			media_controls_play.innerHTML = "✖";
 			media_controls.appendChild(media_controls_play);
 
 			// interface HTML: media, controls, label
 			var media_controls_label = document.createElement("p");
 			media_controls_label.setAttribute("id", "media_controls_label");
-			media_controls_label.setAttribute("class", "text");
+			media_controls_label.setAttribute("class", "text_black");
 			media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%; text-align: center");
 			media_controls.appendChild(media_controls_label);
 
