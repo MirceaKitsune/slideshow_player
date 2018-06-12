@@ -2,7 +2,7 @@
 // Public Domain / CC0, MirceaKitsune 2018
 
 // to avoid broken image warnings, img elements are initialized using this fake 1x1px transparent gif
-const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+const SRC_BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 // valid extensions
 const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif"];
@@ -46,7 +46,7 @@ function settings_cookie_get() {
 var settings = {
 	sites: [],
 	images: {
-		keywords: "art",
+		keywords: "artwork",
 		count: 100,
 		duration: 10,
 		nsfw: false,
@@ -108,7 +108,7 @@ function plugins_busy_set(name, busy) {
 	}
 }
 
-// data, global array
+// data, images, global list
 var data_images = [];
 
 // data, images, functions, clear

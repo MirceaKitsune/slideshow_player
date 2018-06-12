@@ -13,7 +13,7 @@ const RATE = 10;
 const TRANSITION = 0.1;
 
 // default image style
-const IMG_STYLE = "position: absolute; width: auto; height: 100%; max-width: 100%; max-height: 100%";
+const STYLE_IMG = "position: absolute; width: auto; height: 100%; max-width: 100%; max-height: 100%";
 
 // player, global object
 var player = {
@@ -25,8 +25,7 @@ var player = {
 		timer_fade: null,
 		timer_next: null,
 		element_1: null,
-		element_2: null,
-		element_icon: null
+		element_2: null
 	}
 };
 
@@ -51,13 +50,13 @@ function player_images_fullscreen_has() {
 function player_images_fullscreen_mouse(event) {
 	var media = document.getElementById("media");
 	var opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
-	media.setAttribute("style", "position: absolute; overflow: hidden; z-index: 1; opacity: " + opacity + "; " + STYLE_POSITION_MEDIA_ATTACHED + "; " + STYLE_BACKGROUND_MEDIA_ATTACHED);
+	media.setAttribute("style", "z-index: 1; opacity: " + opacity + "; " + STYLE_MEDIA_POSITION_ATTACHED + "; " + STYLE_MEDIA_BACKGROUND_ATTACHED);
 }
 
 // player, images, toggle fullscreen
 function player_images_fullscreen_toggle(force_to) {
 	var body = document.body;
-	var player = document.getElementById("player_area");
+	var play = document.getElementById("player_area");
 	var media = document.getElementById("media");
 	var media_images_label = document.getElementById("media_images_label");
 	var media_images_info = document.getElementById("media_images_info");
@@ -71,15 +70,15 @@ function player_images_fullscreen_toggle(force_to) {
 		// else
 			// return;
 
-		// detach player and media bar
-		player.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_DETACHED);
-		player.removeAttribute("onmousemove");
-		if(body && player && player.contains(media)) {
-			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_DETACHED + "; " + STYLE_BACKGROUND_MEDIA_DETACHED);
+		// configure player / media / media_images_label / media_images_info / media_controls_label elements
+		play.setAttribute("style", STYLE_PLAYER_POSITION_DETACHED);
+		play.removeAttribute("onmousemove");
+		if(body && play && play.contains(media)) {
+			media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
 			media_images_label.setAttribute("class", "text_black");
 			media_images_info.setAttribute("class", "text_black");
 			media_controls_label.setAttribute("class", "text_black");
-			player.removeChild(media);
+			play.removeChild(media);
 			body.appendChild(media);
 		}
 
@@ -92,27 +91,27 @@ function player_images_fullscreen_toggle(force_to) {
 	}
 	else {
 		// request fullscreen mode
-		var method_request = player.requestFullScreen || player.webkitRequestFullScreen || player.mozRequestFullScreen || player.msRequestFullscreen;
+		var method_request = play.requestFullScreen || play.webkitRequestFullScreen || play.mozRequestFullScreen || play.msRequestFullscreen;
 		if(method_request)
-			method_request.call(player);
+			method_request.call(play);
 		else
 			return;
 
-		// attach player and media bar
-		player.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_ATTACHED);
-		player.setAttribute("onmousemove", "player_images_fullscreen_mouse(event)");
-		if(player && body && body.contains(media)) {
-			media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_ATTACHED + "; " + STYLE_BACKGROUND_MEDIA_ATTACHED);
+		// configure player / media / media_images_label / media_images_info / media_controls_label elements
+		play.setAttribute("style", STYLE_PLAYER_POSITION_ATTACHED);
+		play.setAttribute("onmousemove", "player_images_fullscreen_mouse(event)");
+		if(play && body && body.contains(media)) {
+			media.setAttribute("style", STYLE_MEDIA_POSITION_ATTACHED + "; " + STYLE_MEDIA_BACKGROUND_ATTACHED);
 			media_images_label.setAttribute("class", "text_white");
 			media_images_info.setAttribute("class", "text_white");
 			media_controls_label.setAttribute("class", "text_white");
 			body.removeChild(media);
-			player.appendChild(media);
+			play.appendChild(media);
 		}
 
 		// set mouse properties
-		fullscreen_mouse_start = player.offsetHeight - media.offsetHeight - FULLSCREEN_MOUSE_FADE;
-		fullscreen_mouse_end = player.offsetHeight - media.offsetHeight;
+		fullscreen_mouse_start = play.offsetHeight - media.offsetHeight - FULLSCREEN_MOUSE_FADE;
+		fullscreen_mouse_end = play.offsetHeight - media.offsetHeight;
 
 		// start the periodic fullscreen check
 		fullscreen_timer = setInterval(player_images_fullscreen_timer, 100);
@@ -130,15 +129,14 @@ function player_images_fade() {
 		clearInterval(player.images.timer_fade);
 
 		// update the image thumbnail and info
-		interface_update_media_images(true);
+		interface_update_media_images();
 
 		return;
 	}
 
 	player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
-	player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: " + (1 - player.images.transition));
-	player.images.element2.setAttribute("style", IMG_STYLE + "; opacity: " + (0 + player.images.transition));
-	player.images.element_icon.innerHTML = "";
+	player.images.element1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
+	player.images.element2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
 }
 
 // player, images, switching
@@ -159,7 +157,7 @@ function player_images_next() {
 		if(settings.images.loop === true) {
 			player.images.index = 0;
 			player.images.element1.setAttribute("src", player.images.element2.getAttribute("src"));
-			player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: 1");
+			player.images.element1.setAttribute("style", STYLE_IMG + "; opacity: 1");
 
 			// also shuffle the images again
 			if(settings.images.shuffle)
@@ -182,14 +180,13 @@ function player_images_next() {
 	player.images.preloading = true;
 
 	// apply the current and next image
-	player.images.element_icon.innerHTML = "⧗";
 	if(player.images.index > 1) {
 		player.images.element1.setAttribute("src", data_images[player.images.index - 2].src);
-		player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: " + (player.images.transition < 0 ? 0 : 1));
+		player.images.element1.setAttribute("style", STYLE_IMG + "; opacity: " + (player.images.transition < 0 ? 0 : 1));
 	}
 	if(player.images.index > 0) {
 		player.images.element2.setAttribute("src", data_images[player.images.index - 1].src);
-		player.images.element2.setAttribute("style", IMG_STYLE + "; opacity: " + (player.images.transition < 0 ? 1 : 0));
+		player.images.element2.setAttribute("style", STYLE_IMG + "; opacity: " + (player.images.transition < 0 ? 1 : 0));
 		player.images.element2.setAttribute("onload", "player.images.preloading = false");
 		player.images.element2.setAttribute("onerror", "player_detach()");
 	}
@@ -204,7 +201,7 @@ function player_images_skip(index) {
 	player.images.timer_next = setTimeout(player_images_next, 0);
 
 	// update the image thumbnail and info
-	interface_update_media_images(true);
+	interface_update_media_images();
 }
 
 // player, images, play
@@ -219,7 +216,7 @@ function player_images_play() {
 	}
 
 	// update the pause button
-	interface_update_media_images(true);
+	interface_update_media_images();
 }
 
 // player, is available
@@ -240,29 +237,23 @@ function player_busy() {
 // player, HTML, create
 function player_attach() {
 	// create the player element
-	var element = document.getElementById("player_area");
+	var play_area = document.getElementById("player_area");
 	var play = document.createElement("div");
 	play.setAttribute("id", "player");
 	play.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center");
-	element.appendChild(play);
+	play_area.appendChild(play);
 
 	// configure the 1st element
 	player.images.element1 = document.createElement("img");
-	player.images.element1.setAttribute("style", IMG_STYLE + "; opacity: 1");
-	player.images.element1.setAttribute("src", BLANK);
+	player.images.element1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+	player.images.element1.setAttribute("src", SRC_BLANK);
 	play.appendChild(player.images.element1);
 
 	// configure the 2nd element
 	player.images.element2 = document.createElement("img");
-	player.images.element2.setAttribute("style", IMG_STYLE + "; opacity: 0");
-	player.images.element2.setAttribute("src", BLANK);
+	player.images.element2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+	player.images.element2.setAttribute("src", SRC_BLANK);
 	play.appendChild(player.images.element2);
-
-	// icon indicator
-	player.images.element_icon = document.createElement("div");
-	player.images.element_icon.setAttribute("class", "text_black");
-	player.images.element_icon.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 48px; height: 48px; z-index: 1; line-height: 32px; font-size: 48px");
-	play.appendChild(player.images.element_icon);
 
 	// set the interval and timeout functions
 	// player.images.timer_fade = setInterval(player_images_fade, RATE);
@@ -274,17 +265,17 @@ function player_attach() {
 	if(settings.images.shuffle)
 		images_shuffle();
 
-	interface_update_media_images(true);
+	interface_update_media_images();
 	interface_update_media_controls("stop");
 }
 
 // player, HTML, destroy
 function player_detach() {
 	// destroy the player element
-	var element = document.getElementById("player_area");
+	var play_area = document.getElementById("player_area");
 	var play = document.getElementById("player");
 	if(document.body.contains(play)) {
-		element.removeChild(play);
+		play_area.removeChild(play);
 		play.innerHTML = "";
 	}
 
@@ -295,9 +286,8 @@ function player_detach() {
 	player.images.stopped = false;
 	player.images.element_1 = null;
 	player.images.element_2 = null;
-	player.images.element_icon = null;
 
-	interface_update_media_images(false);
+	interface_update_media_images();
 	if(plugins_busy())
 		interface_update_media_controls("busy");
 	else if(player_available())

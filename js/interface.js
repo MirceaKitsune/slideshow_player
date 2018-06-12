@@ -4,12 +4,12 @@
 // attached and detached styles of the player and media bar
 // player: always relative to the document body
 // media: relative to the document body when detached, relative to the player window when attached
-const STYLE_POSITION_PLAYER_ATTACHED = "top: 0%; left: 0%; width: 100%; height: 100%";
-const STYLE_POSITION_PLAYER_DETACHED = "top: 10%; left: 5%; width: 70%; height: 70%";
-const STYLE_POSITION_MEDIA_ATTACHED = "top: 80%; left: 0%; width: 100%; height: 20%";
-const STYLE_POSITION_MEDIA_DETACHED = "top: 80%; left: 5%; width: 70%; height: 20%";
-const STYLE_BACKGROUND_MEDIA_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000c0)";
-const STYLE_BACKGROUND_MEDIA_DETACHED = "background-image: linear-gradient(to right, #00000000, #00000005, #00000000)";
+const STYLE_PLAYER_POSITION_ATTACHED = "top: 0%; left: 0%; width: 100%; height: 100%";
+const STYLE_PLAYER_POSITION_DETACHED = "top: 10%; left: 5%; width: 70%; height: 70%";
+const STYLE_MEDIA_POSITION_ATTACHED = "top: 80%; left: 0%; width: 100%; height: 20%";
+const STYLE_MEDIA_POSITION_DETACHED = "top: 80%; left: 5%; width: 70%; height: 20%";
+const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000c0)";
+const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to right, #00000000, #00000005, #00000000)";
 
 // whether to also refresh the content when loading new settings
 var interface_refresh_sites = false;
@@ -21,6 +21,7 @@ function interface_refresh(name) {
 		return;
 
 	// refresh the content if this setting affects any plugins
+	// if set to true rather than a setting name, force refresh
 	if(name === true || plugins_settings.indexOf(name) >= 0)
 		interface_refresh_sites = true;
 
@@ -49,13 +50,15 @@ function interface_load() {
 	settings.images.duration = Number(elements_settings["controls_images_duration"].value);
 	settings.images.loop = Boolean(elements_settings["controls_images_play_loop"].checked);
 	settings.images.shuffle = Boolean(elements_settings["controls_images_play_shuffle"].checked);
-	settings_cookie_set();
 
 	// limit the settings to acceptable values
 	// should match the limits defined on the corresponding HTML elements
 	settings.images.keywords = settings.images.keywords.substring(0, 100);
 	settings.images.count = Math.max(Math.min(settings.images.count, 1000), 5);
 	settings.images.duration = Math.max(Math.min(settings.images.duration, 100), 5);
+
+	// update the settings cookie
+	settings_cookie_set();
 
 	// evenly distribute the total image count to each source
 	settings.images.count = Math.floor(settings.images.count / settings.sites.length);
@@ -90,7 +93,7 @@ function interface_update_controls_sites_list() {
 		sites_list_checkbox.setAttribute("title", "Whether to fetch images from " + item);
 		sites_list_checkbox.setAttribute("type", "checkbox");
 		sites_list_checkbox.setAttribute("name", item);
-		if(settings.sites.indexOf(item) >= 0)
+		if(settings.sites.length == 0 || settings.sites.indexOf(item) >= 0)
 			sites_list_checkbox.setAttribute("checked", true);
 		sites_list_checkbox.setAttribute("onclick", "interface_refresh(true)");
 		sites_list.appendChild(sites_list_checkbox);
@@ -103,8 +106,9 @@ function interface_update_controls_sites_list() {
 }
 
 // interface, update HTML, media images
-function interface_update_media_images(active) {
-	var ready = player_active() && !player_busy();
+function interface_update_media_images() {
+	var active = player_active();
+	var ready = !player_busy();
 
 	var prev = document.getElementById("media_images_previous");
 	var play = document.getElementById("media_images_play");
@@ -113,7 +117,9 @@ function interface_update_media_images(active) {
 	var thumb = document.getElementById("media_images_thumb");
 	var thumb_image = document.getElementById("media_images_thumb_image");
 	var info = document.getElementById("media_images_info");
+	var player_icon = document.getElementById("player_icon");
 
+	// configure previous / play / next elements
 	if(active === true && ready === true) {
 		prev.setAttribute("class", "button_size_small button_color_blue");
 		prev.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
@@ -148,23 +154,27 @@ function interface_update_media_images(active) {
 		next.innerHTML = "∅";
 	}
 
+	// configure label / thumb / info / player_icon elements
 	if(active === true && ready !== true) {
 		label.innerHTML = "<font size=\"2\"><b>? / " + data_images.length + "</b></font>";
 		thumb.removeAttribute("href");
-		thumb_image.setAttribute("src", BLANK);
+		thumb_image.setAttribute("src", SRC_BLANK);
 		info.innerHTML = "<font size=\"1\"><b>Loading image</b></font>";
+		player_icon.innerHTML = "⧗";
 	}
 	else if(active === true) {
 		label.innerHTML = "<font size=\"2\"><b>" + player.images.index + " / " + data_images.length + "</b></font>";
 		thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
 		info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
+		player_icon.innerHTML = "";
 	}
 	else {
 		label.innerHTML = "<font size=\"2\"><b>Player stopped</b></font>";
 		thumb.removeAttribute("href");
-		thumb_image.setAttribute("src", BLANK);
+		thumb_image.setAttribute("src", SRC_BLANK);
 		info.innerHTML = "";
+		player_icon.innerHTML = "";
 	}
 }
 
@@ -182,27 +192,28 @@ function interface_update_media_controls(state) {
 		"<b>Total images:</b> " + total_images + "<br/>" +
 		"<b>Estimated time:</b> " + total_time;
 
+	// configure play / label elements, as well as the window title
 	switch(state) {
 		case "busy":
 			play.setAttribute("class", "button_size_large button_color_blue");
 			play.setAttribute("onclick", "interface_load()");
 			play.innerHTML = "⧗";
 			label.innerHTML = "<b>Loading content</b>";
-			document.title = "Slideshow Player";
+			document.title = "Slideshow Player (⧗)";
 			break;
 		case "reload":
 			play.setAttribute("class", "button_size_large button_color_cyan");
 			play.setAttribute("onclick", "interface_load()");
 			play.innerHTML = "⟳";
 			label.innerHTML = "<b>Click to apply settings</b>";
-			document.title = "Slideshow Player";
+			document.title = "Slideshow Player (⟳)";
 			break;
 		case "none":
 			play.setAttribute("class", "button_size_large button_color_red");
 			play.removeAttribute("onclick");
 			play.innerHTML = "∅";
 			label.innerHTML = "<b>Unable to play</b>";
-			document.title = "Slideshow Player";
+			document.title = "Slideshow Player (∅)";
 			break;
 		case "stop":
 			play.setAttribute("class", "button_size_large button_color_green");
@@ -223,7 +234,7 @@ function interface_update_media_controls(state) {
 			play.removeAttribute("onclick");
 			play.innerHTML = "✖";
 			label.innerHTML = "<b>Error</b>";
-			document.title = "Slideshow Player";
+			document.title = "Slideshow Player (✖)";
 	}
 }
 
@@ -232,8 +243,17 @@ function interface_init() {
 	// interface HTML: player
 	var play = document.createElement("div");
 	play.setAttribute("id", "player_area");
-	play.setAttribute("style", "position: absolute; background-color: #000000; " + STYLE_POSITION_PLAYER_DETACHED);
+	play.setAttribute("class", "player");
+	play.setAttribute("style", STYLE_PLAYER_POSITION_DETACHED);
 	document.body.appendChild(play);
+	{
+		// interface HTML: player, icon
+		var play_icon = document.createElement("div");
+		play_icon.setAttribute("id", "player_icon");
+		play_icon.setAttribute("class", "text_white");
+		play_icon.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 48px; height: 48px; z-index: 1; line-height: 32px; font-size: 48px");
+		play.appendChild(play_icon);
+	}
 
 	// interface HTML: controls
 	var controls = document.createElement("div");
@@ -386,7 +406,8 @@ function interface_init() {
 	// interface HTML: media
 	var media = document.createElement("div");
 	media.setAttribute("id", "media");
-	media.setAttribute("style", "position: absolute; overflow: hidden; " + STYLE_POSITION_MEDIA_DETACHED + "; " + STYLE_BACKGROUND_MEDIA_DETACHED);
+	media.setAttribute("class", "media");
+	media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
 	document.body.appendChild(media);
 	{
 		// interface HTML: media, images
@@ -441,7 +462,7 @@ function interface_init() {
 				var media_images_thumb_image = document.createElement("img");
 				media_images_thumb_image.setAttribute("id", "media_images_thumb_image");
 				media_images_thumb_image.setAttribute("class", "thumbnail");
-				media_images_thumb_image.setAttribute("src", BLANK);
+				media_images_thumb_image.setAttribute("src", SRC_BLANK);
 				media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
 				media_images_thumb.appendChild(media_images_thumb_image);
 			}
