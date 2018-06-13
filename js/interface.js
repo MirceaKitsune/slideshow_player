@@ -10,7 +10,7 @@ const STYLE_PLAYER_POSITION_DETACHED = "top: 0%; left: 0%; width: 85%; height: 8
 const STYLE_MEDIA_POSITION_ATTACHED = "top: 80%; left: 0%; width: 100%; height: 20%";
 const STYLE_MEDIA_POSITION_DETACHED = "top: 80%; left: 0%; width: 85%; height: 20%";
 const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000c0)";
-const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to right, #00000000, #00000005, #00000000)";
+const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bottom, #00000005, #00000000)";
 
 // whether to also refresh the content when loading new settings
 var interface_refresh_sites = false;
@@ -185,13 +185,14 @@ function interface_update_media_controls(state) {
 	var label = document.getElementById("media_controls_label");
 
 	var total_images = data_images.length;
-	var total_seconds = total_images * settings.images.duration;
+	var total_duration = settings.images.duration;
+	var total_seconds = total_images * total_duration;
 	var total_date = new Date(null);
 	total_date.setSeconds(total_seconds);
 	var total_time = total_date.toISOString().substr(11, 8);
 	var label_status =
-		"<b>Total images:</b> " + total_images + "<br/>" +
-		"<b>Estimated time:</b> " + total_time;
+		"<b>Images:</b> " + total_images + " <b>↺</b> " + total_duration + " sec<br/>" +
+		"<b>Duration:</b> " + total_time;
 
 	// configure play / label elements, as well as the window title
 	switch(state) {
@@ -221,14 +222,14 @@ function interface_update_media_controls(state) {
 			play.setAttribute("onclick", "interface_play()");
 			play.innerHTML = "■";
 			label.innerHTML = label_status;
-			document.title = "Slideshow Player - " + total_images + " images (▶)";
+			document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (▶)";
 			break;
 		case "play":
 			play.setAttribute("class", "button_size_large button_color_yellow");
 			play.setAttribute("onclick", "interface_play()");
 			play.innerHTML = "▶";
 			label.innerHTML = label_status;
-			document.title = "Slideshow Player - " + total_images + " images (■)";
+			document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (■)";
 			break;
 		default:
 			play.setAttribute("class", "button_size_large button_color_pink");

@@ -36,7 +36,7 @@
 }
 
 .button_size_small {
-	border-radius: 40%;
+	border-radius: 10%;
 	text-align: center;
 	line-height: 28px;
 	font-size: 8px;
@@ -50,7 +50,7 @@
 }
 
 .button_size_medium {
-	border-radius: 40%;
+	border-radius: 10%;
 	text-align: center;
 	line-height: 40px;
 	font-size: 16px;
@@ -64,7 +64,7 @@
 }
 
 .button_size_large {
-	border-radius: 40%;
+	border-radius: 10%;
 	text-align: center;
 	line-height: 56px;
 	font-size: 24px;
@@ -87,7 +87,7 @@
 
 .button_color_white {
 	color: #ffffff;
-	border: 2px solid #666666;
+	border: 2px solid #888888;
 	box-shadow: 0 0 2px #aaaaaa;
 	text-shadow: 0 0 2px #ffffff;
 	background-color: #000000;
@@ -95,7 +95,7 @@
 
 .button_color_red {
 	color: #cc0000;
-	border: 2px solid #660000;
+	border: 2px solid #880000;
 	box-shadow: 0 0 2px #aa8888;
 	text-shadow: 0 0 2px #ff8888;
 	background-color: #ffffff;
@@ -103,7 +103,7 @@
 
 .button_color_yellow {
 	color: #cccc00;
-	border: 2px solid #666600;
+	border: 2px solid #888800;
 	box-shadow: 0 0 2px #aaaa88;
 	text-shadow: 0 0 2px #ffff88;
 	background-color: #ffffff;
@@ -111,7 +111,7 @@
 
 .button_color_green {
 	color: #00cc00;
-	border: 2px solid #006600;
+	border: 2px solid #008800;
 	box-shadow: 0 0 2px #88aa88;
 	text-shadow: 0 0 2px #88ff88;
 	background-color: #ffffff;
@@ -119,7 +119,7 @@
 
 .button_color_cyan {
 	color: #00cccc;
-	border: 2px solid #006666;
+	border: 2px solid #008888;
 	box-shadow: 0 0 2px #88aaaa;
 	text-shadow: 0 0 2px #88ffff;
 	background-color: #ffffff;
@@ -127,7 +127,7 @@
 
 .button_color_blue {
 	color: #0000cc;
-	border: 2px solid #000066;
+	border: 2px solid #000088;
 	box-shadow: 0 0 2px #8888aa;
 	text-shadow: 0 0 2px #8888ff;
 	background-color: #ffffff;
@@ -135,7 +135,7 @@
 
 .button_color_pink {
 	color: #cc00cc;
-	border: 2px solid #660066;
+	border: 2px solid #880088;
 	box-shadow: 0 0 2px #aa88aa;
 	text-shadow: 0 0 2px #ff88ff;
 	background-color: #ffffff;
