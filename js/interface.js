@@ -1,13 +1,14 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
-// attached and detached styles of the player and media bar
+// attached and detached element positions and styles
 // player: always relative to the document body
 // media: relative to the document body when detached, relative to the player window when attached
+const STYLE_CONTROLS_POSITION = "top: 0%; left: 85%; width: 15%; height: 100%";
 const STYLE_PLAYER_POSITION_ATTACHED = "top: 0%; left: 0%; width: 100%; height: 100%";
-const STYLE_PLAYER_POSITION_DETACHED = "top: 10%; left: 5%; width: 70%; height: 70%";
+const STYLE_PLAYER_POSITION_DETACHED = "top: 0%; left: 0%; width: 85%; height: 80%";
 const STYLE_MEDIA_POSITION_ATTACHED = "top: 80%; left: 0%; width: 100%; height: 20%";
-const STYLE_MEDIA_POSITION_DETACHED = "top: 80%; left: 5%; width: 70%; height: 20%";
+const STYLE_MEDIA_POSITION_DETACHED = "top: 80%; left: 0%; width: 85%; height: 20%";
 const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000c0)";
 const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to right, #00000000, #00000005, #00000000)";
 
@@ -85,7 +86,7 @@ function interface_play() {
 // interface, update HTML, sites
 function interface_update_controls_sites_list() {
 	var sites_list = document.getElementById("controls_sites_list");
-	sites_list.innerHTML = "<b>Sites:<b/><br/>";
+	sites_list.innerHTML = "";
 	for(var item in plugins) {
 		// interface HTML: controls, images, sites, list, checkbox
 		var sites_list_checkbox = document.createElement("input");
@@ -257,7 +258,7 @@ function interface_init() {
 
 	// interface HTML: controls
 	var controls = document.createElement("div");
-	controls.setAttribute("style", "position: absolute; top: 0%; left: 80%; width: 20%; height: 100%; background-color: #dfdfdf; overflow: auto");
+	controls.setAttribute("style", "position: absolute; overflow: auto; " + STYLE_CONTROLS_POSITION);
 	document.body.appendChild(controls);
 	{
 		// interface HTML: controls, images
@@ -398,7 +399,6 @@ function interface_init() {
 			// updated by interface_update_controls_sites_list
 			var controls_sites_list = document.createElement("p");
 			controls_sites_list.setAttribute("id", "controls_sites_list");
-			controls_sites_list.innerHTML = "<b>Sites:<b/><br/>";
 			controls_sites.appendChild(controls_sites_list);
 		}
 	}
