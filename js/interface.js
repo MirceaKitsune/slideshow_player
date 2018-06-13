@@ -261,6 +261,34 @@ function interface_init() {
 	controls.setAttribute("style", "position: absolute; overflow: auto; " + STYLE_CONTROLS_POSITION);
 	document.body.appendChild(controls);
 	{
+		// interface HTML: controls, banner
+		var controls_banner = document.createElement("div");
+		controls_banner.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 5%; overflow: hidden");
+		controls.appendChild(controls_banner);
+		{
+			// interface HTML: controls, banner, url
+			var controls_banner_url = document.createElement("a");
+			controls_banner_url.setAttribute("target", "_blank");
+			controls_banner_url.setAttribute("href", "https://github.com/MirceaKitsune/slideshow_player");
+			controls_banner_url.setAttribute("style", "text-align: center; text-decoration: none; color: #000000");
+			controls_banner.appendChild(controls_banner_url);
+			{
+				// interface HTML: controls, banner, url, image
+				var controls_banner_url_image = document.createElement("img");
+				controls_banner_url_image.setAttribute("src", "svg/icon_eye.svg");
+				controls_banner_url_image.setAttribute("style", "position: absolute; top: 0%; left: 0%; height: 5%");
+				controls_banner_url.appendChild(controls_banner_url_image);
+
+				// interface HTML: controls, banner, url, text
+				var controls_banner_url_text = document.createElement("div");
+				controls_banner_url_text.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 100%");
+				controls_banner_url_text.innerHTML =
+					"<font size=\"4\"><b>Slideshow Player</b></font><br/>" +
+					"<font size=\"1\"><b>by MirceaKitsune</b></font>";
+				controls_banner_url.appendChild(controls_banner_url_text);
+			}
+		}
+
 		// interface HTML: controls, images
 		var controls_images = document.createElement("form");
 		controls_images.setAttribute("id", "controls_images");
