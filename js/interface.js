@@ -15,6 +15,9 @@ const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bo
 // whether to also refresh the content when loading new settings
 var interface_refresh_sites = false;
 
+// object containing all of the interface elements
+var interface = {};
+
 // interface, functions, refresh
 function interface_refresh(name) {
 	// don't do anything if plugins are still busy
@@ -85,24 +88,25 @@ function interface_play() {
 
 // interface, update HTML, sites
 function interface_update_controls_sites_list() {
-	var sites_list = document.getElementById("controls_sites_list");
-	sites_list.innerHTML = "";
+	interface.controls_sites_list.innerHTML = "";
 	for(var item in plugins) {
 		// interface HTML: controls, images, sites, list, checkbox
-		var sites_list_checkbox = document.createElement("input");
-		sites_list_checkbox.setAttribute("id", "controls_images_list_sites_checkbox_" + item);
-		sites_list_checkbox.setAttribute("title", "Whether to fetch images from " + item);
-		sites_list_checkbox.setAttribute("type", "checkbox");
-		sites_list_checkbox.setAttribute("name", item);
+		var id_checkbox = "controls_images_list_sites_" + item + "_checkbox";
+		interface[id_checkbox] = document.createElement("input");
+		interface[id_checkbox].setAttribute("id", id_checkbox);
+		interface[id_checkbox].setAttribute("title", "Whether to fetch content from " + item);
+		interface[id_checkbox].setAttribute("type", "checkbox");
+		interface[id_checkbox].setAttribute("name", item);
 		if(settings.sites.length == 0 || settings.sites.indexOf(item) >= 0)
-			sites_list_checkbox.setAttribute("checked", true);
-		sites_list_checkbox.setAttribute("onclick", "interface_refresh(true)");
-		sites_list.appendChild(sites_list_checkbox);
+			interface[id_checkbox].setAttribute("checked", true);
+		interface[id_checkbox].setAttribute("onclick", "interface_refresh(true)");
+		interface.controls_sites_list.appendChild(interface[id_checkbox]);
 
 		// interface HTML: controls, images, sites, list, label
-		var sites_list_label = document.createElement("label");
-		sites_list_label.innerHTML = item + "<br/>";
-		sites_list.appendChild(sites_list_label);
+		var id_label = "controls_images_list_sites_" + item + "_label";
+		interface[id_label] = document.createElement("label");
+		interface[id_label].innerHTML = item + "<br/>";
+		interface.controls_sites_list.appendChild(interface[id_label]);
 	}
 }
 
@@ -111,79 +115,67 @@ function interface_update_media_images() {
 	var active = player_active();
 	var ready = !player_busy();
 
-	var prev = document.getElementById("media_images_previous");
-	var play = document.getElementById("media_images_play");
-	var next = document.getElementById("media_images_next");
-	var label = document.getElementById("media_images_label");
-	var thumb = document.getElementById("media_images_thumb");
-	var thumb_image = document.getElementById("media_images_thumb_image");
-	var info = document.getElementById("media_images_info");
-	var player_icon = document.getElementById("player_icon");
-
 	// configure previous / play / next elements
 	if(active === true && ready === true) {
-		prev.setAttribute("class", "button_size_small button_color_blue");
-		prev.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
-		prev.innerHTML = "|◀";
+		interface.media_images_previous.setAttribute("class", "button_size_small button_color_blue");
+		interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
+		interface.media_images_previous.innerHTML = "|◀";
 
 		if(player.images.stopped === true) {
-			play.setAttribute("class", "button_size_medium button_color_yellow");
-			play.setAttribute("onclick", "player_images_play()");
-			play.innerHTML = "▶";
+			interface.media_images_play.setAttribute("class", "button_size_medium button_color_yellow");
+			interface.media_images_play.setAttribute("onclick", "player_images_play()");
+			interface.media_images_play.innerHTML = "▶";
 		}
 		else {
-			play.setAttribute("class", "button_size_medium button_color_green");
-			play.setAttribute("onclick", "player_images_play()");
-			play.innerHTML = "||";
+			interface.media_images_play.setAttribute("class", "button_size_medium button_color_green");
+			interface.media_images_play.setAttribute("onclick", "player_images_play()");
+			interface.media_images_play.innerHTML = "||";
 		}
 
-		next.setAttribute("class", "button_size_small button_color_blue");
-		next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
-		next.innerHTML = "▶|";
+		interface.media_images_next.setAttribute("class", "button_size_small button_color_blue");
+		interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
+		interface.media_images_next.innerHTML = "▶|";
 	}
 	else {
-		prev.setAttribute("class", "button_size_small button_color_red");
-		prev.removeAttribute("onclick");
-		prev.innerHTML = "∅";
+		interface.media_images_previous.setAttribute("class", "button_size_small button_color_red");
+		interface.media_images_previous.removeAttribute("onclick");
+		interface.media_images_previous.innerHTML = "∅";
 
-		play.setAttribute("class", "button_size_medium button_color_red");
-		play.removeAttribute("onclick");
-		play.innerHTML = "∅";
+		interface.media_images_play.setAttribute("class", "button_size_medium button_color_red");
+		interface.media_images_play.removeAttribute("onclick");
+		interface.media_images_play.innerHTML = "∅";
 
-		next.setAttribute("class", "button_size_small button_color_red");
-		next.removeAttribute("onclick");
-		next.innerHTML = "∅";
+		interface.media_images_next.setAttribute("class", "button_size_small button_color_red");
+		interface.media_images_next.removeAttribute("onclick");
+		interface.media_images_next.innerHTML = "∅";
 	}
 
 	// configure label / thumb / info / player_icon elements
 	if(active === true && ready !== true) {
-		label.innerHTML = "<font size=\"2\"><b>? / " + data_images.length + "</b></font>";
-		thumb.removeAttribute("href");
-		thumb_image.setAttribute("src", SRC_BLANK);
-		info.innerHTML = "<font size=\"1\"><b>Loading image</b></font>";
-		player_icon.innerHTML = "⧗";
+		interface.media_images_label.innerHTML = "<font size=\"2\"><b>? / " + data_images.length + "</b></font>";
+		interface.media_images_thumb.removeAttribute("href");
+		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
+		interface.media_images_info.innerHTML = "<font size=\"1\"><b>Loading image</b></font>";
+		interface.player_icon.innerHTML = "⧗";
 	}
 	else if(active === true) {
-		label.innerHTML = "<font size=\"2\"><b>" + player.images.index + " / " + data_images.length + "</b></font>";
-		thumb.setAttribute("href", data_images[player.images.index - 1].url);
-		thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
-		info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
-		player_icon.innerHTML = "";
+		interface.media_images_label.innerHTML = "<font size=\"2\"><b>" + player.images.index + " / " + data_images.length + "</b></font>";
+		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
+		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
+		interface.media_images_info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
+		interface.player_icon.innerHTML = "";
 	}
 	else {
-		label.innerHTML = "<font size=\"2\"><b>Player stopped</b></font>";
-		thumb.removeAttribute("href");
-		thumb_image.setAttribute("src", SRC_BLANK);
-		info.innerHTML = "";
-		player_icon.innerHTML = "";
+		interface.media_images_label.innerHTML = "<font size=\"2\"><b>Player stopped</b></font>";
+		interface.media_images_thumb.removeAttribute("href");
+		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
+		interface.media_images_info.innerHTML = "";
+		interface.player_icon.innerHTML = "";
 	}
 }
 
 // interface, update HTML, media controls
 function interface_update_media_controls(state) {
-	var play = document.getElementById("media_controls_play");
-	var label = document.getElementById("media_controls_label");
-
 	var total_images = data_images.length;
 	var total_duration = settings.images.duration;
 	var total_seconds = total_images * total_duration;
@@ -197,352 +189,334 @@ function interface_update_media_controls(state) {
 	// configure play / label elements, as well as the window title
 	switch(state) {
 		case "busy":
-			play.setAttribute("class", "button_size_large button_color_blue");
-			play.setAttribute("onclick", "interface_load()");
-			play.innerHTML = "⧗";
-			label.innerHTML = "<b>Loading content</b>";
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_blue");
+			interface.media_controls_play.setAttribute("onclick", "interface_load()");
+			interface.media_controls_play.innerHTML = "⧗";
+			interface.media_controls_label.innerHTML = "<b>Loading content</b>";
 			document.title = "Slideshow Player (⧗)";
 			break;
 		case "reload":
-			play.setAttribute("class", "button_size_large button_color_cyan");
-			play.setAttribute("onclick", "interface_load()");
-			play.innerHTML = "⟳";
-			label.innerHTML = "<b>Click to apply settings</b>";
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_cyan");
+			interface.media_controls_play.setAttribute("onclick", "interface_load()");
+			interface.media_controls_play.innerHTML = "⟳";
+			interface.media_controls_label.innerHTML = "<b>Click to apply settings</b>";
 			document.title = "Slideshow Player (⟳)";
 			break;
 		case "none":
-			play.setAttribute("class", "button_size_large button_color_red");
-			play.removeAttribute("onclick");
-			play.innerHTML = "∅";
-			label.innerHTML = "<b>Unable to play</b>";
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_red");
+			interface.media_controls_play.removeAttribute("onclick");
+			interface.media_controls_play.innerHTML = "∅";
+			interface.media_controls_label.innerHTML = "<b>Unable to play</b>";
 			document.title = "Slideshow Player (∅)";
 			break;
 		case "stop":
-			play.setAttribute("class", "button_size_large button_color_green");
-			play.setAttribute("onclick", "interface_play()");
-			play.innerHTML = "■";
-			label.innerHTML = label_status;
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_green");
+			interface.media_controls_play.setAttribute("onclick", "interface_play()");
+			interface.media_controls_play.innerHTML = "■";
+			interface.media_controls_label.innerHTML = label_status;
 			document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (▶)";
 			break;
 		case "play":
-			play.setAttribute("class", "button_size_large button_color_yellow");
-			play.setAttribute("onclick", "interface_play()");
-			play.innerHTML = "▶";
-			label.innerHTML = label_status;
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_yellow");
+			interface.media_controls_play.setAttribute("onclick", "interface_play()");
+			interface.media_controls_play.innerHTML = "▶";
+			interface.media_controls_label.innerHTML = label_status;
 			document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (■)";
 			break;
 		default:
-			play.setAttribute("class", "button_size_large button_color_pink");
-			play.removeAttribute("onclick");
-			play.innerHTML = "✖";
-			label.innerHTML = "<b>Error</b>";
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_pink");
+			interface.media_controls_play.removeAttribute("onclick");
+			interface.media_controls_play.innerHTML = "✖";
+			interface.media_controls_label.innerHTML = "<b>Error</b>";
 			document.title = "Slideshow Player (✖)";
 	}
 }
 
 // interface, HTML, create
 function interface_init() {
+	interface = {};
+
 	// interface HTML: player
-	var play = document.createElement("div");
-	play.setAttribute("id", "player_area");
-	play.setAttribute("class", "player");
-	play.setAttribute("style", STYLE_PLAYER_POSITION_DETACHED);
-	document.body.appendChild(play);
+	interface.player = document.createElement("div");
+	interface.player.setAttribute("class", "player");
+	interface.player.setAttribute("style", STYLE_PLAYER_POSITION_DETACHED);
+	document.body.appendChild(interface.player);
 	{
 		// interface HTML: player, icon
-		var play_icon = document.createElement("div");
-		play_icon.setAttribute("id", "player_icon");
-		play_icon.setAttribute("class", "text_white");
-		play_icon.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 48px; height: 48px; z-index: 1; line-height: 32px; font-size: 48px");
-		play.appendChild(play_icon);
+		interface.player_icon = document.createElement("div");
+		interface.player_icon.setAttribute("class", "text_white");
+		interface.player_icon.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 48px; height: 48px; z-index: 1; line-height: 32px; font-size: 48px");
+		interface.player.appendChild(interface.player_icon);
 	}
 
 	// interface HTML: controls
-	var controls = document.createElement("div");
-	controls.setAttribute("style", "position: absolute; overflow: auto; " + STYLE_CONTROLS_POSITION);
-	document.body.appendChild(controls);
+	interface.controls = document.createElement("div");
+	interface.controls.setAttribute("style", "position: absolute; overflow: auto; " + STYLE_CONTROLS_POSITION);
+	document.body.appendChild(interface.controls);
 	{
 		// interface HTML: controls, banner
-		var controls_banner = document.createElement("div");
-		controls_banner.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 5%; overflow: hidden");
-		controls.appendChild(controls_banner);
+		interface.controls_banner = document.createElement("div");
+		interface.controls_banner.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 5%; overflow: hidden");
+		interface.controls.appendChild(interface.controls_banner);
 		{
 			// interface HTML: controls, banner, url
-			var controls_banner_url = document.createElement("a");
-			controls_banner_url.setAttribute("target", "_blank");
-			controls_banner_url.setAttribute("href", "https://github.com/MirceaKitsune/slideshow_player");
-			controls_banner_url.setAttribute("style", "text-align: center; text-decoration: none; color: #000000");
-			controls_banner.appendChild(controls_banner_url);
+			interface.controls_banner_url = document.createElement("a");
+			interface.controls_banner_url.setAttribute("target", "_blank");
+			interface.controls_banner_url.setAttribute("href", "https://github.com/MirceaKitsune/slideshow_player");
+			interface.controls_banner_url.setAttribute("style", "text-align: center; text-decoration: none; color: #000000");
+			interface.controls_banner.appendChild(interface.controls_banner_url);
 			{
 				// interface HTML: controls, banner, url, image
-				var controls_banner_url_image = document.createElement("img");
-				controls_banner_url_image.setAttribute("src", "svg/icon_eye.svg");
-				controls_banner_url_image.setAttribute("style", "position: absolute; top: 0%; left: 0%; height: 5%");
-				controls_banner_url.appendChild(controls_banner_url_image);
+				interface.controls_banner_url_image = document.createElement("img");
+				interface.controls_banner_url_image.setAttribute("src", "svg/icon_eye.svg");
+				interface.controls_banner_url_image.setAttribute("style", "position: absolute; top: 0%; left: 0%; height: 5%");
+				interface.controls_banner_url.appendChild(interface.controls_banner_url_image);
 
 				// interface HTML: controls, banner, url, text
-				var controls_banner_url_text = document.createElement("div");
-				controls_banner_url_text.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 100%");
-				controls_banner_url_text.innerHTML =
+				interface.controls_banner_url_text = document.createElement("div");
+				interface.controls_banner_url_text.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 100%");
+				interface.controls_banner_url_text.innerHTML =
 					"<font size=\"4\"><b>Slideshow Player</b></font><br/>" +
 					"<font size=\"1\"><b>by MirceaKitsune</b></font>";
-				controls_banner_url.appendChild(controls_banner_url_text);
+				interface.controls_banner_url.appendChild(interface.controls_banner_url_text);
 			}
 		}
 
 		// interface HTML: controls, images
-		var controls_images = document.createElement("form");
-		controls_images.setAttribute("id", "controls_images");
-		controls.appendChild(controls_images);
+		interface.controls_images = document.createElement("form");
+		interface.controls_images.setAttribute("id", "controls_images");
+		interface.controls.appendChild(interface.controls_images);
 		{
 			// interface HTML: media, images, title
-			var controls_images_title = document.createElement("p");
-			controls_images_title.setAttribute("style", "text-align: center");
-			controls_images_title.innerHTML = "<font size=\"4\"><b>Image settings</b></font>";
-			controls_images.appendChild(controls_images_title);
+			interface.controls_images_title = document.createElement("p");
+			interface.controls_images_title.setAttribute("style", "text-align: center");
+			interface.controls_images_title.innerHTML = "<font size=\"4\"><b>Image settings</b></font>";
+			interface.controls_images.appendChild(interface.controls_images_title);
 
 			// interface HTML: controls, images, search
-			var controls_images_search = document.createElement("p");
-			controls_images_search.innerHTML = "<b>Search:<b/><br/>";
-			controls_images.appendChild(controls_images_search);
+			interface.controls_images_search = document.createElement("p");
+			interface.controls_images_search.innerHTML = "<b>Search:<b/><br/>";
+			interface.controls_images.appendChild(interface.controls_images_search);
 			{
 				// interface HTML: controls, images, search, keywords, input
-				var controls_images_search_keywords_input = document.createElement("input");
-				controls_images_search_keywords_input.setAttribute("id", "controls_images_search_keywords");
-				controls_images_search_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
-				controls_images_search_keywords_input.setAttribute("type", "text");
-				controls_images_search_keywords_input.setAttribute("value", settings.images.keywords);
-				controls_images_search_keywords_input.setAttribute("maxlength", "100");
-				controls_images_search_keywords_input.setAttribute("onclick", "interface_refresh(\"keywords\")");
-				controls_images_search.appendChild(controls_images_search_keywords_input);
+				interface.controls_images_search_keywords_input = document.createElement("input");
+				interface.controls_images_search_keywords_input.setAttribute("id", "controls_images_search_keywords");
+				interface.controls_images_search_keywords_input.setAttribute("title", "Images matching those keywords will be used in the slideshow");
+				interface.controls_images_search_keywords_input.setAttribute("type", "text");
+				interface.controls_images_search_keywords_input.setAttribute("value", settings.images.keywords);
+				interface.controls_images_search_keywords_input.setAttribute("maxlength", "100");
+				interface.controls_images_search_keywords_input.setAttribute("onclick", "interface_refresh(\"keywords\")");
+				interface.controls_images_search.appendChild(interface.controls_images_search_keywords_input);
 
 				// interface HTML: controls, images, search, br
-				var controls_images_search_br = document.createElement("br");
-				controls_images_search.appendChild(controls_images_search_br);
+				interface.controls_images_search_br = document.createElement("br");
+				interface.controls_images_search.appendChild(interface.controls_images_search_br);
 
 				// interface HTML: controls, images, search, nsfw, input
-				var controls_images_search_nsfw_input = document.createElement("input");
-				controls_images_search_nsfw_input.setAttribute("id", "controls_images_search_nsfw");
-				controls_images_search_nsfw_input.setAttribute("title", "Include content that is not safe for work");
-				controls_images_search_nsfw_input.setAttribute("type", "checkbox");
+				interface.controls_images_search_nsfw_input = document.createElement("input");
+				interface.controls_images_search_nsfw_input.setAttribute("id", "controls_images_search_nsfw");
+				interface.controls_images_search_nsfw_input.setAttribute("title", "Include content that is not safe for work");
+				interface.controls_images_search_nsfw_input.setAttribute("type", "checkbox");
 				if(settings.images.nsfw === true)
-					controls_images_search_nsfw_input.setAttribute("checked", true);
-				controls_images_search_nsfw_input.setAttribute("onclick", "interface_refresh(\"nsfw\")");
-				controls_images_search.appendChild(controls_images_search_nsfw_input);
+					interface.controls_images_search_nsfw_input.setAttribute("checked", true);
+				interface.controls_images_search_nsfw_input.setAttribute("onclick", "interface_refresh(\"nsfw\")");
+				interface.controls_images_search.appendChild(interface.controls_images_search_nsfw_input);
 
 				// interface HTML: controls, images, search, nsfw, label
-				var controls_images_search_nsfw_label = document.createElement("label");
-				controls_images_search_nsfw_label.innerHTML = "NSFW<br/>";
-				controls_images_search.appendChild(controls_images_search_nsfw_label);
+				interface.controls_images_search_nsfw_label = document.createElement("label");
+				interface.controls_images_search_nsfw_label.innerHTML = "NSFW<br/>";
+				interface.controls_images_search.appendChild(interface.controls_images_search_nsfw_label);
 			}
 
 			// interface HTML: controls, images, count
-			var controls_images_count = document.createElement("p");
-			controls_images_count.innerHTML = "<b>Count:<b/><br/>";
-			controls_images.appendChild(controls_images_count);
+			interface.controls_images_count = document.createElement("p");
+			interface.controls_images_count.innerHTML = "<b>Count:<b/><br/>";
+			interface.controls_images.appendChild(interface.controls_images_count);
 			{
 				// interface HTML: controls, images, count, input
-				var controls_images_count_input = document.createElement("input");
-				controls_images_count_input.setAttribute("id", "controls_images_count");
-				controls_images_count_input.setAttribute("title", "The total number of images to be used in the slideshow");
-				controls_images_count_input.setAttribute("type", "number");
-				controls_images_count_input.setAttribute("value", settings.images.count);
-				controls_images_count_input.setAttribute("step", "5");
-				controls_images_count_input.setAttribute("min", "5");
-				controls_images_count_input.setAttribute("max", "1000");
-				controls_images_count_input.setAttribute("onclick", "interface_refresh(\"count\")");
-				controls_images_count.appendChild(controls_images_count_input);
+				interface.controls_images_count_input = document.createElement("input");
+				interface.controls_images_count_input.setAttribute("id", "controls_images_count");
+				interface.controls_images_count_input.setAttribute("title", "The total number of images to be used in the slideshow");
+				interface.controls_images_count_input.setAttribute("type", "number");
+				interface.controls_images_count_input.setAttribute("value", settings.images.count);
+				interface.controls_images_count_input.setAttribute("step", "5");
+				interface.controls_images_count_input.setAttribute("min", "5");
+				interface.controls_images_count_input.setAttribute("max", "1000");
+				interface.controls_images_count_input.setAttribute("onclick", "interface_refresh(\"count\")");
+				interface.controls_images_count.appendChild(interface.controls_images_count_input);
 			}
 
 			// interface HTML: controls, images, duration
-			var controls_images_duration = document.createElement("p");
-			controls_images_duration.innerHTML = "<b>Duration:<b/><br/>";
-			controls_images.appendChild(controls_images_duration);
+			interface.controls_images_duration = document.createElement("p");
+			interface.controls_images_duration.innerHTML = "<b>Duration:<b/><br/>";
+			interface.controls_images.appendChild(interface.controls_images_duration);
 			{
 				// interface HTML: controls, images, duration, input
-				var controls_images_duration_input = document.createElement("input");
-				controls_images_duration_input.setAttribute("id", "controls_images_duration");
-				controls_images_duration_input.setAttribute("title", "Number of seconds for which to display each image");
-				controls_images_duration_input.setAttribute("type", "number");
-				controls_images_duration_input.setAttribute("value", settings.images.duration);
-				controls_images_duration_input.setAttribute("step", "1");
-				controls_images_duration_input.setAttribute("min", "5");
-				controls_images_duration_input.setAttribute("max", "100");
-				controls_images_duration_input.setAttribute("onclick", "interface_refresh(\"duration\")");
-				controls_images_duration.appendChild(controls_images_duration_input);
+				interface.controls_images_duration_input = document.createElement("input");
+				interface.controls_images_duration_input.setAttribute("id", "controls_images_duration");
+				interface.controls_images_duration_input.setAttribute("title", "Number of seconds for which to display each image");
+				interface.controls_images_duration_input.setAttribute("type", "number");
+				interface.controls_images_duration_input.setAttribute("value", settings.images.duration);
+				interface.controls_images_duration_input.setAttribute("step", "1");
+				interface.controls_images_duration_input.setAttribute("min", "5");
+				interface.controls_images_duration_input.setAttribute("max", "100");
+				interface.controls_images_duration_input.setAttribute("onclick", "interface_refresh(\"duration\")");
+				interface.controls_images_duration.appendChild(interface.controls_images_duration_input);
 			}
 
 			// interface HTML: controls, images, play
-			var controls_images_play = document.createElement("p");
-			controls_images_play.innerHTML = "<b>Options:<b/><br/>";
-			controls_images.appendChild(controls_images_play);
+			interface.controls_images_play = document.createElement("p");
+			interface.controls_images_play.innerHTML = "<b>Options:<b/><br/>";
+			interface.controls_images.appendChild(interface.controls_images_play);
 			{
 				// interface HTML: controls, images, play, loop, input
-				var controls_images_play_loop_input = document.createElement("input");
-				controls_images_play_loop_input.setAttribute("id", "controls_images_play_loop");
-				controls_images_play_loop_input.setAttribute("title", "Whether to loop through the images indefinitely");
-				controls_images_play_loop_input.setAttribute("type", "checkbox");
+				interface.controls_images_play_loop_input = document.createElement("input");
+				interface.controls_images_play_loop_input.setAttribute("id", "controls_images_play_loop");
+				interface.controls_images_play_loop_input.setAttribute("title", "Whether to loop through the images indefinitely");
+				interface.controls_images_play_loop_input.setAttribute("type", "checkbox");
 				if(settings.images.loop === true)
-					controls_images_play_loop_input.setAttribute("checked", true);
-				controls_images_play_loop_input.setAttribute("onclick", "interface_refresh(\"loop\")");
-				controls_images_play.appendChild(controls_images_play_loop_input);
+					interface.controls_images_play_loop_input.setAttribute("checked", true);
+				interface.controls_images_play_loop_input.setAttribute("onclick", "interface_refresh(\"loop\")");
+				interface.controls_images_play.appendChild(interface.controls_images_play_loop_input);
 
 				// interface HTML: controls, images, play, loop, label
-				var controls_images_play_loop_label = document.createElement("label");
-				controls_images_play_loop_label.innerHTML = "Loop<br/>";
-				controls_images_play.appendChild(controls_images_play_loop_label);
+				interface.controls_images_play_loop_label = document.createElement("label");
+				interface.controls_images_play_loop_label.innerHTML = "Loop<br/>";
+				interface.controls_images_play.appendChild(interface.controls_images_play_loop_label);
 
 				// interface HTML: controls, images, play, shuffle, input
-				var controls_images_play_shuffle_input = document.createElement("input");
-				controls_images_play_shuffle_input.setAttribute("id", "controls_images_play_shuffle");
-				controls_images_play_shuffle_input.setAttribute("title", "Whether to shuffle the images before playing");
-				controls_images_play_shuffle_input.setAttribute("type", "checkbox");
+				interface.controls_images_play_shuffle_input = document.createElement("input");
+				interface.controls_images_play_shuffle_input.setAttribute("id", "controls_images_play_shuffle");
+				interface.controls_images_play_shuffle_input.setAttribute("title", "Whether to shuffle the images before playing");
+				interface.controls_images_play_shuffle_input.setAttribute("type", "checkbox");
 				if(settings.images.shuffle === true)
-					controls_images_play_shuffle_input.setAttribute("checked", true);
-				controls_images_play_shuffle_input.setAttribute("onclick", "interface_refresh(\"shuffle\")");
-				controls_images_play.appendChild(controls_images_play_shuffle_input);
+					interface.controls_images_play_shuffle_input.setAttribute("checked", true);
+				interface.controls_images_play_shuffle_input.setAttribute("onclick", "interface_refresh(\"shuffle\")");
+				interface.controls_images_play.appendChild(interface.controls_images_play_shuffle_input);
 
 				// interface HTML: controls, images, play, shuffle, label
-				var controls_images_play_shuffle_label = document.createElement("label");
-				controls_images_play_shuffle_label.innerHTML = "Shuffle<br/>";
-				controls_images_play.appendChild(controls_images_play_shuffle_label);
+				interface.controls_images_play_shuffle_label = document.createElement("label");
+				interface.controls_images_play_shuffle_label.innerHTML = "Shuffle<br/>";
+				interface.controls_images_play.appendChild(interface.controls_images_play_shuffle_label);
 			}
 		}
 
 		// interface HTML: controls, hr
-		var controls_hr = document.createElement("hr");
-		controls.appendChild(controls_hr);
+		interface.controls_hr_1 = document.createElement("hr");
+		interface.controls.appendChild(interface.controls_hr_1);
 
 		// interface HTML: controls, sites
-		var controls_sites = document.createElement("form");
-		controls_sites.setAttribute("id", "controls_sites");
-		controls.appendChild(controls_sites);
+		interface.controls_sites = document.createElement("form");
+		interface.controls_sites.setAttribute("id", "controls_sites");
+		interface.controls.appendChild(interface.controls_sites);
 		{
 			// interface HTML: controls, sites, title
-			var controls_sites_title = document.createElement("p");
-			controls_sites_title.setAttribute("style", "text-align: center");
-			controls_sites_title.innerHTML = "<font size=\"4\"><b>Sources</b></font>";
-			controls_sites.appendChild(controls_sites_title);
+			interface.controls_sites_title = document.createElement("p");
+			interface.controls_sites_title.setAttribute("style", "text-align: center");
+			interface.controls_sites_title.innerHTML = "<font size=\"4\"><b>Sources</b></font>";
+			interface.controls_sites.appendChild(interface.controls_sites_title);
 
 			// interface HTML: controls, sites, list
-			// updated by interface_update_controls_sites_list
-			var controls_sites_list = document.createElement("p");
-			controls_sites_list.setAttribute("id", "controls_sites_list");
-			controls_sites.appendChild(controls_sites_list);
+			interface.controls_sites_list = document.createElement("p");
+			interface.controls_sites.appendChild(interface.controls_sites_list);
 		}
 	}
 
 	// interface HTML: media
-	var media = document.createElement("div");
-	media.setAttribute("id", "media");
-	media.setAttribute("class", "media");
-	media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
-	document.body.appendChild(media);
+	interface.media = document.createElement("div");
+	interface.media.setAttribute("class", "media");
+	interface.media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
+	document.body.appendChild(interface.media);
 	{
 		// interface HTML: media, images
-		// updated by interface_update_media_images
-		var media_images = document.createElement("div");
-		media_images.setAttribute("id", "media_images");
-		media_images.setAttribute("style", "position: absolute; margin: 0 0 0 0%; top: 0%; left: 0%; width: 192px; height: 100%");
-		media.appendChild(media_images);
+		interface.media_images = document.createElement("div");
+		interface.media_images.setAttribute("style", "position: absolute; margin: 0 0 0 0%; top: 0%; left: 0%; width: 192px; height: 100%");
+		interface.media.appendChild(interface.media_images);
 		{
 			// interface HTML: media, images, previous
-			var media_images_previous = document.createElement("div");
-			media_images_previous.setAttribute("id", "media_images_previous");
-			media_images_previous.setAttribute("title", "Previous image (" + KEY_LABEL_IMAGES_PREVIOUS + ")");
-			media_images_previous.setAttribute("class", "button_size_small button_color_pink");
-			media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
-			media_images_previous.innerHTML = "✖";
-			media_images.appendChild(media_images_previous);
+			interface.media_images_previous = document.createElement("div");
+			interface.media_images_previous.setAttribute("title", "Previous image (" + KEY_LABEL_IMAGES_PREVIOUS + ")");
+			interface.media_images_previous.setAttribute("class", "button_size_small button_color_pink");
+			interface.media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
+			interface.media_images_previous.innerHTML = "✖";
+			interface.media_images.appendChild(interface.media_images_previous);
 
 			// interface HTML: media, images, play
-			var media_images_play = document.createElement("div");
-			media_images_play.setAttribute("id", "media_images_play");
-			media_images_play.setAttribute("title", "Play / Pause image (" + KEY_LABEL_IMAGES_PLAY + ")");
-			media_images_play.setAttribute("class", "button_size_medium button_color_pink");
-			media_images_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
-			media_images_play.innerHTML = "✖";
-			media_images.appendChild(media_images_play);
+			interface.media_images_play = document.createElement("div");
+			interface.media_images_play.setAttribute("title", "Play / Pause image (" + KEY_LABEL_IMAGES_PLAY + ")");
+			interface.media_images_play.setAttribute("class", "button_size_medium button_color_pink");
+			interface.media_images_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
+			interface.media_images_play.innerHTML = "✖";
+			interface.media_images.appendChild(interface.media_images_play);
 
 			// interface HTML: media, images, next
-			var media_images_next = document.createElement("div");
-			media_images_next.setAttribute("id", "media_images_next");
-			media_images_next.setAttribute("title", "Next image (" + KEY_LABEL_IMAGES_NEXT + ")");
-			media_images_next.setAttribute("class", "button_size_small button_color_pink");
-			media_images_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
-			media_images_next.innerHTML = "✖";
-			media_images.appendChild(media_images_next);
+			interface.media_images_next = document.createElement("div");
+			interface.media_images_next.setAttribute("title", "Next image (" + KEY_LABEL_IMAGES_NEXT + ")");
+			interface.media_images_next.setAttribute("class", "button_size_small button_color_pink");
+			interface.media_images_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
+			interface.media_images_next.innerHTML = "✖";
+			interface.media_images.appendChild(interface.media_images_next);
 
 			// interface HTML: media, images, label
-			var media_images_label = document.createElement("p");
-			media_images_label.setAttribute("id", "media_images_label");
-			media_images_label.setAttribute("class", "text_black");
-			media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%");
-			media_images.appendChild(media_images_label);
+			interface.media_images_label = document.createElement("p");
+			interface.media_images_label.setAttribute("class", "text_black");
+			interface.media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%");
+			interface.media_images.appendChild(interface.media_images_label);
 
 			// interface HTML: media, images, thumb
-			var media_images_thumb = document.createElement("a");
-			media_images_thumb.setAttribute("id", "media_images_thumb");
-			media_images_thumb.setAttribute("title", "Open image (" + KEY_LABEL_IMAGES_OPEN + ")");
-			media_images_thumb.setAttribute("target", "_blank");
-			media_images.appendChild(media_images_thumb);
+			interface.media_images_thumb = document.createElement("a");
+			interface.media_images_thumb.setAttribute("title", "Open image (" + KEY_LABEL_IMAGES_OPEN + ")");
+			interface.media_images_thumb.setAttribute("target", "_blank");
+			interface.media_images.appendChild(interface.media_images_thumb);
 			{
 				// interface HTML: media, images, thumb, image
-				var media_images_thumb_image = document.createElement("img");
-				media_images_thumb_image.setAttribute("id", "media_images_thumb_image");
-				media_images_thumb_image.setAttribute("class", "thumbnail");
-				media_images_thumb_image.setAttribute("src", SRC_BLANK);
-				media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
-				media_images_thumb.appendChild(media_images_thumb_image);
+				interface.media_images_thumb_image = document.createElement("img");
+				interface.media_images_thumb_image.setAttribute("class", "thumbnail");
+				interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
+				interface.media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
+				interface.media_images_thumb.appendChild(interface.media_images_thumb_image);
 			}
 
 			// interface HTML: media, images, info
-			var media_images_info = document.createElement("p");
-			media_images_info.setAttribute("id", "media_images_info");
-			media_images_info.setAttribute("class", "text_black");
-			media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%");
-			media_images.appendChild(media_images_info);
+			interface.media_images_info = document.createElement("p");
+			interface.media_images_info.setAttribute("class", "text_black");
+			interface.media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%");
+			interface.media_images.appendChild(interface.media_images_info);
 		}
 
 		// interface HTML: media, controls
-		// updated by interface_update_media_controls
-		var media_controls = document.createElement("div");
-		media_controls.setAttribute("id", "media_controls");
-		media_controls.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 0%; left: -192px; width: 384px; height: 100%");
-		media.appendChild(media_controls);
+		interface.media_controls = document.createElement("div");
+		interface.media_controls.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 0%; left: -192px; width: 384px; height: 100%");
+		interface.media.appendChild(interface.media_controls);
 		{
 			// interface HTML: media, controls, play
-			var media_controls_play = document.createElement("div");
-			media_controls_play.setAttribute("id", "media_controls_play");
-			media_controls_play.setAttribute("title", "Toggle player / Refresh settings (" + KEY_LABEL_PLAY + ")");
-			media_controls_play.setAttribute("class", "button_size_large button_color_pink");
-			media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
-			media_controls_play.innerHTML = "✖";
-			media_controls.appendChild(media_controls_play);
+			interface.media_controls_play = document.createElement("div");
+			interface.media_controls_play.setAttribute("title", "Toggle player / Refresh settings (" + KEY_LABEL_PLAY + ")");
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_pink");
+			interface.media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
+			interface.media_controls_play.innerHTML = "✖";
+			interface.media_controls.appendChild(interface.media_controls_play);
 
 			// interface HTML: media, controls, label
-			var media_controls_label = document.createElement("p");
-			media_controls_label.setAttribute("id", "media_controls_label");
-			media_controls_label.setAttribute("class", "text_black");
-			media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%");
-			media_controls.appendChild(media_controls_label);
+			interface.media_controls_label = document.createElement("p");
+			interface.media_controls_label.setAttribute("class", "text_black");
+			interface.media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%");
+			interface.media_controls.appendChild(interface.media_controls_label);
 
 			// interface HTML: media, controls, fullscreen
-			var media_controls_fullscreen = document.createElement("div");
-			media_controls_fullscreen.setAttribute("id", "media_controls_fullscreen");
-			media_controls_fullscreen.setAttribute("title", "Fullscreen");
-			media_controls_fullscreen.setAttribute("class", "button_size_small button_color_black");
-			media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 128px");
-			media_controls_fullscreen.setAttribute("onclick", "player_images_fullscreen_toggle()");
-			media_controls_fullscreen.innerHTML = "▭";
-			media_controls.appendChild(media_controls_fullscreen);
+			interface.media_controls_fullscreen = document.createElement("div");
+			interface.media_controls_fullscreen.setAttribute("title", "Fullscreen");
+			interface.media_controls_fullscreen.setAttribute("class", "button_size_small button_color_black");
+			interface.media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 128px");
+			interface.media_controls_fullscreen.setAttribute("onclick", "player_images_fullscreen_toggle()");
+			interface.media_controls_fullscreen.innerHTML = "▭";
+			interface.media_controls.appendChild(interface.media_controls_fullscreen);
 		}
 
 		// interface HTML: media, music
-		var media_music = document.createElement("div");
-		media_music.setAttribute("id", "media_music");
-		media_music.setAttribute("style", "position: absolute; margin: 0 0 0 100%; top: 0%; left: -192px; width: 192px; height: 100%");
-		media.appendChild(media_music);
+		interface.media_music = document.createElement("div");
+		interface.media_music.setAttribute("style", "position: absolute; margin: 0 0 0 100%; top: 0%; left: -192px; width: 192px; height: 100%");
+		interface.media.appendChild(interface.media_music);
 	}
 
 	interface_refresh(true);

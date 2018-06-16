@@ -170,29 +170,24 @@ document.onkeydown = function(event) {
 	var event_key = event.keyCode;
 	switch(event_key) {
 		case KEY_KEYCODE_PLAY:
-			var element = document.getElementById("media_controls_play");
-			if(typeof element.onclick === "function")
-				element.onclick.apply(element);
+			if(typeof interface.media_controls_play.onclick === "function")
+				interface.media_controls_play.onclick.apply(interface.media_controls_play);
 			break;
 		case KEY_KEYCODE_IMAGES_PREVIOUS:
-			var element = document.getElementById("media_images_previous");
-			if(typeof element.onclick === "function")
-				element.onclick.apply(element);
+			if(typeof interface.media_images_previous.onclick === "function")
+				interface.media_images_previous.onclick.apply(interface.media_images_previous);
 			break;
 		case KEY_KEYCODE_IMAGES_PLAY:
-			var element = document.getElementById("media_images_play");
-			if(typeof element.onclick === "function")
-				element.onclick.apply(element);
+			if(typeof interface.media_images_play.onclick === "function")
+				interface.media_images_play.onclick.apply(interface.media_images_play);
 			break;
 		case KEY_KEYCODE_IMAGES_NEXT:
-			var element = document.getElementById("media_images_next");
-			if(typeof element.onclick === "function")
-				element.onclick.apply(element);
+			if(typeof interface.media_images_next.onclick === "function")
+				interface.media_images_next.onclick.apply(interface.media_images_next);
 			break;
 		case KEY_KEYCODE_IMAGES_OPEN:
-			var element = document.getElementById("media_images_thumb");
-			if(typeof element.href === "string" && element.href !== "")
-				window.open(element.href, "_blank");
+			if(typeof interface.media_images_thumb.href === "string" && interface.media_images_thumb.href !== "")
+				window.open(interface.media_images_thumb.href, "_blank");
 			break;
 	}
 }
