@@ -30,8 +30,10 @@ function interface_refresh(name) {
 	if(name === true || plugins_settings.indexOf(name) >= 0)
 		interface_refresh_sites = true;
 
-	if(player_active() !== true)
+	if(player_active() !== true) {
 		interface_update_media_controls("reload");
+		interface_update_media_images();
+	}
 
 	interface_refresh_yes = true;
 }
