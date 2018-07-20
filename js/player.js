@@ -116,14 +116,10 @@ function player_images_fade() {
 	if(player.images.preloading === true)
 		return;
 
-	// check if the transition has finished
+	// deactivate the fading function and stop if the transition has finished
 	if(player.images.transition >= 1) {
-		// deactivate the fading function
 		clearInterval(player.images.timer_fade);
-
-		// update the image thumbnail and info
-		interface_update_media_images();
-
+		interface_update_media();
 		return;
 	}
 
@@ -193,8 +189,7 @@ function player_images_skip(index) {
 	clearTimeout(player.images.timer_next);
 	player.images.timer_next = setTimeout(player_images_next, 0);
 
-	// update the image thumbnail and info
-	interface_update_media_images();
+	interface_update_media();
 }
 
 // player, images, play
@@ -208,27 +203,29 @@ function player_images_play() {
 		player.images.stopped = true;
 	}
 
-	// update the pause button
-	interface_update_media_images();
+	interface_update_media();
 }
 
 // player, is available
 function player_available() {
-	return (data_images.length > 0 && player.images.index == 0 && !plugins_busy());
+	return (data_images.length > 0 && !plugins_busy());
 }
 
 // player, is active
 function player_active() {
-	return (player.images.index > 0);
+	return (document.body.contains(player.element));
 }
 
 // player, is busy
 function player_busy() {
-	return (player.images.transition < 1 || player.images.preloading === true);
+	return (player.images.index == 0 || player.images.transition < 1 || player.images.preloading === true);
 }
 
 // player, HTML, create
 function player_attach() {
+	if(player_active() === true)
+		return;
+
 	// create the player element
 	player.element = document.createElement("div");
 	player.element.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center");
@@ -256,17 +253,17 @@ function player_attach() {
 	if(settings.images.shuffle)
 		images_shuffle();
 
-	interface_update_media_images();
-	interface_update_media_controls("stop");
+	interface_update_media();
 }
 
 // player, HTML, destroy
 function player_detach() {
+	if(player_active() !== true)
+		return;
+
 	// destroy the player element
-	if(document.body.contains(player.element)) {
-		interface.player.removeChild(player.element);
-		player.element.innerHTML = "";
-	}
+	interface.player.removeChild(player.element);
+	player.element.innerHTML = "";
 
 	// unset the interval and timeout functions
 	clearInterval(player.images.timer_fade);
@@ -277,13 +274,5 @@ function player_detach() {
 	player.images.element_1 = null;
 	player.images.element_2 = null;
 
-	interface_update_media_images();
-	if(plugins_busy())
-		interface_update_media_controls("busy");
-	else if(interface_refresh_yes === true)
-		interface_update_media_controls("reload");
-	else if(player_available())
-		interface_update_media_controls("play");
-	else
-		interface_update_media_controls("none");
+	interface_update_media();
 }

@@ -13,7 +13,6 @@ const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bo
 const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bottom, #00000005, #00000000)";
 
 // whether to also refresh the content when loading new settings
-var interface_refresh_yes = false;
 var interface_refresh_sites = false;
 
 // object containing all of the interface elements
@@ -21,29 +20,19 @@ var interface = {};
 
 // interface, functions, refresh
 function interface_refresh(name) {
-	// don't do anything if plugins are still busy
-	if(plugins_busy())
-		return;
-
-	// refresh the content if this setting affects any plugins
-	// if set to true rather than a setting name, force refresh
+	// if this setting was used by any plugins, we will want to pull new contents from the server
+	// when the name variable is set to true rather than a setting name, force a refresh regardless
+	// if sites don't need to be refreshed, automatically load the new settings instead of asking for a manual refresh later
 	if(name === true || plugins_settings.indexOf(name) >= 0)
 		interface_refresh_sites = true;
+	else
+		interface_load(false);
 
-	if(player_active() !== true) {
-		interface_update_media_controls("reload");
-		interface_update_media_images();
-	}
-
-	interface_refresh_yes = true;
+	interface_update_media();
 }
 
 // interface, functions, plugin loader
-function interface_load() {
-	// don't do anything if plugins are still busy
-	if(plugins_busy())
-		return;
-
+function interface_load(sites) {
 	var elements_settings = document.forms["controls_images"].elements;
 	var elements_list = document.forms["controls_sites"].elements;
 
@@ -72,22 +61,19 @@ function interface_load() {
 	// evenly distribute the total image count to each source
 	settings.images.count = Math.floor(settings.images.count / settings.sites.length);
 
-	// load every selected plugin
-	player_detach();
-	if(interface_refresh_sites === true) {
+	// if sites need to be refreshed, load every selected plugin
+	if(interface_refresh_sites === true && sites === true && plugins_busy() !== true && player_active() !== true) {
 		images_clear();
 		for(var site in settings.sites)
 			plugins_load(settings.sites[site]);
 		interface_refresh_sites = false;
 	}
-
-	interface_refresh_yes = false;
 }
 
 // interface, functions, play button
 function interface_play() {
 	// add or remove the player
-	if(player_available() === true)
+	if(player_active() !== true && player_available() === true)
 		player_attach();
 	else
 		player_detach();
@@ -115,6 +101,21 @@ function interface_update_controls_sites_list() {
 		interface[id_label].innerHTML = item + "<br/>";
 		interface.controls_sites_list.appendChild(interface[id_label]);
 	}
+}
+
+// interface, functions, media
+function interface_update_media() {
+	if(player_active() === true)
+		interface_update_media_controls("stop");
+	else if(plugins_busy() === true)
+		interface_update_media_controls("busy");
+	else if(interface_refresh_sites === true)
+		interface_update_media_controls("reload");
+	else if(player_available() === true)
+		interface_update_media_controls("play");
+	else
+		interface_update_media_controls("none");
+	interface_update_media_images();
 }
 
 // interface, update HTML, media images
@@ -197,14 +198,14 @@ function interface_update_media_controls(state) {
 	switch(state) {
 		case "busy":
 			interface.media_controls_play.setAttribute("class", "button_size_large button_color_blue");
-			interface.media_controls_play.setAttribute("onclick", "interface_load()");
+			interface.media_controls_play.removeAttribute("onclick");
 			interface.media_controls_play.innerHTML = "⧗";
 			interface.media_controls_label.innerHTML = "<b>Loading content</b>";
 			document.title = "Slideshow Player (⧗)";
 			break;
 		case "reload":
 			interface.media_controls_play.setAttribute("class", "button_size_large button_color_cyan");
-			interface.media_controls_play.setAttribute("onclick", "interface_load()");
+			interface.media_controls_play.setAttribute("onclick", "interface_load(true)");
 			interface.media_controls_play.innerHTML = "⟳";
 			interface.media_controls_label.innerHTML = "<b>Click to apply settings</b>";
 			document.title = "Slideshow Player (⟳)";
@@ -313,6 +314,7 @@ function interface_init() {
 				interface.controls_images_search_keywords_input.setAttribute("value", settings.images.keywords);
 				interface.controls_images_search_keywords_input.setAttribute("maxlength", "100");
 				interface.controls_images_search_keywords_input.setAttribute("onclick", "interface_refresh(\"keywords\")");
+				interface.controls_images_search_keywords_input.setAttribute("onkeyup", "interface_refresh(\"keywords\")");
 				interface.controls_images_search.appendChild(interface.controls_images_search_keywords_input);
 
 				// interface HTML: controls, images, search, br
@@ -350,6 +352,7 @@ function interface_init() {
 				interface.controls_images_count_input.setAttribute("min", "5");
 				interface.controls_images_count_input.setAttribute("max", "1000");
 				interface.controls_images_count_input.setAttribute("onclick", "interface_refresh(\"count\")");
+				interface.controls_images_count_input.setAttribute("onkeyup", "interface_refresh(\"count\")");
 				interface.controls_images_count.appendChild(interface.controls_images_count_input);
 			}
 
@@ -368,6 +371,7 @@ function interface_init() {
 				interface.controls_images_duration_input.setAttribute("min", "5");
 				interface.controls_images_duration_input.setAttribute("max", "100");
 				interface.controls_images_duration_input.setAttribute("onclick", "interface_refresh(\"duration\")");
+				interface.controls_images_duration_input.setAttribute("onkeyup", "interface_refresh(\"duration\")");
 				interface.controls_images_duration.appendChild(interface.controls_images_duration_input);
 			}
 

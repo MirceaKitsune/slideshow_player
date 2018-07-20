@@ -97,7 +97,7 @@ function plugins_busy() {
 // plugins, busy set
 function plugins_busy_set(name, busy) {
 	plugins[name].busy = busy;
-	player_detach();
+	interface_update_media();
 
 	// automatically mark the plugin as no longer busy after a given timeout
 	clearTimeout(plugins[name].busy_timeout);
@@ -115,7 +115,7 @@ var data_images = [];
 function images_clear() {
 	player_detach();
 	data_images = [];
-	interface_update_media_controls("none");
+	interface_update_media();
 }
 
 // data, images, functions, add
