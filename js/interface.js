@@ -13,6 +13,7 @@ const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bo
 const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bottom, #00000005, #00000000)";
 
 // whether to also refresh the content when loading new settings
+var interface_refresh_yes = false;
 var interface_refresh_sites = false;
 
 // object containing all of the interface elements
@@ -29,8 +30,10 @@ function interface_refresh(name) {
 	if(name === true || plugins_settings.indexOf(name) >= 0)
 		interface_refresh_sites = true;
 
-	player_detach();
-	interface_update_media_controls("reload");
+	if(player_active() !== true)
+		interface_update_media_controls("reload");
+
+	interface_refresh_yes = true;
 }
 
 // interface, functions, plugin loader
@@ -75,6 +78,8 @@ function interface_load() {
 			plugins_load(settings.sites[site]);
 		interface_refresh_sites = false;
 	}
+
+	interface_refresh_yes = false;
 }
 
 // interface, functions, play button

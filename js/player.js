@@ -280,6 +280,8 @@ function player_detach() {
 	interface_update_media_images();
 	if(plugins_busy())
 		interface_update_media_controls("busy");
+	else if(interface_refresh_yes === true)
+		interface_update_media_controls("reload");
 	else if(player_available())
 		interface_update_media_controls("play");
 	else
