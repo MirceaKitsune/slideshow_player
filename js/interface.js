@@ -446,7 +446,7 @@ function interface_init() {
 		{
 			// interface HTML: media, images, previous
 			interface.media_images_previous = document.createElement("div");
-			interface.media_images_previous.setAttribute("title", "Previous image (" + KEY_LABEL_IMAGES_PREVIOUS + ")");
+			interface.media_images_previous.setAttribute("title", "Previous image (" + KEY_IMAGES_PREVIOUS + ")");
 			interface.media_images_previous.setAttribute("class", "button_size_small button_color_pink");
 			interface.media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
 			interface.media_images_previous.innerHTML = "✖";
@@ -454,7 +454,7 @@ function interface_init() {
 
 			// interface HTML: media, images, play
 			interface.media_images_play = document.createElement("div");
-			interface.media_images_play.setAttribute("title", "Play / Pause image (" + KEY_LABEL_IMAGES_PLAY + ")");
+			interface.media_images_play.setAttribute("title", "Play / Pause image (" + KEY_IMAGES_PLAY + ")");
 			interface.media_images_play.setAttribute("class", "button_size_medium button_color_pink");
 			interface.media_images_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
 			interface.media_images_play.innerHTML = "✖";
@@ -462,7 +462,7 @@ function interface_init() {
 
 			// interface HTML: media, images, next
 			interface.media_images_next = document.createElement("div");
-			interface.media_images_next.setAttribute("title", "Next image (" + KEY_LABEL_IMAGES_NEXT + ")");
+			interface.media_images_next.setAttribute("title", "Next image (" + KEY_IMAGES_NEXT + ")");
 			interface.media_images_next.setAttribute("class", "button_size_small button_color_pink");
 			interface.media_images_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
 			interface.media_images_next.innerHTML = "✖";
@@ -476,7 +476,7 @@ function interface_init() {
 
 			// interface HTML: media, images, thumb
 			interface.media_images_thumb = document.createElement("a");
-			interface.media_images_thumb.setAttribute("title", "Open image (" + KEY_LABEL_IMAGES_OPEN + ")");
+			interface.media_images_thumb.setAttribute("title", "Open image (" + KEY_IMAGES_OPEN + ")");
 			interface.media_images_thumb.setAttribute("target", "_blank");
 			interface.media_images.appendChild(interface.media_images_thumb);
 			{
@@ -502,7 +502,7 @@ function interface_init() {
 		{
 			// interface HTML: media, controls, play
 			interface.media_controls_play = document.createElement("div");
-			interface.media_controls_play.setAttribute("title", "Toggle player / Refresh settings (" + KEY_LABEL_PLAY + ")");
+			interface.media_controls_play.setAttribute("title", "Toggle player / Refresh settings (" + KEY_PLAY + ")");
 			interface.media_controls_play.setAttribute("class", "button_size_large button_color_pink");
 			interface.media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
 			interface.media_controls_play.innerHTML = "✖";

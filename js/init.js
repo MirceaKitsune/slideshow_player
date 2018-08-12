@@ -8,16 +8,11 @@ const SRC_BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAE
 const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif"];
 
 // shortcut definitions
-const KEY_KEYCODE_PLAY = 13;
-const KEY_KEYCODE_IMAGES_PREVIOUS = 37;
-const KEY_KEYCODE_IMAGES_PLAY = 8;
-const KEY_KEYCODE_IMAGES_NEXT = 39;
-const KEY_KEYCODE_IMAGES_OPEN = 9;
-const KEY_LABEL_PLAY = "Enter";
-const KEY_LABEL_IMAGES_PREVIOUS = "Left arrow";
-const KEY_LABEL_IMAGES_PLAY = "Backspace";
-const KEY_LABEL_IMAGES_NEXT = "Right arrow";
-const KEY_LABEL_IMAGES_OPEN = "Tab";
+const KEY_PLAY = "Enter";
+const KEY_IMAGES_PREVIOUS = "ArrowLeft";
+const KEY_IMAGES_PLAY = "Backspace";
+const KEY_IMAGES_NEXT = "ArrowRight";
+const KEY_IMAGES_OPEN = "Tab";
 
 // set the user agent
 Object.defineProperty(navigator, "userAgent", {
@@ -171,25 +166,24 @@ document.onkeydown = function(event) {
 	if(event.target.id !== "")
 		return;
 
-	var event_key = event.keyCode;
-	switch(event_key) {
-		case KEY_KEYCODE_PLAY:
+	switch(event.key) {
+		case KEY_PLAY:
 			if(typeof interface.media_controls_play.onclick === "function")
 				interface.media_controls_play.onclick.apply(interface.media_controls_play);
 			break;
-		case KEY_KEYCODE_IMAGES_PREVIOUS:
+		case KEY_IMAGES_PREVIOUS:
 			if(typeof interface.media_images_previous.onclick === "function")
 				interface.media_images_previous.onclick.apply(interface.media_images_previous);
 			break;
-		case KEY_KEYCODE_IMAGES_PLAY:
+		case KEY_IMAGES_PLAY:
 			if(typeof interface.media_images_play.onclick === "function")
 				interface.media_images_play.onclick.apply(interface.media_images_play);
 			break;
-		case KEY_KEYCODE_IMAGES_NEXT:
+		case KEY_IMAGES_NEXT:
 			if(typeof interface.media_images_next.onclick === "function")
 				interface.media_images_next.onclick.apply(interface.media_images_next);
 			break;
-		case KEY_KEYCODE_IMAGES_OPEN:
+		case KEY_IMAGES_OPEN:
 			if(typeof interface.media_images_thumb.href === "string" && interface.media_images_thumb.href !== "")
 				window.open(interface.media_images_thumb.href, "_blank");
 			break;
