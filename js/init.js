@@ -167,6 +167,10 @@ function images_shuffle() {
 
 // bind shortcut keys to the events of their corresponding elements
 document.onkeydown = function(event) {
+	// don't handle the event if the key was used inside an input element
+	if(event.target.id !== "")
+		return;
+
 	var event_key = event.keyCode;
 	switch(event_key) {
 		case KEY_KEYCODE_PLAY:
