@@ -70,6 +70,7 @@ function interface_load(sites) {
 	settings.music.count = Number(elements_settings_music["controls_music_count"].value);
 	settings.music.loop = Boolean(elements_settings_music["controls_music_play_loop"].checked);
 	settings.music.shuffle = Boolean(elements_settings_music["controls_music_play_shuffle"].checked);
+	settings.music.volume = Number(elements_settings_music["controls_music_volume"].value);
 
 	// limit the settings to acceptable values
 	// should match the limits defined on the corresponding HTML elements
@@ -78,6 +79,7 @@ function interface_load(sites) {
 	settings.images.duration = Math.max(Math.min(settings.images.duration, 100), 5);
 	settings.music.keywords = settings.music.keywords.substring(0, 100);
 	settings.music.count = Math.max(Math.min(settings.music.count, 100), 1);
+	settings.music.volume = Math.max(Math.min(settings.music.volume, 1), 0);
 
 	// update the settings cookie
 	settings_cookie_set();
@@ -85,6 +87,11 @@ function interface_load(sites) {
 	// evenly distribute the total image count to each source
 	settings.images.count = Math.floor(settings.images.count / sites_images);
 	settings.music.count = Math.floor(settings.music.count / sites_music);
+
+	// refresh the volume of the audio element
+	interface.controls_music_volume_label.innerHTML = settings.music.volume.toFixed(2);
+	if(player_active() === true)
+		player.music.element.volume = settings.music.volume;
 
 	// if sites need to be refreshed, load every selected plugin
 	if(sites === true && plugins_busy() !== true && player_active() !== true) {
@@ -604,6 +611,30 @@ function interface_init() {
 				interface.controls_music_play_shuffle_label = document.createElement("label");
 				interface.controls_music_play_shuffle_label.innerHTML = "Shuffle<br/>";
 				interface.controls_music_play.appendChild(interface.controls_music_play_shuffle_label);
+			}
+
+			// interface HTML: controls, music, volume
+			interface.controls_music_volume = document.createElement("p");
+			interface.controls_music_volume.innerHTML = "<b>Volume:<b/><br/>";
+			interface.controls_music.appendChild(interface.controls_music_volume);
+			{
+				// interface HTML: controls, music, volume, input
+				interface.controls_music_volume_input = document.createElement("input");
+				interface.controls_music_volume_input.setAttribute("id", "controls_music_volume");
+				interface.controls_music_volume_input.setAttribute("title", "Audio volume of the music");
+				interface.controls_music_volume_input.setAttribute("type", "range");
+				interface.controls_music_volume_input.setAttribute("value", settings.music.volume);
+				interface.controls_music_volume_input.setAttribute("step", "0.05");
+				interface.controls_music_volume_input.setAttribute("min", "0");
+				interface.controls_music_volume_input.setAttribute("max", "1");
+				interface.controls_music_volume_input.setAttribute("onclick", "interface_refresh(\"volume\", TYPE_MUSIC)");
+				interface.controls_music_volume_input.setAttribute("oninput", "interface_refresh(\"volume\", TYPE_MUSIC)");
+				interface.controls_music_volume.appendChild(interface.controls_music_volume_input);
+
+				// interface HTML: controls, music, volume, label
+				interface.controls_music_volume_label = document.createElement("label");
+				interface.controls_music_volume_label.innerHTML = settings.music.volume.toFixed(2);
+				interface.controls_music_volume.appendChild(interface.controls_music_volume_label);
 			}
 		}
 

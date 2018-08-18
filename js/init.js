@@ -61,7 +61,8 @@ var settings = {
 		keywords: "instrumental",
 		count: 10,
 		loop: false,
-		shuffle: false
+		shuffle: false,
+		volume: 1
 	}
 };
 settings_cookie_get();

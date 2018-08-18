@@ -259,6 +259,7 @@ function player_music_next() {
 	if(player.music.index > 0) {
 		player.music.element.setAttribute("src", data_music[player.music.index - 1].src);
 		player.music.element.setAttribute("oncanplay", "player_music_next_canplay()");
+		player.music.element.volume = settings.music.volume;
 	}
 
 	interface_update_media();
@@ -341,7 +342,6 @@ function player_attach() {
 
 	// configure the music element
 	player.music.element = document.createElement("audio");
-	player.music.element.setAttribute("volume", 1);
 	player.element.appendChild(player.music.element);
 
 	// set the image interval and timeout functions
