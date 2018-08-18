@@ -18,6 +18,10 @@ const KEY_IMAGES_PREVIOUS = "ArrowLeft";
 const KEY_IMAGES_PLAY = "Backspace";
 const KEY_IMAGES_NEXT = "ArrowRight";
 const KEY_IMAGES_OPEN = "Tab";
+const KEY_MUSIC_PREVIOUS = "ArrowDown";
+const KEY_MUSIC_PLAY = "\\";
+const KEY_MUSIC_NEXT = "ArrowUp";
+const KEY_MUSIC_OPEN = "`";
 
 // set the user agent
 Object.defineProperty(navigator, "userAgent", {
@@ -270,6 +274,22 @@ document.onkeydown = function(event) {
 		case KEY_IMAGES_OPEN:
 			if(typeof interface.media_images_thumb.href === "string" && interface.media_images_thumb.href !== "")
 				window.open(interface.media_images_thumb.href, "_blank");
+			break;
+		case KEY_MUSIC_PREVIOUS:
+			if(typeof interface.media_music_previous.onclick === "function")
+				interface.media_music_previous.onclick.apply(interface.media_music_previous);
+			break;
+		case KEY_MUSIC_PLAY:
+			if(typeof interface.media_music_play.onclick === "function")
+				interface.media_music_play.onclick.apply(interface.media_music_play);
+			break;
+		case KEY_MUSIC_NEXT:
+			if(typeof interface.media_music_next.onclick === "function")
+				interface.media_music_next.onclick.apply(interface.media_music_next);
+			break;
+		case KEY_MUSIC_OPEN:
+			if(typeof interface.media_music_thumb.href === "string" && interface.media_music_thumb.href !== "")
+				window.open(interface.media_music_thumb.href, "_blank");
 			break;
 	}
 }

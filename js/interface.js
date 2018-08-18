@@ -726,7 +726,7 @@ function interface_init() {
 		{
 			// interface HTML: media, music, previous
 			interface.media_music_previous = document.createElement("div");
-			interface.media_music_previous.setAttribute("title", "Previous song (" + KEY_IMAGES_PREVIOUS + ")");
+			interface.media_music_previous.setAttribute("title", "Previous song (" + KEY_MUSIC_PREVIOUS + ")");
 			interface.media_music_previous.setAttribute("class", "button_size_small button_color_pink");
 			interface.media_music_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
 			interface.media_music_previous.innerHTML = "✖";
@@ -734,7 +734,7 @@ function interface_init() {
 
 			// interface HTML: media, music, play
 			interface.media_music_play = document.createElement("div");
-			interface.media_music_play.setAttribute("title", "Play / Pause song (" + KEY_IMAGES_PLAY + ")");
+			interface.media_music_play.setAttribute("title", "Play / Pause song (" + KEY_MUSIC_PLAY + ")");
 			interface.media_music_play.setAttribute("class", "button_size_medium button_color_pink");
 			interface.media_music_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
 			interface.media_music_play.innerHTML = "✖";
@@ -742,7 +742,7 @@ function interface_init() {
 
 			// interface HTML: media, music, next
 			interface.media_music_next = document.createElement("div");
-			interface.media_music_next.setAttribute("title", "Next song (" + KEY_IMAGES_NEXT + ")");
+			interface.media_music_next.setAttribute("title", "Next song (" + KEY_MUSIC_NEXT + ")");
 			interface.media_music_next.setAttribute("class", "button_size_small button_color_pink");
 			interface.media_music_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
 			interface.media_music_next.innerHTML = "✖";
@@ -756,7 +756,7 @@ function interface_init() {
 
 			// interface HTML: media, music, thumb
 			interface.media_music_thumb = document.createElement("a");
-			interface.media_music_thumb.setAttribute("title", "Open song (" + KEY_IMAGES_OPEN + ")");
+			interface.media_music_thumb.setAttribute("title", "Open song (" + KEY_MUSIC_OPEN + ")");
 			interface.media_music_thumb.setAttribute("target", "_blank");
 			interface.media_music.appendChild(interface.media_music_thumb);
 			{

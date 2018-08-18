@@ -266,12 +266,35 @@ function player_music_next() {
 
 // player, music, skip
 function player_music_skip(index) {
+	player.music.index = Math.max(index - 1, 0);
 
+	clearTimeout(player.music.timer_next);
+	player.music.timer_next = setTimeout(player_music_next, 0);
+
+	interface_update_media();
 }
 
 // player, music, play
 function player_music_play() {
+	clearTimeout(player.music.timer_next);
+	if(player.music.stopped === true) {
+		// we need to know the duration of the current song in order to reschedule, don't unpause if preloading
+		if(player.music.preloading === true)
+			return;
 
+		// reschedule switching to the next song
+		var duration = Math.max(player.music.element.duration - player.music.element.currentTime, 0);
+		player.music.timer_next = setTimeout(player_music_next, duration * 1000);
+
+		player.music.element.play();
+		player.music.stopped = false;
+	}
+	else {
+		player.music.element.pause();
+		player.music.stopped = true;
+	}
+
+	interface_update_media();
 }
 
 // player, is available
