@@ -137,6 +137,10 @@ function player_images_fade() {
 
 // player, images, switching
 function player_images_next() {
+	// do nothing if there are no images
+	if(data_images.length == 0)
+		return;
+
 	// if an asset is still loading, retry every one second
 	// if all assets have loaded, schedule the next image normally
 	clearTimeout(player.images.timer_next);
@@ -236,6 +240,10 @@ function player_music_next_canplay() {
 
 // player, music, switching
 function player_music_next() {
+	// do nothing if there are no songs
+	if(data_music.length == 0)
+		return;
+
 	// stop or restart the slideshow if this is the final song
 	if(player.music.index >= data_music.length) {
 		if(settings.music.loop === true) {
@@ -300,7 +308,7 @@ function player_music_play() {
 
 // player, is available
 function player_available() {
-	return (data_images.length > 0 && !plugins_busy());
+	return ((data_images.length > 0 || data_music.length > 0) && !plugins_busy());
 }
 
 // player, is active
@@ -321,6 +329,10 @@ function player_busy_music() {
 // player, HTML, create
 function player_attach() {
 	if(player_active() === true)
+		return;
+
+	// don't spawn the player if there is no content to play
+	if(data_images.length == 0 && data_music.length == 0)
 		return;
 
 	// create the player element

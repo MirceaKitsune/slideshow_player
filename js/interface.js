@@ -164,7 +164,7 @@ function interface_update_media() {
 
 // interface, update HTML, media images
 function interface_update_media_images() {
-	var active = player_active();
+	var active = (player_active() && data_images.length > 0);
 	var ready = !player_busy_images();
 
 	// configure previous / play / next elements
@@ -228,7 +228,7 @@ function interface_update_media_images() {
 
 // interface, update HTML, media music
 function interface_update_media_music() {
-	var active = player_active();
+	var active = (player_active() && data_music.length > 0);
 	var ready = !player_busy_music();
 
 	// configure previous / play / next elements
