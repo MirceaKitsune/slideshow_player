@@ -235,10 +235,17 @@ function player_images_next() {
 
 // player, images, skip
 function player_images_skip(index) {
-	if(index <= 0 || index > data_images.length)
+	var overflow_start = index <= 0;
+	var overflow_end = index > data_images.length;
+	if((overflow_start || overflow_end) && settings.images.loop !== true)
 		return;
 
-	player.images.index = index - 1;
+	if(overflow_start)
+		player.images.index = data_images.length - 1;
+	else if(overflow_end)
+		player.images.index = 0;
+	else
+		player.images.index = index - 1;
 	player.images.transition = -1;
 
 	clearTimeout(player.images.timer_next);
@@ -318,10 +325,17 @@ function player_music_next() {
 
 // player, music, skip
 function player_music_skip(index) {
-	if(index <= 0 || index > data_music.length)
+	var overflow_start = index <= 0;
+	var overflow_end = index > data_music.length;
+	if((overflow_start || overflow_end) && settings.music.loop !== true)
 		return;
 
-	player.music.index = index - 1;
+	if(overflow_start)
+		player.music.index = data_music.length - 1;
+	else if(overflow_end)
+		player.music.index = 0;
+	else
+		player.music.index = index - 1;
 	player.music.preloading = true;
 
 	clearTimeout(player.music.timer_next);
