@@ -124,7 +124,7 @@ function plugins_busy() {
 function plugins_busy_set(name, type, busy) {
 	var name_plugin = type + " " + name;
 	plugins[name_plugin].busy = busy;
-	interface_update_media();
+	interface_update_media(false, false);
 
 	// automatically mark the plugin as no longer busy after a given timeout
 	clearTimeout(plugins[name_plugin].busy_timeout);
@@ -142,7 +142,7 @@ var data_images = [];
 function images_clear() {
 	player_detach();
 	data_images = [];
-	interface_update_media();
+	interface_update_media(true, false);
 }
 
 // data, images, functions, add
@@ -199,7 +199,7 @@ var data_music = [];
 function music_clear() {
 	player_detach();
 	data_music = [];
-	interface_update_media();
+	interface_update_media(false, true);
 }
 
 // data, music, functions, add

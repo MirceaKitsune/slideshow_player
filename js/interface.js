@@ -35,7 +35,7 @@ function interface_refresh(name, type) {
 		interface_load(false);
 	}
 
-	interface_update_media();
+	interface_update_media(false, false);
 }
 
 // interface, functions, plugin loader
@@ -147,7 +147,7 @@ function interface_update_controls_sites_list() {
 }
 
 // interface, functions, media
-function interface_update_media() {
+function interface_update_media(update_images, update_music) {
 	if(player_active() === true)
 		interface_update_media_controls("stop");
 	else if(plugins_busy() === true)
@@ -158,8 +158,11 @@ function interface_update_media() {
 		interface_update_media_controls("play");
 	else
 		interface_update_media_controls("none");
-	interface_update_media_images();
-	interface_update_media_music();
+
+	if(update_images === true)
+		interface_update_media_images();
+	if(update_music === true)
+		interface_update_media_music();
 }
 
 // interface, update HTML, media images
@@ -808,4 +811,5 @@ function interface_init() {
 	}
 
 	interface_refresh(true, true);
+	interface_update_media(true, true);
 }

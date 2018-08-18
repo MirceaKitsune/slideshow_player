@@ -164,7 +164,7 @@ function player_images_fade() {
 	// deactivate the fading function and stop if the transition has finished
 	if(player.images.transition >= 1) {
 		clearInterval(player.images.timer_fade);
-		interface_update_media();
+		interface_update_media(true, false);
 		return;
 	}
 
@@ -240,13 +240,16 @@ function player_images_next() {
 
 // player, images, skip
 function player_images_skip(index) {
-	player.images.index = Math.max(index - 1, 0);
+	if(index <= 0 || index > data_images.length)
+		return;
+
+	player.images.index = index - 1;
 	player.images.transition = -1;
 
 	clearTimeout(player.images.timer_next);
 	player.images.timer_next = setTimeout(player_images_next, 0);
 
-	interface_update_media();
+	interface_update_media(true, false);
 }
 
 // player, images, play
@@ -260,7 +263,7 @@ function player_images_play() {
 		player.images.stopped = true;
 	}
 
-	interface_update_media();
+	interface_update_media(true, false);
 }
 
 // player, music, switching, canplay
@@ -279,9 +282,10 @@ function player_music_next_canplay() {
 	player.music.timer_next = setTimeout(player_music_next, duration * 1000);
 
 	// start playing the song
-	player.music.element.play();
+	if(player.music.stopped !== true)
+		player.music.element.play();
 
-	interface_update_media();
+	interface_update_media(false, true);
 }
 
 // player, music, switching
@@ -315,18 +319,20 @@ function player_music_next() {
 		player.music.element.setAttribute("oncanplay", "player_music_next_canplay()");
 		player.music.element.volume = settings.music.volume;
 	}
-
-	interface_update_media();
 }
 
 // player, music, skip
 function player_music_skip(index) {
-	player.music.index = Math.max(index - 1, 0);
+	if(index <= 0 || index > data_music.length)
+		return;
+
+	player.music.index = index - 1;
+	player.music.preloading = true;
 
 	clearTimeout(player.music.timer_next);
 	player.music.timer_next = setTimeout(player_music_next, 0);
 
-	interface_update_media();
+	interface_update_media(false, true);
 }
 
 // player, music, play
@@ -349,7 +355,7 @@ function player_music_play() {
 		player.music.stopped = true;
 	}
 
-	interface_update_media();
+	interface_update_media(false, true);
 }
 
 // player, is available
@@ -421,7 +427,7 @@ function player_attach() {
 	if(settings.music.shuffle)
 		music_shuffle();
 
-	interface_update_media();
+	interface_update_media(true, true);
 }
 
 // player, HTML, destroy
@@ -445,5 +451,5 @@ function player_detach() {
 	player.music.stopped = false;
 	player.music.element = null;
 
-	interface_update_media();
+	interface_update_media(true, true);
 }
