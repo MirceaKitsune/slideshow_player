@@ -213,9 +213,55 @@ function player_images_play() {
 	interface_update_media();
 }
 
+// player, music, switching, canplay
+function player_music_next_canplay() {
+	if(player.music.preloading !== true)
+		return;
+	player.music.preloading = false;
+
+	// schedule the next song
+	var duration = player.music.element.duration;
+	if(duration === NaN || duration <= 0) {
+		player_detach();
+		return;
+	}
+	clearTimeout(player.music.timer_next);
+	player.music.timer_next = setTimeout(player_music_next, duration * 1000);
+
+	// start playing the song
+	player.music.element.play();
+
+	interface_update_media();
+}
+
 // player, music, switching
 function player_music_next() {
+	// stop or restart the slideshow if this is the final song
+	if(player.music.index >= data_music.length) {
+		if(settings.music.loop === true) {
+			player.music.index = 0;
 
+			// also shuffle the music again
+			if(settings.music.shuffle)
+				music_shuffle();
+		}
+		else {
+			player_detach();
+			return;
+		}
+	}
+
+	// bump the index to the next song
+	++player.music.index;
+	player.music.preloading = true;
+
+	// apply the current song
+	if(player.music.index > 0) {
+		player.music.element.setAttribute("src", data_music[player.music.index - 1].src);
+		player.music.element.setAttribute("oncanplay", "player_music_next_canplay()");
+	}
+
+	interface_update_media();
 }
 
 // player, music, skip
@@ -245,7 +291,7 @@ function player_busy_images() {
 
 // player, is busy, music
 function player_busy_music() {
-	return (player.music.index == 0);
+	return (player.music.index == 0 || player.music.preloading === true);
 }
 
 // player, HTML, create
@@ -272,6 +318,8 @@ function player_attach() {
 
 	// configure the music element
 	player.music.element = document.createElement("audio");
+	player.music.element.setAttribute("volume", 1);
+	player.element.appendChild(player.music.element);
 
 	// set the image interval and timeout functions
 	// player.images.timer_fade = setInterval(player_images_fade, RATE);
