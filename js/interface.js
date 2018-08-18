@@ -13,7 +13,8 @@ const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bo
 const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bottom, #00000005, #00000000)";
 
 // whether to also refresh the content when loading new settings
-var interface_refresh_sites = false;
+var interface_refresh_images = false;
+var interface_refresh_music = false;
 
 // object containing all of the interface elements
 var interface = {};
@@ -21,12 +22,18 @@ var interface = {};
 // interface, functions, refresh
 function interface_refresh(name, type) {
 	// if this setting was used by any plugins, we will want to pull new contents from the server
-	// when the name variable is set to true rather than a setting name, force a refresh regardless
+	// when the name or type variables are set to true rather than a setting name, force a refresh regardless
 	// if sites don't need to be refreshed, automatically load the new settings instead of asking for a manual refresh later
-	if(name === true || plugins_settings_used(name, type))
-		interface_refresh_sites = true;
-	else
+	var force = (name === true || type === true);
+	if(force || plugins_settings_used(name, type)) {
+		if(force || type === TYPE_IMAGES)
+			interface_refresh_images = true;
+		if(force || type === TYPE_MUSIC)
+			interface_refresh_music = true;
+	}
+	else {
 		interface_load(false);
+	}
 
 	interface_update_media();
 }
@@ -80,12 +87,22 @@ function interface_load(sites) {
 	settings.music.count = Math.floor(settings.music.count / sites_music);
 
 	// if sites need to be refreshed, load every selected plugin
-	if(interface_refresh_sites === true && sites === true && plugins_busy() !== true && player_active() !== true) {
-		images_clear();
-		music_clear();
-		for(var site in settings.sites)
-			plugins_load(settings.sites[site]);
-		interface_refresh_sites = false;
+	if(sites === true && plugins_busy() !== true && player_active() !== true) {
+		if(interface_refresh_images === true)
+			images_clear();
+		if(interface_refresh_music === true)
+			music_clear();
+
+		for(var site in settings.sites) {
+			var name_site = settings.sites[site];
+			if(interface_refresh_images === true && name_site.substring(0, TYPE_IMAGES.length) === TYPE_IMAGES)
+				plugins_load(name_site);
+			if(interface_refresh_music === true && name_site.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
+				plugins_load(name_site);
+		}
+
+		interface_refresh_images = false;
+		interface_refresh_music = false;
 	}
 }
 
@@ -111,7 +128,7 @@ function interface_update_controls_sites_list() {
 		interface[id_checkbox].setAttribute("name", item);
 		if(settings.sites.length == 0 || settings.sites.indexOf(item) >= 0)
 			interface[id_checkbox].setAttribute("checked", true);
-		interface[id_checkbox].setAttribute("onclick", "interface_refresh(true, null)");
+		interface[id_checkbox].setAttribute("onclick", "interface_refresh(true, true)");
 		interface.controls_sites_list.appendChild(interface[id_checkbox]);
 
 		// interface HTML: controls, images, sites, list, label
@@ -128,7 +145,7 @@ function interface_update_media() {
 		interface_update_media_controls("stop");
 	else if(plugins_busy() === true)
 		interface_update_media_controls("busy");
-	else if(interface_refresh_sites === true)
+	else if(interface_refresh_images === true || interface_refresh_music === true)
 		interface_update_media_controls("reload");
 	else if(player_available() === true)
 		interface_update_media_controls("play");
@@ -759,5 +776,5 @@ function interface_init() {
 		}
 	}
 
-	interface_refresh(true, null);
+	interface_refresh(true, true);
 }
