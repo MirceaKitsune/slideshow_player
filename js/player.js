@@ -161,8 +161,19 @@ function player_images_fade() {
 	if(player.images.preloading === true)
 		return;
 
-	// deactivate the fading function and stop if the transition has finished
+	// stop recording the latency
+	player_images_latency_stop();
+
+	// check if the transition has finished
 	if(player.images.transition >= 1) {
+		// schedule the next image
+		// the latency calculated based on the loading time of previous images is deducted from the duration of this image
+		if(player.images.stopped !== true) {
+			var duration = Math.max(settings.images.duration - player_images_latency.time_average, 5);
+			player.images.timer_next = setTimeout(player_images_next, duration * 1000);
+		}
+
+		// deactivate the fading function and stop
 		clearInterval(player.images.timer_fade);
 		interface_update_media(true, false);
 		return;
@@ -171,9 +182,6 @@ function player_images_fade() {
 	player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
 	player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
 	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
-
-	// stop recording the latency
-	player_images_latency_stop();
 }
 
 // player, images, switching
@@ -182,18 +190,8 @@ function player_images_next() {
 	if(data_images.length == 0)
 		return;
 
-	// if an asset is still loading, retry every one second
-	// if all assets have loaded, schedule the next image normally
-	// the latency calculated based on the loading time of previous images is deducted from the duration of this image
-	clearTimeout(player.images.timer_next);
-	if(player.images.preloading === true) {
-		player.images.timer_next = setTimeout(player_images_next, 1000);
-		return;
-	}
-	else if(player.images.stopped !== true) {
-		var duration = Math.max(settings.images.duration - player_images_latency.time_average, 5);
-		player.images.timer_next = setTimeout(player_images_next, duration * 1000);
-	}
+	// start recording the latency
+	player_images_latency_start();
 
 	// stop or restart the slideshow if this is the final image
 	if(player.images.index >= data_images.length) {
@@ -233,9 +231,6 @@ function player_images_next() {
 		player.images.element_2.setAttribute("onload", "player.images.preloading = false");
 		player.images.element_2.setAttribute("onerror", "player_detach()");
 	}
-
-	// start recording the latency
-	player_images_latency_start();
 }
 
 // player, images, skip
