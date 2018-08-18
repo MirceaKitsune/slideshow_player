@@ -12,6 +12,11 @@ const RATE = 10;
 // 0 is instant, 1 makes the transition last throughout the full duration of the image
 const TRANSITION = 0.1;
 
+// latency strength: 0.5 = half, 1.0 = full, 2.0 = double
+// latency step: resolution of the latency check in seconds, lower is more accurate but also more expensive
+const IMAGES_LATENCY_STRENGTH = 1;
+const IMAGES_LATENCY_STEP = 0.1;
+
 // default image style
 const STYLE_IMG = "position: absolute; width: auto; height: 100%; max-width: 100%; max-height: 100%";
 
@@ -118,6 +123,39 @@ function player_images_fullscreen_toggle(force_to) {
 	}
 }
 
+// player, images, latency, settings
+var player_images_latency = {
+	time_average: 0,
+	time_this: 0,
+	recording: false,
+	timer: null
+};
+
+// player, images, latency, start recording
+function player_images_latency_start() {
+	if(player_images_latency.recording === true)
+		return;
+
+	player_images_latency.recording = true;
+	player_images_latency.time_this = 0;
+	player_images_latency.timer = setInterval(function() {
+		player_images_latency.time_this += IMAGES_LATENCY_STEP;
+	}, IMAGES_LATENCY_STEP * 1000);
+}
+
+// player, images, latency, stop recording
+function player_images_latency_stop() {
+	if(player_images_latency.recording === false)
+		return;
+
+	// update the average latency based on the current latency
+	player_images_latency.time_average = (player_images_latency.time_average + (player_images_latency.time_this * IMAGES_LATENCY_STRENGTH)) / 2;
+
+	player_images_latency.recording = false;
+	player_images_latency.time_this = 0;
+	clearInterval(player_images_latency.timer);
+}
+
 // player, images, transition
 function player_images_fade() {
 	if(player.images.preloading === true)
@@ -133,6 +171,9 @@ function player_images_fade() {
 	player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
 	player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
 	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
+
+	// stop recording the latency
+	player_images_latency_stop();
 }
 
 // player, images, switching
@@ -143,13 +184,15 @@ function player_images_next() {
 
 	// if an asset is still loading, retry every one second
 	// if all assets have loaded, schedule the next image normally
+	// the latency calculated based on the loading time of previous images is deducted from the duration of this image
 	clearTimeout(player.images.timer_next);
 	if(player.images.preloading === true) {
 		player.images.timer_next = setTimeout(player_images_next, 1000);
 		return;
 	}
 	else if(player.images.stopped !== true) {
-		player.images.timer_next = setTimeout(player_images_next, settings.images.duration * 1000);
+		var duration = Math.max(settings.images.duration - player_images_latency.time_average, 5);
+		player.images.timer_next = setTimeout(player_images_next, duration * 1000);
 	}
 
 	// stop or restart the slideshow if this is the final image
@@ -190,6 +233,9 @@ function player_images_next() {
 		player.images.element_2.setAttribute("onload", "player.images.preloading = false");
 		player.images.element_2.setAttribute("onerror", "player_detach()");
 	}
+
+	// start recording the latency
+	player_images_latency_start();
 }
 
 // player, images, skip
