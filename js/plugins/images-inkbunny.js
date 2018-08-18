@@ -4,9 +4,12 @@
 // Image loading plugin for: https://inkbunny.net
 // API documentation: https://wiki.inkbunny.net/wiki/API
 
+// the name string of this plugin
+const name_inkbunny = "Inkbunny";
+
 // indicate that the plugin has finished working
 function parse_inkbunny_ready(data) {
-	plugins_busy_set("Inkbunny", false);
+	plugins_busy_set(name_inkbunny, TYPE_IMAGES, false);
 }
 
 // close the temporary guest session
@@ -37,8 +40,8 @@ function parse_inkbunny(data) {
 
 // change the rating, then call the image parser with the session id
 function parse_inkbunny_rating(data) {
-	var keywords = plugins_settings_images_read("keywords");
-	var count = Math.min(plugins_settings_images_read("count"), 100); // this site supports a maximum of 100 results per page
+	var keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	var count = Math.min(plugins_settings_read("count", TYPE_IMAGES), 100); // this site supports a maximum of 100 results per page
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";
@@ -49,7 +52,7 @@ function parse_inkbunny_rating(data) {
 // create a new session as guest, then call the rating api with its session id
 function parse_inkbunny_login(data) {
 	// whether or not to enable the NSFW tags
-	var nsfw = plugins_settings_images_read("nsfw") === true ? "yes" : "no";
+	var nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) === true ? "yes" : "no";
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";
@@ -63,8 +66,8 @@ function images_inkbunny() {
 	script.src = "https://inkbunny.net/api_login.php?output_mode=json&username=guest&callback=parse_inkbunny_login";
 	document.body.appendChild(script);
 
-	plugins_busy_set("Inkbunny", true);
+	plugins_busy_set(name_inkbunny, TYPE_IMAGES, true);
 }
 
 // register the plugin
-plugins_register("Inkbunny", images_inkbunny);
+plugins_register(name_inkbunny, TYPE_IMAGES, images_inkbunny);

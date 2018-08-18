@@ -4,6 +4,9 @@
 // Image loading plugin for: https://e621.net
 // API documentation: https://e621.net/help/show/api
 
+// the name string of this plugin
+const name_e621 = "e621";
+
 // convert each entry into an image object for the player
 function parse_e621(data) {
 	for(var entry in data) {
@@ -19,22 +22,22 @@ function parse_e621(data) {
 		images_add(this_image);
 	}
 
-	plugins_busy_set("e621", false);
+	plugins_busy_set(name_e621, TYPE_IMAGES, false);
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
-	var domain = plugins_settings_images_read("nsfw") === true ? "e621" : "e926"; // e926 is the SFW version of e621
-	var keywords = plugins_settings_images_read("keywords");
-	var count = Math.min(plugins_settings_images_read("count"), 320); // this site supports a maximum of 320 results per page
+	var domain = plugins_settings_read("nsfw", TYPE_IMAGES) === true ? "e621" : "e926"; // e926 is the SFW version of e621
+	var keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	var count = Math.min(plugins_settings_read("count", TYPE_IMAGES), 320); // this site supports a maximum of 320 results per page
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";
 	script.src = "https://" + domain + ".net/post/index.json?tags=" + keywords + "&limit=" + count + "&callback=parse_e621";
 	document.body.appendChild(script);
 
-	plugins_busy_set("e621", true);
+	plugins_busy_set(name_e621, TYPE_IMAGES, true);
 }
 
 // register the plugin
-plugins_register("e621", images_e621);
+plugins_register(name_e621, TYPE_IMAGES, images_e621);

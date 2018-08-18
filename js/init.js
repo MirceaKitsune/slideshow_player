@@ -6,6 +6,11 @@ const SRC_BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAE
 
 // valid extensions
 const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif"];
+const EXTENSIONS_SND = ["mp3", "ogg", "wav", "flac"];
+
+// the symbol or word describing a given media type
+const TYPE_IMAGES = "⎙";
+const TYPE_MUSIC = "♫";
 
 // shortcut definitions
 const KEY_PLAY = "Enter";
@@ -47,6 +52,12 @@ var settings = {
 		nsfw: false,
 		loop: false,
 		shuffle: false
+	},
+	music: {
+		keywords: "instrumental",
+		count: 10,
+		loop: false,
+		shuffle: false
 	}
 };
 settings_cookie_get();
@@ -56,8 +67,9 @@ var plugins = {};
 var plugins_settings = [];
 
 // plugins, functions, register
-function plugins_register(name, func) {
-	plugins[name] = {
+function plugins_register(name, type, func) {
+	var name_plugin = type + " " + name;
+	plugins[name_plugin] = {
 		func: func,
 		busy: false,
 		busy_timeout: null
@@ -70,13 +82,27 @@ function plugins_load(name) {
 	plugins[name].func();
 }
 
-// plugins, functions, settings, images, read
-function plugins_settings_images_read(name) {
+// plugins, functions, settings, read
+function plugins_settings_read(name, type) {
 	// take note that this setting was used by a plugin
-	if(plugins_settings.indexOf(name) < 0)
-		plugins_settings.push(name);
+	var name_settings = type + "_" + name;
+	if(plugins_settings.indexOf(name_settings) < 0)
+		plugins_settings.push(name_settings);
 
-	return settings.images[name];
+	switch(type) {
+		case TYPE_IMAGES:
+			return settings.images[name];
+		case TYPE_MUSIC:
+			return settings.music[name];
+		default:
+			return null;
+	}
+}
+
+// plugins, functions, settings, used
+function plugins_settings_used(name, type) {
+	var name_settings = type + "_" + name;
+	return (plugins_settings.indexOf(name_settings) >= 0);
 }
 
 // plugins, busy check
@@ -90,15 +116,16 @@ function plugins_busy() {
 }
 
 // plugins, busy set
-function plugins_busy_set(name, busy) {
-	plugins[name].busy = busy;
+function plugins_busy_set(name, type, busy) {
+	var name_plugin = type + " " + name;
+	plugins[name_plugin].busy = busy;
 	interface_update_media();
 
 	// automatically mark the plugin as no longer busy after a given timeout
-	clearTimeout(plugins[name].busy_timeout);
+	clearTimeout(plugins[name_plugin].busy_timeout);
 	if(busy === true) {
-		plugins[name].busy_timeout = setTimeout(function() {
-			plugins_busy_set(name, false);
+		plugins[name_plugin].busy_timeout = setTimeout(function() {
+			plugins_busy_set(name_plugin, false);
 		}, 1000 * 30);
 	}
 }
@@ -157,6 +184,63 @@ function images_shuffle() {
 	for(var i = data_images.length - 1; i > 0; i--) {
 		var j = Math.floor(Math.random() * (i + 1));
 		[data_images[i], data_images[j]] = [data_images[j], data_images[i]];
+	}
+}
+
+// data, music, global list
+var data_music = [];
+
+// data, music, functions, clear
+function music_clear() {
+	player_detach();
+	data_music = [];
+	interface_update_media();
+}
+
+// data, music, functions, add
+function music_add(item) {
+	player_detach();
+
+	// check that this song doesn't already exist
+	for(song in data_music) {
+		if(data_music[song].src === item.src)
+			return;
+	}
+
+	// check that all mandatory fields are set
+	if(typeof item.src !== "string")
+		return;
+	if(typeof item.thumb !== "string")
+		return;
+	if(typeof item.title !== "string")
+		return;
+	if(typeof item.author !== "string")
+		return;
+	if(typeof item.url !== "string")
+		return;
+
+	// check that the extension is a valid song
+	var valid_ext = false;
+	for(extension in EXTENSIONS_SND) {
+		var check_ext = EXTENSIONS_SND[extension];
+		var str_url = item.src;
+		var str_ext = str_url.substring(str_url.length, str_url.length - check_ext.length).toLowerCase();
+		if(str_ext === check_ext) {
+			valid_ext = true;
+			break;
+		}
+	}
+	if(valid_ext !== true)
+		return;
+
+	data_music.push(item);
+}
+
+// data, music, functions, shuffle
+function music_shuffle() {
+	for(var i = data_music.length - 1; i > 0; i--) {
+		var j = Math.floor(Math.random() * (i + 1));
+		[data_music[i], data_music[j]] = [data_music[j], data_music[i]];
 	}
 }
 

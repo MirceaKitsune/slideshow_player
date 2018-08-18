@@ -27,6 +27,13 @@ var player = {
 		timer_next: null,
 		element_1: null,
 		element_2: null
+	},
+	music: {
+		preloading: false,
+		stopped: false,
+		index: 0,
+		timer_next: null,
+		element: null
 	}
 };
 
@@ -124,8 +131,8 @@ function player_images_fade() {
 	}
 
 	player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
-	player.images.element1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
-	player.images.element2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
+	player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
+	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
 }
 
 // player, images, switching
@@ -145,8 +152,8 @@ function player_images_next() {
 	if(player.images.index >= data_images.length) {
 		if(settings.images.loop === true) {
 			player.images.index = 0;
-			player.images.element1.setAttribute("src", player.images.element2.getAttribute("src"));
-			player.images.element1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+			player.images.element_1.setAttribute("src", player.images.element_2.getAttribute("src"));
+			player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
 
 			// also shuffle the images again
 			if(settings.images.shuffle)
@@ -170,14 +177,14 @@ function player_images_next() {
 
 	// apply the current and next image
 	if(player.images.index > 1) {
-		player.images.element1.setAttribute("src", data_images[player.images.index - 2].src);
-		player.images.element1.setAttribute("style", STYLE_IMG + "; opacity: " + (player.images.transition < 0 ? 0 : 1));
+		player.images.element_1.setAttribute("src", data_images[player.images.index - 2].src);
+		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (player.images.transition < 0 ? 0 : 1));
 	}
 	if(player.images.index > 0) {
-		player.images.element2.setAttribute("src", data_images[player.images.index - 1].src);
-		player.images.element2.setAttribute("style", STYLE_IMG + "; opacity: " + (player.images.transition < 0 ? 1 : 0));
-		player.images.element2.setAttribute("onload", "player.images.preloading = false");
-		player.images.element2.setAttribute("onerror", "player_detach()");
+		player.images.element_2.setAttribute("src", data_images[player.images.index - 1].src);
+		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (player.images.transition < 0 ? 1 : 0));
+		player.images.element_2.setAttribute("onload", "player.images.preloading = false");
+		player.images.element_2.setAttribute("onerror", "player_detach()");
 	}
 }
 
@@ -206,6 +213,21 @@ function player_images_play() {
 	interface_update_media();
 }
 
+// player, music, switching
+function player_music_next() {
+
+}
+
+// player, music, skip
+function player_music_skip(index) {
+
+}
+
+// player, music, play
+function player_music_play() {
+
+}
+
 // player, is available
 function player_available() {
 	return (data_images.length > 0 && !plugins_busy());
@@ -216,9 +238,14 @@ function player_active() {
 	return (document.body.contains(player.element));
 }
 
-// player, is busy
-function player_busy() {
+// player, is busy, images
+function player_busy_images() {
 	return (player.images.index == 0 || player.images.transition < 1 || player.images.preloading === true);
+}
+
+// player, is busy, music
+function player_busy_music() {
+	return (player.music.index == 0);
 }
 
 // player, HTML, create
@@ -231,27 +258,39 @@ function player_attach() {
 	player.element.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center");
 	interface.player.appendChild(player.element);
 
-	// configure the 1st element
-	player.images.element1 = document.createElement("img");
-	player.images.element1.setAttribute("style", STYLE_IMG + "; opacity: 1");
-	player.images.element1.setAttribute("src", SRC_BLANK);
-	player.element.appendChild(player.images.element1);
+	// configure the 1st image element
+	player.images.element_1 = document.createElement("img");
+	player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+	player.images.element_1.setAttribute("src", SRC_BLANK);
+	player.element.appendChild(player.images.element_1);
 
-	// configure the 2nd element
-	player.images.element2 = document.createElement("img");
-	player.images.element2.setAttribute("style", STYLE_IMG + "; opacity: 0");
-	player.images.element2.setAttribute("src", SRC_BLANK);
-	player.element.appendChild(player.images.element2);
+	// configure the 2nd image element
+	player.images.element_2 = document.createElement("img");
+	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+	player.images.element_2.setAttribute("src", SRC_BLANK);
+	player.element.appendChild(player.images.element_2);
 
-	// set the interval and timeout functions
+	// configure the music element
+	player.music.element = document.createElement("audio");
+
+	// set the image interval and timeout functions
 	// player.images.timer_fade = setInterval(player_images_fade, RATE);
 	player.images.timer_next = setTimeout(player_images_next, 0);
 	player.images.index = 0;
 	player.images.stopped = false;
 
+	// set the music interval and timeout functions
+	player.music.timer_next = setTimeout(player_music_next, 0);
+	player.music.index = 0;
+	player.music.stopped = false;
+
 	// shuffle the images each time before playing
 	if(settings.images.shuffle)
 		images_shuffle();
+
+	// shuffle the songs each time before playing
+	if(settings.music.shuffle)
+		music_shuffle();
 
 	interface_update_media();
 }
@@ -273,6 +312,9 @@ function player_detach() {
 	player.images.stopped = false;
 	player.images.element_1 = null;
 	player.images.element_2 = null;
+	player.music.index = 0;
+	player.music.stopped = false;
+	player.music.element = null;
 
 	interface_update_media();
 }
