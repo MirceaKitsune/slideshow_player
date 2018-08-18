@@ -22,7 +22,7 @@ function parse_e621(data) {
 		images_add(this_image);
 	}
 
-	plugins_busy_set(name_e621, TYPE_IMAGES, false);
+	plugins_busy_set(name_e621, TYPE_IMAGES, 0);
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -36,7 +36,7 @@ function images_e621() {
 	script.src = "https://" + domain + ".net/post/index.json?tags=" + keywords + "&limit=" + count + "&callback=parse_e621";
 	document.body.appendChild(script);
 
-	plugins_busy_set(name_e621, TYPE_IMAGES, true);
+	plugins_busy_set(name_e621, TYPE_IMAGES, 30);
 }
 
 // register the plugin

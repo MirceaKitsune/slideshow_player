@@ -121,17 +121,18 @@ function plugins_busy() {
 }
 
 // plugins, busy set
-function plugins_busy_set(name, type, busy) {
+function plugins_busy_set(name, type, timeout) {
+	var busy = timeout > 0;
 	var name_plugin = type + " " + name;
 	plugins[name_plugin].busy = busy;
 	interface_update_media(false, false);
 
-	// automatically mark the plugin as no longer busy after a given timeout
+	// automatically mark the plugin as no longer busy after the given timeout
 	clearTimeout(plugins[name_plugin].busy_timeout);
 	if(busy === true) {
 		plugins[name_plugin].busy_timeout = setTimeout(function() {
-			plugins_busy_set(name_plugin, false);
-		}, 1000 * 30);
+			plugins_busy_set(name, type, 0);
+		}, timeout * 1000);
 	}
 }
 

@@ -22,7 +22,7 @@ function parse_derpibooru(data) {
 		images_add(this_image);
 	}
 
-	plugins_busy_set(name_derpibooru, TYPE_IMAGES, false);
+	plugins_busy_set(name_derpibooru, TYPE_IMAGES, 0);
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -41,7 +41,7 @@ function images_derpibooru() {
 	script.src = url_prefix + encodeURIComponent("https://derpibooru.org/search.json?q=" + keywords + "&perpage=" + count + "&filter_id=" + filter_id) + url_sufix;
 	document.body.appendChild(script);
 
-	plugins_busy_set(name_derpibooru, TYPE_IMAGES, true);
+	plugins_busy_set(name_derpibooru, TYPE_IMAGES, 30);
 }
 
 // register the plugin

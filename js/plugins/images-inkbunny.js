@@ -9,7 +9,7 @@ const name_inkbunny = "Inkbunny";
 
 // indicate that the plugin has finished working
 function parse_inkbunny_ready(data) {
-	plugins_busy_set(name_inkbunny, TYPE_IMAGES, false);
+	plugins_busy_set(name_inkbunny, TYPE_IMAGES, 0);
 }
 
 // close the temporary guest session
@@ -66,7 +66,7 @@ function images_inkbunny() {
 	script.src = "https://inkbunny.net/api_login.php?output_mode=json&username=guest&callback=parse_inkbunny_login";
 	document.body.appendChild(script);
 
-	plugins_busy_set(name_inkbunny, TYPE_IMAGES, true);
+	plugins_busy_set(name_inkbunny, TYPE_IMAGES, 30);
 }
 
 // register the plugin
