@@ -35,7 +35,7 @@ function interface_refresh(name, type) {
 		interface_load(false);
 	}
 
-	interface_update_media(false, false);
+	interface_update_media(true, false, false);
 }
 
 // interface, functions, plugin loader
@@ -85,13 +85,12 @@ function interface_load(sites) {
 	settings_cookie_set();
 
 	// evenly distribute the total image count to each source
-	settings.images.count = Math.floor(settings.images.count / sites_images);
-	settings.music.count = Math.floor(settings.music.count / sites_music);
+	settings.images.count = Math.ceil(settings.images.count / sites_images);
+	settings.music.count = Math.ceil(settings.music.count / sites_music);
 
-	// refresh the volume of the audio element
-	interface.controls_music_volume_label.innerHTML = settings.music.volume.toFixed(2);
-	if(player_active() === true)
-		player.music.element.volume = settings.music.volume;
+	// update the image and music controls
+	interface_update_controls_images();
+	interface_update_controls_music();
 
 	// if sites need to be refreshed, load every selected plugin
 	if(sites === true && plugins_busy() !== true && player_active() !== true) {
@@ -122,8 +121,21 @@ function interface_play() {
 		player_detach();
 }
 
-// interface, update HTML, sites
-function interface_update_controls_sites_list() {
+// interface, update HTML, controls, images
+function interface_update_controls_images() {
+
+}
+
+// interface, update HTML, controls, music
+function interface_update_controls_music() {
+	// refresh the volume of the audio element
+	interface.controls_music_volume_label.innerHTML = settings.music.volume.toFixed(2);
+	if(document.body.contains(player.music.element))
+		player.music.element.volume = settings.music.volume;
+}
+
+// interface, update HTML, controls, sites
+function interface_update_controls_sites() {
 	interface.controls_sites_list.innerHTML = "";
 	for(var item in plugins) {
 		// interface HTML: controls, images, sites, list, checkbox
@@ -147,18 +159,9 @@ function interface_update_controls_sites_list() {
 }
 
 // interface, functions, media
-function interface_update_media(update_images, update_music) {
-	if(player_active() === true)
-		interface_update_media_controls("stop");
-	else if(plugins_busy() === true)
-		interface_update_media_controls("busy");
-	else if(interface_refresh_images === true || interface_refresh_music === true)
-		interface_update_media_controls("reload");
-	else if(player_available() === true)
-		interface_update_media_controls("play");
-	else
-		interface_update_media_controls("none");
-
+function interface_update_media(update_controls, update_images, update_music) {
+	if(update_controls === true)
+		interface_update_media_controls();
 	if(update_images === true)
 		interface_update_media_images();
 	if(update_music === true)
@@ -211,7 +214,7 @@ function interface_update_media_images() {
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 		interface.media_images_info.innerHTML = "<font size=\"1\"><b>Loading image</b></font>";
-		interface.player_icon_images.innerHTML = "⧗";
+		interface.player_icon_images.innerHTML = "⧗<br/><font size=\"2\"><b>Latency:</b> " + player_images_latency.time_average.toFixed(2) + " sec</font>";
 	}
 	else if(active === true) {
 		interface.media_images_label.innerHTML = "<font size=\"2\"><b>" + player.images.index + " / " + data_images.length + "</b></font>";
@@ -221,7 +224,7 @@ function interface_update_media_images() {
 		interface.player_icon_images.innerHTML = "";
 	}
 	else {
-		interface.media_images_label.innerHTML = "<font size=\"2\"><b>Player stopped</b></font>";
+		interface.media_images_label.innerHTML = "<font size=\"2\"><b>No images loaded</b></font>";
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 		interface.media_images_info.innerHTML = "";
@@ -285,7 +288,7 @@ function interface_update_media_music() {
 		interface.player_icon_music.innerHTML = "";
 	}
 	else {
-		interface.media_music_label.innerHTML = "<font size=\"2\"><b>Player stopped</b></font>";
+		interface.media_music_label.innerHTML = "<font size=\"2\"><b>No music loaded</b></font>";
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 		interface.media_music_info.innerHTML = "";
@@ -294,7 +297,7 @@ function interface_update_media_music() {
 }
 
 // interface, update HTML, media controls
-function interface_update_media_controls(state) {
+function interface_update_media_controls() {
 	var total_images = data_images.length;
 	var total_duration = settings.images.duration;
 	var total_seconds = total_images * total_duration;
@@ -302,52 +305,44 @@ function interface_update_media_controls(state) {
 	total_date.setSeconds(total_seconds);
 	var total_time = total_date.toISOString().substr(11, 8);
 	var label_status =
-		"<b>Images:</b> " + total_images + " <b>↺</b> " + total_duration + " sec <b>|</b> <b>Songs:</b> " + data_music.length + "<br/>" +
-		"<b>" + total_time + "</b>";
+		"<b>Images:</b> " + total_images + " <b>↺</b> " + total_duration + " sec <b>►</b> " + total_time + "<br/>" +
+		"<b>Music:</b> " + data_music.length;
 
 	// configure play / label elements, as well as the window title
-	switch(state) {
-		case "busy":
-			interface.media_controls_play.setAttribute("class", "button_size_large button_color_blue");
-			interface.media_controls_play.removeAttribute("onclick");
-			interface.media_controls_play.innerHTML = "⧗";
-			interface.media_controls_label.innerHTML = "<b>Loading content</b>";
-			document.title = "Slideshow Player (⧗)";
-			break;
-		case "reload":
-			interface.media_controls_play.setAttribute("class", "button_size_large button_color_cyan");
-			interface.media_controls_play.setAttribute("onclick", "interface_load(true)");
-			interface.media_controls_play.innerHTML = "⟳";
-			interface.media_controls_label.innerHTML = "<b>Click to apply settings</b>";
-			document.title = "Slideshow Player (⟳)";
-			break;
-		case "none":
-			interface.media_controls_play.setAttribute("class", "button_size_large button_color_red");
-			interface.media_controls_play.removeAttribute("onclick");
-			interface.media_controls_play.innerHTML = "∅";
-			interface.media_controls_label.innerHTML = "<b>Unable to play</b>";
-			document.title = "Slideshow Player (∅)";
-			break;
-		case "stop":
-			interface.media_controls_play.setAttribute("class", "button_size_large button_color_green");
-			interface.media_controls_play.setAttribute("onclick", "interface_play()");
-			interface.media_controls_play.innerHTML = "■";
-			interface.media_controls_label.innerHTML = label_status;
-			document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (▶)";
-			break;
-		case "play":
-			interface.media_controls_play.setAttribute("class", "button_size_large button_color_yellow");
-			interface.media_controls_play.setAttribute("onclick", "interface_play()");
-			interface.media_controls_play.innerHTML = "▶";
-			interface.media_controls_label.innerHTML = label_status;
-			document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (■)";
-			break;
-		default:
-			interface.media_controls_play.setAttribute("class", "button_size_large button_color_pink");
-			interface.media_controls_play.removeAttribute("onclick");
-			interface.media_controls_play.innerHTML = "✖";
-			interface.media_controls_label.innerHTML = "<b>Error</b>";
-			document.title = "Slideshow Player (✖)";
+	if(player_active() === true) {
+		interface.media_controls_play.setAttribute("class", "button_size_large button_color_green");
+		interface.media_controls_play.setAttribute("onclick", "interface_play()");
+		interface.media_controls_play.innerHTML = "■";
+		interface.media_controls_label.innerHTML = label_status;
+		document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (▶)";
+	}
+	else if(plugins_busy() === true) {
+		interface.media_controls_play.setAttribute("class", "button_size_large button_color_blue");
+		interface.media_controls_play.removeAttribute("onclick");
+		interface.media_controls_play.innerHTML = "⧗";
+		interface.media_controls_label.innerHTML = "<b>Loading content</b>";
+		document.title = "Slideshow Player (⧗)";
+	}
+	else if(interface_refresh_images === true || interface_refresh_music === true) {
+		interface.media_controls_play.setAttribute("class", "button_size_large button_color_cyan");
+		interface.media_controls_play.setAttribute("onclick", "interface_load(true)");
+		interface.media_controls_play.innerHTML = "⟳";
+		interface.media_controls_label.innerHTML = "<b>Click to apply settings</b>";
+		document.title = "Slideshow Player (⟳)";
+	}
+	else if(player_available() === true) {
+		interface.media_controls_play.setAttribute("class", "button_size_large button_color_yellow");
+		interface.media_controls_play.setAttribute("onclick", "interface_play()");
+		interface.media_controls_play.innerHTML = "▶";
+		interface.media_controls_label.innerHTML = label_status;
+		document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (■)";
+	}
+	else {
+		interface.media_controls_play.setAttribute("class", "button_size_large button_color_red");
+		interface.media_controls_play.removeAttribute("onclick");
+		interface.media_controls_play.innerHTML = "∅";
+		interface.media_controls_label.innerHTML = "<b>Unable to play</b>";
+		document.title = "Slideshow Player (∅)";
 	}
 }
 
@@ -364,13 +359,13 @@ function interface_init() {
 		// interface HTML: player, icon, images
 		interface.player_icon_images = document.createElement("div");
 		interface.player_icon_images.setAttribute("class", "text_white");
-		interface.player_icon_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 48px; height: 48px; z-index: 1; line-height: 32px; font-size: 48px");
+		interface.player_icon_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 128px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
 		interface.player.appendChild(interface.player_icon_images);
 
 		// interface HTML: player, icon, music
 		interface.player_icon_music = document.createElement("div");
 		interface.player_icon_music.setAttribute("class", "text_white");
-		interface.player_icon_music.setAttribute("style", "position: absolute; top: 0%; left: 48px; width: 48px; height: 48px; z-index: 1; line-height: 32px; font-size: 48px");
+		interface.player_icon_music.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 128px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
 		interface.player.appendChild(interface.player_icon_music);
 	}
 
@@ -670,7 +665,7 @@ function interface_init() {
 	{
 		// interface HTML: media, images
 		interface.media_images = document.createElement("div");
-		interface.media_images.setAttribute("style", "position: absolute; margin: 0 0 0 0%; top: 0%; left: 0%; width: 192px; height: 100%");
+		interface.media_images.setAttribute("style", "position: absolute; margin: 0 0 0 0%; top: 0%; left: 0%; width: 256px; height: 100%");
 		interface.media.appendChild(interface.media_images);
 		{
 			// interface HTML: media, images, previous
@@ -726,7 +721,7 @@ function interface_init() {
 
 		// interface HTML: media, controls
 		interface.media_controls = document.createElement("div");
-		interface.media_controls.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 0%; left: -192px; width: 384px; height: 100%");
+		interface.media_controls.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 0%; left: -256px; width: 512px; height: 100%");
 		interface.media.appendChild(interface.media_controls);
 		{
 			// interface HTML: media, controls, play
@@ -755,7 +750,7 @@ function interface_init() {
 
 		// interface HTML: media, music
 		interface.media_music = document.createElement("div");
-		interface.media_music.setAttribute("style", "position: absolute; margin: 0 0 0 100%; top: 0%; left: -192px; width: 192px; height: 100%");
+		interface.media_music.setAttribute("style", "position: absolute; margin: 0 0 0 100%; top: 0%; left: -256px; width: 256px; height: 100%");
 		interface.media.appendChild(interface.media_music);
 		{
 			// interface HTML: media, music, previous
@@ -811,5 +806,5 @@ function interface_init() {
 	}
 
 	interface_refresh(true, true);
-	interface_update_media(true, true);
+	interface_update_media(true, true, true);
 }

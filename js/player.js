@@ -173,15 +173,16 @@ function player_images_fade() {
 			player.images.timer_next = setTimeout(player_images_next, duration * 1000);
 		}
 
-		// deactivate the fading function and stop
+		// deactivate the fading function
 		clearInterval(player.images.timer_fade);
-		interface_update_media(true, false);
-		return;
+		interface_update_media(false, true, false);
 	}
-
-	player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
-	player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
-	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
+	else {
+		// advance the transition and apply the new transparency to the image elements
+		player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
+		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
+		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
+	}
 }
 
 // player, images, switching
@@ -251,7 +252,7 @@ function player_images_skip(index) {
 	clearTimeout(player.images.timer_next);
 	player.images.timer_next = setTimeout(player_images_next, 0);
 
-	interface_update_media(true, false);
+	interface_update_media(false, true, false);
 }
 
 // player, images, play
@@ -265,7 +266,7 @@ function player_images_play() {
 		player.images.stopped = true;
 	}
 
-	interface_update_media(true, false);
+	interface_update_media(false, true, false);
 }
 
 // player, music, switching, canplay
@@ -287,7 +288,7 @@ function player_music_next_canplay() {
 	if(player.music.stopped !== true)
 		player.music.element.play();
 
-	interface_update_media(false, true);
+	interface_update_media(false, false, true);
 }
 
 // player, music, switching
@@ -341,7 +342,7 @@ function player_music_skip(index) {
 	clearTimeout(player.music.timer_next);
 	player.music.timer_next = setTimeout(player_music_next, 0);
 
-	interface_update_media(false, true);
+	interface_update_media(false, false, true);
 }
 
 // player, music, play
@@ -364,7 +365,7 @@ function player_music_play() {
 		player.music.stopped = true;
 	}
 
-	interface_update_media(false, true);
+	interface_update_media(false, false, true);
 }
 
 // player, is available
@@ -436,7 +437,7 @@ function player_attach() {
 	if(settings.music.shuffle)
 		music_shuffle();
 
-	interface_update_media(true, true);
+	interface_update_media(true, true, true);
 }
 
 // player, HTML, destroy
@@ -449,6 +450,7 @@ function player_detach() {
 	player.element.innerHTML = "";
 
 	// unset the interval and timeout functions
+	player_images_latency_stop();
 	clearInterval(player.images.timer_fade);
 	clearTimeout(player.images.timer_next);
 	clearTimeout(player.music.timer_next);
@@ -461,5 +463,5 @@ function player_detach() {
 	player.music.stopped = false;
 	player.music.element = null;
 
-	interface_update_media(true, true);
+	interface_update_media(true, true, true);
 }
