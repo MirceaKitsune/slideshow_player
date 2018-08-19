@@ -451,6 +451,7 @@ function player_detach() {
 	// unset the interval and timeout functions
 	clearInterval(player.images.timer_fade);
 	clearTimeout(player.images.timer_next);
+	clearTimeout(player.music.timer_next);
 	player.element = null;
 	player.images.index = 0;
 	player.images.stopped = false;
