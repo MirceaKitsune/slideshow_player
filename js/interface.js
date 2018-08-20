@@ -278,7 +278,7 @@ function interface_update_media_music() {
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 		interface.media_music_info.innerHTML = "<font size=\"1\"><b>Loading song</b></font>";
-		interface.player_icon_music.innerHTML = "⧗";
+		interface.player_icon_music.innerHTML = "⧖";
 	}
 	else if(active === true) {
 		interface.media_music_label.innerHTML = "<font size=\"2\"><b>" + player.music.index + " / " + data_music.length + "</b></font>";

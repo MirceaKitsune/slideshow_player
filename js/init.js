@@ -296,5 +296,11 @@ document.onkeydown = function(event) {
 	}
 }
 
+// ask the user to confirm they want to leave if the player is busy
+window.onbeforeunload = function() {
+	if(player_active() === true)
+		return "Closing this page will end the current slideshow. Are you sure?";
+}
+
 // initialize the interface
 interface_init();
