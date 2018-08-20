@@ -465,3 +465,9 @@ function player_detach() {
 
 	interface_update_media(true, true, true);
 }
+
+// ask the user to confirm they want to leave if a slideshow is playing
+window.onbeforeunload = function() {
+	if(player_active() === true)
+		return "Closing this page will end the current slideshow. Are you sure?";
+}
