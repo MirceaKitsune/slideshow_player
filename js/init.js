@@ -212,11 +212,16 @@ function images_pick() {
 			new_images.push(data_images_all[image]);
 	}
 
-	// don't apply the change if it would leave the active player with no images
-	if(player_active() === true && new_images.length <= 0)
-		return;
+	if(new_images.length === 0) {
+		data_images = [];
 
-	if(new_images.length !== data_images.length) {
+		// stop the player if there are neither images or songs left to play
+		// otherwise if the player is active and no images are left, clear the image player
+		if(data_music.length === 0)
+			player_detach();
+		else if(player_active() === true)
+			player_images_clear();
+	} else if(new_images.length !== data_images.length) {
 		data_images = new_images;
 
 		// suffle the images again
@@ -300,11 +305,16 @@ function music_pick() {
 			new_music.push(data_music_all[song]);
 	}
 
-	// don't apply the change if it would leave the active player with no songs
-	if(player_active() === true && new_music.length <= 0)
-		return;
+	if(new_music.length === 0) {
+		data_music = [];
 
-	if(new_music.length !== data_music.length) {
+		// stop the player if there are neither images or songs left to play
+		// otherwise if the player is active and no songs are left, clear the music player
+		if(data_images.length === 0)
+			player_detach();
+		else if(player_active() === true)
+			player_music_clear();
+	} else if(new_music.length !== data_music.length) {
 		data_music = new_music;
 
 		// suffle the songs again

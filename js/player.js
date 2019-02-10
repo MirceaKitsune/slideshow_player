@@ -188,7 +188,7 @@ function player_images_fade() {
 // player, images, switching
 function player_images_next() {
 	// do nothing if there are no images
-	if(data_images.length <= 0)
+	if(data_images.length === 0)
 		return;
 
 	// start recording the latency
@@ -269,6 +269,21 @@ function player_images_play() {
 	interface_update_media(false, true, false);
 }
 
+// player, images, clear
+function player_images_clear() {
+	if(player_active() !== true)
+		return;
+
+	player.images.index = 1;
+	player.images.stopped = false;
+	player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+	player.images.element_1.setAttribute("src", SRC_BLANK);
+	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+	player.images.element_2.setAttribute("src", SRC_BLANK);
+
+	interface_update_media(false, true, false);
+}
+
 // player, music, switching, canplay
 function player_music_next_canplay() {
 	if(player.music.preloading !== true)
@@ -294,7 +309,7 @@ function player_music_next_canplay() {
 // player, music, switching
 function player_music_next() {
 	// do nothing if there are no songs
-	if(data_music.length <= 0)
+	if(data_music.length === 0)
 		return;
 
 	// stop or restart the slideshow if this is the final song
@@ -368,6 +383,20 @@ function player_music_play() {
 	interface_update_media(false, false, true);
 }
 
+// player, music, clear
+function player_music_clear() {
+	if(player_active() !== true)
+		return;
+
+	player.music.index = 1;
+	player.music.stopped = false;
+	player.music.element.pause();
+	player.music.element.currentTime = 0;
+	player.music.element.removeAttribute("src");
+
+	interface_update_media(false, false, true);
+}
+
 // player, is available
 function player_available() {
 	return ((data_images.length > 0 || data_music.length > 0) && !plugins_busy());
@@ -396,18 +425,6 @@ function player_attach() {
 	// don't spawn the player if there is no content to play
 	if(data_images.length == 0 && data_music.length == 0)
 		return;
-
-	// refresh the images and songs in use
-	images_pick();
-	music_pick();
-
-	// shuffle the images each time before playing
-	if(settings.images.shuffle)
-		images_shuffle();
-
-	// shuffle the songs each time before playing
-	if(settings.music.shuffle)
-		music_shuffle();
 
 	// create the player element
 	player.element = document.createElement("div");
@@ -441,6 +458,18 @@ function player_attach() {
 	player.music.index = 0;
 	player.music.stopped = false;
 
+	// refresh the images and songs in use
+	images_pick();
+	music_pick();
+
+	// shuffle the images each time before playing
+	if(settings.images.shuffle)
+		images_shuffle();
+
+	// shuffle the songs each time before playing
+	if(settings.music.shuffle)
+		music_shuffle();
+
 	interface_update_media(true, true, true);
 }
 
@@ -448,10 +477,6 @@ function player_attach() {
 function player_detach() {
 	if(player_active() !== true)
 		return;
-
-	// refresh the images and songs in use
-	images_pick();
-	music_pick();
 
 	// destroy the player element
 	interface.player.removeChild(player.element);
@@ -470,6 +495,10 @@ function player_detach() {
 	player.music.index = 0;
 	player.music.stopped = false;
 	player.music.element = null;
+
+	// refresh the images and songs in use
+	images_pick();
+	music_pick();
 
 	interface_update_media(true, true, true);
 }
