@@ -201,14 +201,31 @@ function images_add(item) {
 
 // data, images, functions, pick
 function images_pick() {
-	data_images = [];
+	var new_images = [];
 	for(image in data_images_all) {
-		if(data_images.length >= settings.images.count)
+		// we've reached the maximum count, stop here
+		if(new_images.length >= settings.images.count)
 			break;
 
-		// add this submission if it meets the necessary criteria
+		// add this image if it meets the necessary criteria
 		if(data_images_all[image].score >= settings.images.score)
-			data_images.push(data_images_all[image]);
+			new_images.push(data_images_all[image]);
+	}
+
+	// don't apply the change if it would leave the active player with no images
+	if(player_active() === true && new_images.length <= 0)
+		return;
+
+	if(new_images.length !== data_images.length) {
+		data_images = new_images;
+
+		// suffle the images again
+		if(settings.images.shuffle)
+			images_shuffle();
+
+		// if the player is active while we changed images, refresh the image player
+		if(player_active() === true)
+			player_images_skip(player.images.index);
 	}
 }
 
@@ -272,14 +289,31 @@ function music_add(item) {
 
 // data, music, functions, pick
 function music_pick() {
-	data_music = [];
+	var new_music = [];
 	for(song in data_music_all) {
-		if(data_music.length >= settings.music.count)
+		// we've reached the maximum count, stop here
+		if(new_music.length >= settings.music.count)
 			break;
 
-		// add this submission if it meets the necessary criteria
+		// add this song if it meets the necessary criteria
 		if(data_music_all[song].score >= settings.music.score)
-			data_music.push(data_music_all[song]);
+			new_music.push(data_music_all[song]);
+	}
+
+	// don't apply the change if it would leave the active player with no songs
+	if(player_active() === true && new_music.length <= 0)
+		return;
+
+	if(new_music.length !== data_music.length) {
+		data_music = new_music;
+
+		// suffle the songs again
+		if(settings.music.shuffle)
+			music_shuffle();
+
+		// if the player is active while we changed songs, refresh the music player
+		if(player_active() === true)
+			player_music_skip(player.music.index);
 	}
 }
 

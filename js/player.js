@@ -397,6 +397,18 @@ function player_attach() {
 	if(data_images.length == 0 && data_music.length == 0)
 		return;
 
+	// refresh the images and songs in use
+	images_pick();
+	music_pick();
+
+	// shuffle the images each time before playing
+	if(settings.images.shuffle)
+		images_shuffle();
+
+	// shuffle the songs each time before playing
+	if(settings.music.shuffle)
+		music_shuffle();
+
 	// create the player element
 	player.element = document.createElement("div");
 	player.element.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center");
@@ -429,18 +441,6 @@ function player_attach() {
 	player.music.index = 0;
 	player.music.stopped = false;
 
-	// refresh the images and songs in use
-	images_pick();
-	music_pick();
-
-	// shuffle the images each time before playing
-	if(settings.images.shuffle)
-		images_shuffle();
-
-	// shuffle the songs each time before playing
-	if(settings.music.shuffle)
-		music_shuffle();
-
 	interface_update_media(true, true, true);
 }
 
@@ -448,6 +448,10 @@ function player_attach() {
 function player_detach() {
 	if(player_active() !== true)
 		return;
+
+	// refresh the images and songs in use
+	images_pick();
+	music_pick();
 
 	// destroy the player element
 	interface.player.removeChild(player.element);
@@ -466,10 +470,6 @@ function player_detach() {
 	player.music.index = 0;
 	player.music.stopped = false;
 	player.music.element = null;
-
-	// refresh the images and songs in use
-	images_pick();
-	music_pick();
 
 	interface_update_media(true, true, true);
 }

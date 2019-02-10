@@ -89,10 +89,8 @@ function interface_load(sites) {
 	settings_cookie_set();
 
 	// update the images and songs to be used
-	if(player_active() !== true) {
-		images_pick();
-		music_pick();
-	}
+	images_pick();
+	music_pick();
 
 	// update the image and music controls
 	interface_update_controls_images();
