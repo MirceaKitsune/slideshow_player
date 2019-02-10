@@ -12,21 +12,18 @@ const limit_e621 = 320;
 
 // convert each entry into an image object for the player
 function parse_e621(data) {
-	var score = plugins_settings_read("score", TYPE_IMAGES);
-
 	for(var entry in data) {
 		var this_data = data[entry];
 		var this_image = {};
 
-		if(this_data.score >= score) {
-			this_image.src = String(this_data.file_url);
-			this_image.thumb = String(this_data.preview_url);
-			this_image.title = String(this_data.source); // API doesn't provide the title, use the file name instead
-			this_image.author = String(this_data.artist);
-			this_image.url = String(this_data.source);
+		this_image.src = String(this_data.file_url);
+		this_image.thumb = String(this_data.preview_url);
+		this_image.title = String(this_data.source); // API doesn't provide the title, use the file name instead
+		this_image.author = String(this_data.artist);
+		this_image.url = String(this_data.source);
+		this_image.score = Number(this_data.score);
 
-			images_add(this_image);
-		}
+		images_add(this_image);
 	}
 
 	plugins_busy_set(name_e621, TYPE_IMAGES, 0);

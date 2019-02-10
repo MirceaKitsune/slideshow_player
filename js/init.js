@@ -106,6 +106,12 @@ function plugins_settings_read(name, type) {
 	}
 }
 
+// plugins, functions, ready
+function plugins_ready() {
+	images_pick();
+	music_pick();
+}
+
 // plugins, functions, settings, used
 function plugins_settings_used(name, type) {
 	var name_settings = type + "_" + name;
@@ -127,7 +133,6 @@ function plugins_busy_set(name, type, timeout) {
 	var busy = timeout > 0;
 	var name_plugin = type + " " + name;
 	plugins[name_plugin].busy = busy;
-	interface_update_media(true, false, false);
 
 	// automatically mark the plugin as no longer busy after the given timeout
 	clearTimeout(plugins[name_plugin].busy_timeout);
@@ -136,14 +141,21 @@ function plugins_busy_set(name, type, timeout) {
 			plugins_busy_set(name, type, 0);
 		}, timeout * 1000);
 	}
+
+	// call the ready function if this was the last plugin that finished working
+	if(plugins_busy() === false)
+		plugins_ready();
+
+	interface_update_media(true, false, false);
 }
 
 // data, images, global list
-var data_images = [];
+var data_images_all = data_images = [];
 
 // data, images, functions, clear
 function images_clear() {
 	player_detach();
+	data_images_all = [];
 	data_images = [];
 	interface_update_media(true, true, false);
 }
@@ -153,8 +165,8 @@ function images_add(item) {
 	player_detach();
 
 	// check that this image doesn't already exist
-	for(image in data_images) {
-		if(data_images[image].src === item.src)
+	for(image in data_images_all) {
+		if(data_images_all[image].src === item.src)
 			return;
 	}
 
@@ -184,7 +196,20 @@ function images_add(item) {
 	if(valid_ext !== true)
 		return;
 
-	data_images.push(item);
+	data_images_all.push(item);
+}
+
+// data, images, functions, pick
+function images_pick() {
+	data_images = [];
+	for(image in data_images_all) {
+		if(image >= settings.images.count)
+			break;
+
+		// add this submission if it meets the necessary criteria
+		if(data_images_all[image].score >= settings.images.score)
+			data_images.push(data_images_all[image]);
+	}
 }
 
 // data, images, functions, shuffle
@@ -196,11 +221,12 @@ function images_shuffle() {
 }
 
 // data, music, global list
-var data_music = [];
+var data_music_all = data_music = [];
 
 // data, music, functions, clear
 function music_clear() {
 	player_detach();
+	data_music_all = [];
 	data_music = [];
 	interface_update_media(true, false, true);
 }
@@ -210,8 +236,8 @@ function music_add(item) {
 	player_detach();
 
 	// check that this song doesn't already exist
-	for(song in data_music) {
-		if(data_music[song].src === item.src)
+	for(song in data_music_all) {
+		if(data_music_all[song].src === item.src)
 			return;
 	}
 
@@ -241,7 +267,20 @@ function music_add(item) {
 	if(valid_ext !== true)
 		return;
 
-	data_music.push(item);
+	data_music_all.push(item);
+}
+
+// data, music, functions, pick
+function music_pick() {
+	data_music = [];
+	for(song in data_music_all) {
+		if(song >= settings.music.count)
+			break;
+
+		// add this submission if it meets the necessary criteria
+		if(data_music_all[song].score >= settings.music.score)
+			data_music.push(data_music_all[song]);
+	}
 }
 
 // data, music, functions, shuffle

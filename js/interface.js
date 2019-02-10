@@ -88,6 +88,12 @@ function interface_load(sites) {
 	// update the settings cookie
 	settings_cookie_set();
 
+	// update the images and songs to be used
+	if(player_active() !== true) {
+		images_pick();
+		music_pick();
+	}
+
 	// update the image and music controls
 	interface_update_controls_images();
 	interface_update_controls_music();
@@ -170,7 +176,7 @@ function interface_update_media(update_controls, update_images, update_music) {
 
 // interface, update HTML, media images
 function interface_update_media_images() {
-	var active = (player_active() && data_images.length > 0 && settings.images.count > 0);
+	var active = (player_active() && data_images.length > 0);
 	var ready = !player_busy_images();
 
 	// configure previous / play / next elements
@@ -210,14 +216,14 @@ function interface_update_media_images() {
 
 	// configure label / thumb / info / player_icon elements
 	if(active === true && ready !== true) {
-		interface.media_images_label.innerHTML = "<font size=\"2\"><b>? / " + Math.min(data_images.length, settings.images.count) + "</b></font>";
+		interface.media_images_label.innerHTML = "<font size=\"2\"><b>? / " + data_images.length + "</b></font>";
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 		interface.media_images_info.innerHTML = "<font size=\"1\"><b>Loading image</b></font>";
 		interface.player_icon_images.innerHTML = "⧗<br/><font size=\"2\"><b>Latency:</b> " + player_images_latency.time_average.toFixed(2) + " sec</font>";
 	}
 	else if(active === true) {
-		interface.media_images_label.innerHTML = "<font size=\"2\"><b>" + player.images.index + " / " + Math.min(data_images.length, settings.images.count) + "</b></font>";
+		interface.media_images_label.innerHTML = "<font size=\"2\"><b>" + player.images.index + " / " + data_images.length + "</b></font>";
 		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
 		interface.media_images_info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
@@ -234,7 +240,7 @@ function interface_update_media_images() {
 
 // interface, update HTML, media music
 function interface_update_media_music() {
-	var active = (player_active() && data_music.length > 0 && settings.music.count > 0);
+	var active = (player_active() && data_music.length > 0);
 	var ready = !player_busy_music();
 
 	// configure previous / play / next elements
@@ -274,14 +280,14 @@ function interface_update_media_music() {
 
 	// configure label / thumb / info / player_icon elements
 	if(active === true && ready !== true) {
-		interface.media_music_label.innerHTML = "<font size=\"2\"><b>? / " + Math.min(data_music.length, settings.music.count) + "</b></font>";
+		interface.media_music_label.innerHTML = "<font size=\"2\"><b>? / " + data_music.length + "</b></font>";
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 		interface.media_music_info.innerHTML = "<font size=\"1\"><b>Loading song</b></font>";
 		interface.player_icon_music.innerHTML = "⧖";
 	}
 	else if(active === true) {
-		interface.media_music_label.innerHTML = "<font size=\"2\"><b>" + player.music.index + " / " + Math.min(data_music.length, settings.music.count) + "</b></font>";
+		interface.media_music_label.innerHTML = "<font size=\"2\"><b>" + player.music.index + " / " + data_music.length + "</b></font>";
 		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
 		interface.media_music_info.innerHTML = "<font size=\"1\"><b>" + data_music[player.music.index - 1].title + "</b> by <b>" + data_music[player.music.index - 1].author + "</b></font>";
@@ -298,9 +304,7 @@ function interface_update_media_music() {
 
 // interface, update HTML, media controls
 function interface_update_media_controls() {
-	var total_images = Math.min(data_images.length, settings.images.count);
-	var total_songs = Math.min(data_music.length, settings.music.count);
-
+	var total_images = data_images.length;
 	var total_duration = settings.images.duration;
 	var total_seconds = total_images * total_duration;
 	var total_date = new Date(null);
@@ -308,7 +312,7 @@ function interface_update_media_controls() {
 	var total_time = total_date.toISOString().substr(11, 8);
 	var label_status =
 		"<b>Images:</b> " + total_images + " <b>↺</b> " + total_duration + " sec <b>►</b> " + total_time + "<br/>" +
-		"<b>Music:</b> " + total_songs;
+		"<b>Music:</b> " + data_music.length;
 
 	// configure play / label elements, as well as the window title
 	if(player_active() === true) {

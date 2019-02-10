@@ -34,6 +34,7 @@ function parse_inkbunny(data) {
 		this_image.title = String(this_data.title);
 		this_image.author = String(this_data.username);
 		this_image.url = String(this_data.file_url_full); // API doesn't provide the page URL, use the image file instead
+		this_image.score = 0;
 
 		images_add(this_image);
 	}
@@ -64,11 +65,6 @@ function parse_inkbunny_login(data) {
 
 // fetch the json object containing the data and execute it as a script
 function images_inkbunny() {
-	// scores are not supported by this API, abort if the option is set to a value greater than zero
-	var score = plugins_settings_read("score", TYPE_IMAGES);
-	if(score > 0)
-		return;
-
 	var script = document.createElement("script");
 	script.src = "https://inkbunny.net/api_login.php?output_mode=json&username=guest&callback=parse_inkbunny_login";
 	document.body.appendChild(script);
