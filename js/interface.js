@@ -350,6 +350,10 @@ function interface_update_media_controls() {
 		interface.media_controls_label.innerHTML = "<b>Unable to play</b>";
 		document.title = "Slideshow Player (∅)";
 	}
+
+	// add an extra refresh icon if the sources become outdated while the system is working
+	if((player_active() === true || plugins_busy() === true) && (interface_refresh_images || interface_refresh_music))
+		interface.media_controls_play.innerHTML += "\n⟳";
 }
 
 // interface, HTML, create
