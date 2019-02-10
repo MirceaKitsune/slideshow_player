@@ -13,7 +13,7 @@ const limit_e621 = 320;
 // convert each entry into an image object for the player
 function parse_e621(data) {
 	for(var entry in data) {
-		var this_data = data[entry];
+		const this_data = data[entry];
 		var this_image = {};
 
 		this_image.src = String(this_data.file_url);
@@ -31,8 +31,8 @@ function parse_e621(data) {
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
-	var domain = plugins_settings_read("nsfw", TYPE_IMAGES) === true ? "e621" : "e926"; // e926 is the SFW version of e621
-	var keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) === true ? "e621" : "e926"; // e926 is the SFW version of e621
+	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";

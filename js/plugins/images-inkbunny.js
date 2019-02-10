@@ -26,7 +26,7 @@ function parse_inkbunny_logout(data) {
 // convert each entry into an image object for the player
 function parse_inkbunny(data) {
 	for(var entry in data.submissions) {
-		var this_data = data.submissions[entry];
+		const this_data = data.submissions[entry];
 		var this_image = {};
 
 		this_image.src = String(this_data.file_url_full);
@@ -44,7 +44,7 @@ function parse_inkbunny(data) {
 
 // change the rating, then call the image parser with the session id
 function parse_inkbunny_rating(data) {
-	var keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";
@@ -55,7 +55,7 @@ function parse_inkbunny_rating(data) {
 // create a new session as guest, then call the rating api with its session id
 function parse_inkbunny_login(data) {
 	// whether or not to enable the NSFW tags
-	var nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) === true ? "yes" : "no";
+	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) === true ? "yes" : "no";
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";

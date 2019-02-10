@@ -61,7 +61,7 @@ function player_images_fullscreen_has() {
 
 // player, images, fullscreen mouse movement
 function player_images_fullscreen_mouse(event) {
-	var opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
+	const opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
 	interface.media.setAttribute("style", "z-index: 1; opacity: " + opacity + "; " + STYLE_MEDIA_POSITION_ATTACHED + "; " + STYLE_MEDIA_BACKGROUND_ATTACHED);
 }
 
@@ -69,7 +69,7 @@ function player_images_fullscreen_mouse(event) {
 function player_images_fullscreen_toggle(force_to) {
 	if(typeof force_to === "boolean" ? !force_to : player_images_fullscreen_has()) {
 		// cancel fullscreen mode
-		var method_cancel = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msCancelFullScreen;
+		const method_cancel = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msCancelFullScreen;
 		if(method_cancel)
 			method_cancel.call(document);
 		// else
@@ -96,7 +96,7 @@ function player_images_fullscreen_toggle(force_to) {
 	}
 	else {
 		// request fullscreen mode
-		var method_request = interface.player.requestFullScreen || interface.player.webkitRequestFullScreen || interface.player.mozRequestFullScreen || interface.player.msRequestFullscreen;
+		const method_request = interface.player.requestFullScreen || interface.player.webkitRequestFullScreen || interface.player.mozRequestFullScreen || interface.player.msRequestFullscreen;
 		if(method_request)
 			method_request.call(interface.player);
 		else
@@ -169,7 +169,7 @@ function player_images_fade() {
 		// schedule the next image
 		// the latency calculated based on the loading time of previous images is deducted from the duration of this image
 		if(player.images.stopped !== true) {
-			var duration = Math.max(settings.images.duration - player_images_latency.time_average, 5);
+			const duration = Math.max(settings.images.duration - player_images_latency.time_average, 5);
 			player.images.timer_next = setTimeout(player_images_next, duration * 1000);
 		}
 
@@ -236,8 +236,8 @@ function player_images_next() {
 
 // player, images, skip
 function player_images_skip(index) {
-	var overflow_start = index <= 0;
-	var overflow_end = index > data_images.length;
+	const overflow_start = index <= 0;
+	const overflow_end = index > data_images.length;
 	if((overflow_start || overflow_end) && settings.images.loop !== true)
 		return;
 
@@ -276,7 +276,7 @@ function player_music_next_canplay() {
 	player.music.preloading = false;
 
 	// schedule the next song
-	var duration = player.music.element.duration;
+	const duration = player.music.element.duration;
 	if(duration === NaN || duration <= 0) {
 		player_detach();
 		return;
@@ -326,8 +326,8 @@ function player_music_next() {
 
 // player, music, skip
 function player_music_skip(index) {
-	var overflow_start = index <= 0;
-	var overflow_end = index > data_music.length;
+	const overflow_start = index <= 0;
+	const overflow_end = index > data_music.length;
 	if((overflow_start || overflow_end) && settings.music.loop !== true)
 		return;
 
@@ -354,7 +354,7 @@ function player_music_play() {
 			return;
 
 		// reschedule switching to the next song
-		var duration = Math.max(player.music.element.duration - player.music.element.currentTime, 0);
+		const duration = Math.max(player.music.element.duration - player.music.element.currentTime, 0);
 		player.music.timer_next = setTimeout(player_music_next, duration * 1000);
 
 		player.music.element.play();

@@ -32,8 +32,8 @@ Object.defineProperty(navigator, "userAgent", {
 
 // settings, cookie, set
 function settings_cookie_set() {
-	var expire = 365 * 24 * 60 * 60; // year, hour, minute, second
-	var string = JSON.stringify(settings);
+	const expire = 365 * 24 * 60 * 60; // year, hour, minute, second
+	const string = JSON.stringify(settings);
 	var time = new Date();
 	time.setTime(time.getTime() + 1 * expire * 1000);
 	document.cookie = "slideshowplayer" + "=" + string + "; expires=" + time.toUTCString();
@@ -41,7 +41,7 @@ function settings_cookie_set() {
 
 // settings, cookie, get
 function settings_cookie_get() {
-	var table = document.cookie.match(new RegExp("slideshowplayer" + "=([^;]+)"));
+	const table = document.cookie.match(new RegExp("slideshowplayer" + "=([^;]+)"));
 	if(table)
 		settings = JSON.parse(table[1]);
 }
@@ -75,7 +75,7 @@ var plugins_settings = [];
 
 // plugins, functions, register
 function plugins_register(name, type, func) {
-	var name_plugin = type + " " + name;
+	const name_plugin = type + " " + name;
 	plugins[name_plugin] = {
 		func: func,
 		busy: false,
@@ -92,7 +92,7 @@ function plugins_load(name) {
 // plugins, functions, settings, read
 function plugins_settings_read(name, type) {
 	// take note that this setting was used by a plugin
-	var name_settings = type + "_" + name;
+	const name_settings = type + "_" + name;
 	if(plugins_settings.indexOf(name_settings) < 0)
 		plugins_settings.push(name_settings);
 
@@ -114,7 +114,7 @@ function plugins_ready() {
 
 // plugins, functions, settings, used
 function plugins_settings_used(name, type) {
-	var name_settings = type + "_" + name;
+	const name_settings = type + "_" + name;
 	return (plugins_settings.indexOf(name_settings) >= 0);
 }
 
@@ -130,8 +130,8 @@ function plugins_busy() {
 
 // plugins, busy set
 function plugins_busy_set(name, type, timeout) {
-	var busy = timeout > 0;
-	var name_plugin = type + " " + name;
+	const busy = timeout > 0;
+	const name_plugin = type + " " + name;
 	plugins[name_plugin].busy = busy;
 
 	// automatically mark the plugin as no longer busy after the given timeout
@@ -185,9 +185,9 @@ function images_add(item) {
 	// check that the extension is a valid image
 	var valid_ext = false;
 	for(extension in EXTENSIONS_IMG) {
-		var check_ext = EXTENSIONS_IMG[extension];
-		var str_url = item.src;
-		var str_ext = str_url.substring(str_url.length, str_url.length - check_ext.length).toLowerCase();
+		const check_ext = EXTENSIONS_IMG[extension];
+		const str_url = item.src;
+		const str_ext = str_url.substring(str_url.length, str_url.length - check_ext.length).toLowerCase();
 		if(str_ext === check_ext) {
 			valid_ext = true;
 			break;
@@ -203,7 +203,7 @@ function images_add(item) {
 function images_pick() {
 	data_images = [];
 	for(image in data_images_all) {
-		if(image >= settings.images.count)
+		if(data_images.length >= settings.images.count)
 			break;
 
 		// add this submission if it meets the necessary criteria
@@ -215,7 +215,7 @@ function images_pick() {
 // data, images, functions, shuffle
 function images_shuffle() {
 	for(var i = data_images.length - 1; i > 0; i--) {
-		var j = Math.floor(Math.random() * (i + 1));
+		const j = Math.floor(Math.random() * (i + 1));
 		[data_images[i], data_images[j]] = [data_images[j], data_images[i]];
 	}
 }
@@ -256,9 +256,9 @@ function music_add(item) {
 	// check that the extension is a valid song
 	var valid_ext = false;
 	for(extension in EXTENSIONS_SND) {
-		var check_ext = EXTENSIONS_SND[extension];
-		var str_url = item.src;
-		var str_ext = str_url.substring(str_url.length, str_url.length - check_ext.length).toLowerCase();
+		const check_ext = EXTENSIONS_SND[extension];
+		const str_url = item.src;
+		const str_ext = str_url.substring(str_url.length, str_url.length - check_ext.length).toLowerCase();
 		if(str_ext === check_ext) {
 			valid_ext = true;
 			break;
@@ -274,7 +274,7 @@ function music_add(item) {
 function music_pick() {
 	data_music = [];
 	for(song in data_music_all) {
-		if(song >= settings.music.count)
+		if(data_music.length >= settings.music.count)
 			break;
 
 		// add this submission if it meets the necessary criteria
@@ -286,7 +286,7 @@ function music_pick() {
 // data, music, functions, shuffle
 function music_shuffle() {
 	for(var i = data_music.length - 1; i > 0; i--) {
-		var j = Math.floor(Math.random() * (i + 1));
+		const j = Math.floor(Math.random() * (i + 1));
 		[data_music[i], data_music[j]] = [data_music[j], data_music[i]];
 	}
 }

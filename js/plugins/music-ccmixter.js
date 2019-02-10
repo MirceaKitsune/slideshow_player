@@ -13,7 +13,7 @@ const limit_ccmixter = 15;
 // convert each entry into a music object for the player
 function parse_ccmixter(data) {
 	for(var entry in data) {
-		var this_data = data[entry];
+		const this_data = data[entry];
 		var this_song = {};
 
 		this_song.src = String(this_data.files[0].download_url);
@@ -32,8 +32,8 @@ function parse_ccmixter(data) {
 // fetch the json object containing the data and execute it as a script
 function music_ccmixter() {
 	// since this site doesn't offer builtin JSONP support, use a JSON to JSONP converter from: json2jsonp.com
-	var url_prefix = "https://json2jsonp.com/?url=";
-	var url_sufix = "&callback=parse_ccmixter";
+	const url_prefix = "https://json2jsonp.com/?url=";
+	const url_sufix = "&callback=parse_ccmixter";
 
 	var keywords = plugins_settings_read("keywords", TYPE_MUSIC); // load the keywords
 	keywords = keywords.replace(" ", ","); // json2jsonp.com returns an error when spaces are included in the URL, convert spaces to commas

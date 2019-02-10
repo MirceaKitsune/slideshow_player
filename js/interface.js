@@ -24,7 +24,7 @@ function interface_refresh(name, type) {
 	// if this setting was used by any plugins, we will want to pull new contents from the server
 	// when the name or type variables are set to true rather than a setting name, force a refresh regardless
 	// if sites don't need to be refreshed, automatically load the new settings instead of asking for a manual refresh later
-	var force = (name === true || type === true);
+	const force = (name === true || type === true);
 	if(force || plugins_settings_used(name, type)) {
 		if(force || type === TYPE_IMAGES)
 			interface_refresh_images = true;
@@ -40,9 +40,9 @@ function interface_refresh(name, type) {
 
 // interface, functions, plugin loader
 function interface_load(sites) {
-	var elements_settings_images = document.forms["controls_images"].elements;
-	var elements_settings_music = document.forms["controls_music"].elements;
-	var elements_list = document.forms["controls_sites"].elements;
+	const elements_settings_images = document.forms["controls_images"].elements;
+	const elements_settings_music = document.forms["controls_music"].elements;
+	const elements_list = document.forms["controls_sites"].elements;
 
 	var sites_images = 0;
 	var sites_music = 0;
@@ -106,7 +106,7 @@ function interface_load(sites) {
 			music_clear();
 
 		for(var site in settings.sites) {
-			var name_site = settings.sites[site];
+			const name_site = settings.sites[site];
 			if(interface_refresh_images === true && name_site.substring(0, TYPE_IMAGES.length) === TYPE_IMAGES)
 				plugins_load(name_site);
 			if(interface_refresh_music === true && name_site.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
@@ -145,7 +145,7 @@ function interface_update_controls_sites() {
 	interface.controls_sites_list.innerHTML = "";
 	for(var item in plugins) {
 		// interface HTML: controls, images, sites, list, checkbox
-		var id_checkbox = "controls_images_list_sites_" + item + "_checkbox";
+		const id_checkbox = "controls_images_list_sites_" + item + "_checkbox";
 		interface[id_checkbox] = document.createElement("input");
 		interface[id_checkbox].setAttribute("id", id_checkbox);
 		interface[id_checkbox].setAttribute("title", "Whether to fetch content from " + item);
@@ -157,7 +157,7 @@ function interface_update_controls_sites() {
 		interface.controls_sites_list.appendChild(interface[id_checkbox]);
 
 		// interface HTML: controls, images, sites, list, label
-		var id_label = "controls_images_list_sites_" + item + "_label";
+		const id_label = "controls_images_list_sites_" + item + "_label";
 		interface[id_label] = document.createElement("label");
 		interface[id_label].innerHTML = item + "<br/>";
 		interface.controls_sites_list.appendChild(interface[id_label]);
@@ -176,8 +176,8 @@ function interface_update_media(update_controls, update_images, update_music) {
 
 // interface, update HTML, media images
 function interface_update_media_images() {
-	var active = (player_active() && data_images.length > 0);
-	var ready = !player_busy_images();
+	const active = (player_active() && data_images.length > 0);
+	const ready = !player_busy_images();
 
 	// configure previous / play / next elements
 	if(active === true && ready === true) {
@@ -240,8 +240,8 @@ function interface_update_media_images() {
 
 // interface, update HTML, media music
 function interface_update_media_music() {
-	var active = (player_active() && data_music.length > 0);
-	var ready = !player_busy_music();
+	const active = (player_active() && data_music.length > 0);
+	const ready = !player_busy_music();
 
 	// configure previous / play / next elements
 	if(active === true && ready === true) {
@@ -304,13 +304,13 @@ function interface_update_media_music() {
 
 // interface, update HTML, media controls
 function interface_update_media_controls() {
-	var total_images = data_images.length;
-	var total_duration = settings.images.duration;
-	var total_seconds = total_images * total_duration;
+	const total_images = data_images.length;
+	const total_duration = settings.images.duration;
+	const total_seconds = total_images * total_duration;
 	var total_date = new Date(null);
 	total_date.setSeconds(total_seconds);
-	var total_time = total_date.toISOString().substr(11, 8);
-	var label_status =
+	const total_time = total_date.toISOString().substr(11, 8);
+	const label_status =
 		"<b>Images:</b> " + total_images + " <b>↺</b> " + total_duration + " sec <b>►</b> " + total_time + "<br/>" +
 		"<b>Music:</b> " + data_music.length;
 
@@ -485,7 +485,7 @@ function interface_init() {
 				interface.controls_images_score_input.setAttribute("title", "The minimum rating images must have");
 				interface.controls_images_score_input.setAttribute("type", "number");
 				interface.controls_images_score_input.setAttribute("value", settings.images.score);
-				interface.controls_images_score_input.setAttribute("step", "10");
+				interface.controls_images_score_input.setAttribute("step", "1");
 				interface.controls_images_score_input.setAttribute("min", "-1000");
 				interface.controls_images_score_input.setAttribute("max", "1000");
 				interface.controls_images_score_input.setAttribute("onclick", "interface_refresh(\"score\", TYPE_IMAGES)");
@@ -611,7 +611,7 @@ function interface_init() {
 				interface.controls_music_score_input.setAttribute("title", "The minimum rating songs must have");
 				interface.controls_music_score_input.setAttribute("type", "number");
 				interface.controls_music_score_input.setAttribute("value", settings.music.score);
-				interface.controls_music_score_input.setAttribute("step", "10");
+				interface.controls_music_score_input.setAttribute("step", "1");
 				interface.controls_music_score_input.setAttribute("min", "-1000");
 				interface.controls_music_score_input.setAttribute("max", "1000");
 				interface.controls_music_score_input.setAttribute("onclick", "interface_refresh(\"score\", TYPE_MUSIC)");
