@@ -9,17 +9,21 @@ const name_ccmixter = "CCMixter";
 
 // convert each entry into a music object for the player
 function parse_ccmixter(data) {
+	var score = plugins_settings_read("score", TYPE_MUSIC);
+
 	for(var entry in data) {
 		var this_data = data[entry];
 		var this_song = {};
 
-		this_song.src = String(this_data.files[0].download_url);
-		this_song.thumb = String(this_data.license_logo_url); // API doesn't provide a thumbnail, use the logo instead
-		this_song.title = String(this_data.upload_name);
-		this_song.author = String(this_data.user_real_name);
-		this_song.url = String(this_data.file_page_url);
+		if(this_data.upload_num_scores >= score) {
+			this_song.src = String(this_data.files[0].download_url);
+			this_song.thumb = String(this_data.license_logo_url); // API doesn't provide a thumbnail, use the logo instead
+			this_song.title = String(this_data.upload_name);
+			this_song.author = String(this_data.user_real_name);
+			this_song.url = String(this_data.file_page_url);
 
-		music_add(this_song);
+			music_add(this_song);
+		}
 	}
 
 	plugins_busy_set(name_ccmixter, TYPE_MUSIC, 0);

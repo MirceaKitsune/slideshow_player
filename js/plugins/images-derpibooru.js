@@ -9,17 +9,21 @@ const name_derpibooru = "Derpibooru";
 
 // convert each entry into an image object for the player
 function parse_derpibooru(data) {
+	var score = plugins_settings_read("score", TYPE_IMAGES);
+
 	for(var entry in data.search) {
 		var this_data = data.search[entry];
 		var this_image = {};
 
-		this_image.src = "https:" + String(this_data.representations.large); // representations.full is better but occasionally causes errors
-		this_image.thumb = "https:" + String(this_data.representations.thumb);
-		this_image.title = String(this_data.file_name); // API doesn't provide the title, use the file name instead
-		this_image.author = String(this_data.uploader);
-		this_image.url = "https:" + String(this_data.representations.full); // API doesn't provide a page link, use the image instead
+		if(this_data.score >= score) {
+			this_image.src = "https:" + String(this_data.representations.large); // representations.full is better but occasionally causes errors
+			this_image.thumb = "https:" + String(this_data.representations.thumb);
+			this_image.title = String(this_data.file_name); // API doesn't provide the title, use the file name instead
+			this_image.author = String(this_data.uploader);
+			this_image.url = "https:" + String(this_data.representations.full); // API doesn't provide a page link, use the image instead
 
-		images_add(this_image);
+			images_add(this_image);
+		}
 	}
 
 	plugins_busy_set(name_derpibooru, TYPE_IMAGES, 0);

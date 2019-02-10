@@ -62,6 +62,11 @@ function parse_inkbunny_login(data) {
 
 // fetch the json object containing the data and execute it as a script
 function images_inkbunny() {
+	// scores are not supported by this API, abort if the option is set to a value greater than zero
+	var score = plugins_settings_read("score", TYPE_IMAGES);
+	if(score > 0)
+		return;
+
 	var script = document.createElement("script");
 	script.src = "https://inkbunny.net/api_login.php?output_mode=json&username=guest&callback=parse_inkbunny_login";
 	document.body.appendChild(script);

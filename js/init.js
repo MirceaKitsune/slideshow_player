@@ -52,6 +52,7 @@ var settings = {
 	images: {
 		keywords: "artwork",
 		count: 100,
+		score: 0,
 		duration: 10,
 		nsfw: false,
 		loop: false,
@@ -60,6 +61,7 @@ var settings = {
 	music: {
 		keywords: "instrumental",
 		count: 10,
+		score: 0,
 		loop: false,
 		shuffle: false,
 		volume: 1
