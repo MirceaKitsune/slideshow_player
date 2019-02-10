@@ -7,6 +7,9 @@
 // the name string of this plugin
 const name_ccmixter = "CCMixter";
 
+// maximum number of results the API may return per search
+const limit_ccmixter = 15;
+
 // convert each entry into a music object for the player
 function parse_ccmixter(data) {
 	var score = plugins_settings_read("score", TYPE_MUSIC);
@@ -37,11 +40,10 @@ function music_ccmixter() {
 
 	var keywords = plugins_settings_read("keywords", TYPE_MUSIC); // load the keywords
 	keywords = keywords.replace(" ", ","); // json2jsonp.com returns an error when spaces are included in the URL, convert spaces to commas
-	var count = Math.min(plugins_settings_read("count", TYPE_MUSIC), 50); // this site supports a maximum of 50 results per page
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";
-	script.src = url_prefix + encodeURIComponent("http://ccmixter.org/api/query?f=json&tags=" + keywords + "&limit=" + count) + url_sufix;
+	script.src = url_prefix + encodeURIComponent("http://ccmixter.org/api/query?f=json&tags=" + keywords + "&limit=" + limit_ccmixter) + url_sufix;
 	document.body.appendChild(script);
 
 	plugins_busy_set(name_ccmixter, TYPE_MUSIC, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout

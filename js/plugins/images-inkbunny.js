@@ -7,6 +7,9 @@
 // the name string of this plugin
 const name_inkbunny = "Inkbunny";
 
+// maximum number of results the API may return per page
+const limit_inkbunny = 100;
+
 // indicate that the plugin has finished working
 function parse_inkbunny_ready(data) {
 	plugins_busy_set(name_inkbunny, TYPE_IMAGES, 0);
@@ -41,11 +44,10 @@ function parse_inkbunny(data) {
 // change the rating, then call the image parser with the session id
 function parse_inkbunny_rating(data) {
 	var keywords = plugins_settings_read("keywords", TYPE_IMAGES);
-	var count = Math.min(plugins_settings_read("count", TYPE_IMAGES), 100); // this site supports a maximum of 100 results per page
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";
-	script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + keywords + "&count_limit=" + count + "&submissions_per_page=" + count + "&callback=parse_inkbunny";
+	script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + keywords + "&count_limit=" + limit_inkbunny + "&submissions_per_page=" + limit_inkbunny + "&callback=parse_inkbunny";
 	document.body.appendChild(script);
 }
 

@@ -187,15 +187,17 @@ function player_images_fade() {
 
 // player, images, switching
 function player_images_next() {
+	var count = Math.min(data_images.length, settings.images.count);
+
 	// do nothing if there are no images
-	if(data_images.length == 0)
+	if(count <= 0)
 		return;
 
 	// start recording the latency
 	player_images_latency_start();
 
 	// stop or restart the slideshow if this is the final image
-	if(player.images.index >= data_images.length) {
+	if(player.images.index >= count) {
 		if(settings.images.loop === true) {
 			player.images.index = 0;
 			player.images.element_1.setAttribute("src", player.images.element_2.getAttribute("src"));
@@ -236,13 +238,15 @@ function player_images_next() {
 
 // player, images, skip
 function player_images_skip(index) {
+	var count = Math.min(data_images.length, settings.images.count);
+
 	var overflow_start = index <= 0;
-	var overflow_end = index > data_images.length;
+	var overflow_end = index > count;
 	if((overflow_start || overflow_end) && settings.images.loop !== true)
 		return;
 
 	if(overflow_start)
-		player.images.index = data_images.length - 1;
+		player.images.index = count - 1;
 	else if(overflow_end)
 		player.images.index = 0;
 	else
@@ -293,12 +297,14 @@ function player_music_next_canplay() {
 
 // player, music, switching
 function player_music_next() {
+	var count = Math.min(data_music.length, settings.music.count);
+
 	// do nothing if there are no songs
-	if(data_music.length == 0)
+	if(count <= 0)
 		return;
 
 	// stop or restart the slideshow if this is the final song
-	if(player.music.index >= data_music.length) {
+	if(player.music.index >= count) {
 		if(settings.music.loop === true) {
 			player.music.index = 0;
 
@@ -326,13 +332,15 @@ function player_music_next() {
 
 // player, music, skip
 function player_music_skip(index) {
+	var count = Math.min(data_music.length, settings.music.count);
+
 	var overflow_start = index <= 0;
-	var overflow_end = index > data_music.length;
+	var overflow_end = index > count;
 	if((overflow_start || overflow_end) && settings.music.loop !== true)
 		return;
 
 	if(overflow_start)
-		player.music.index = data_music.length - 1;
+		player.music.index = count - 1;
 	else if(overflow_end)
 		player.music.index = 0;
 	else
@@ -370,7 +378,7 @@ function player_music_play() {
 
 // player, is available
 function player_available() {
-	return ((data_images.length > 0 || data_music.length > 0) && !plugins_busy());
+	return (((data_images.length > 0 && settings.images.count > 0) || (data_music.length > 0 && settings.music.count)) && !plugins_busy());
 }
 
 // player, is active
@@ -394,7 +402,7 @@ function player_attach() {
 		return;
 
 	// don't spawn the player if there is no content to play
-	if(data_images.length == 0 && data_music.length == 0)
+	if((data_images.length == 0 || settings.images.count <= 0) && (data_music.length == 0 || settings.music.count <= 0))
 		return;
 
 	// create the player element
