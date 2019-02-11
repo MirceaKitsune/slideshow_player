@@ -52,7 +52,6 @@ var settings = {
 	images: {
 		keywords: "artwork",
 		count: 100,
-		score: 0,
 		duration: 10,
 		nsfw: false,
 		loop: false,
@@ -61,7 +60,6 @@ var settings = {
 	music: {
 		keywords: "instrumental",
 		count: 10,
-		score: 0,
 		loop: false,
 		shuffle: false,
 		volume: 1
@@ -201,29 +199,21 @@ function images_add(item) {
 
 // data, images, functions, pick
 function images_pick() {
-	var new_images = [];
-	for(image in data_images_all) {
-		// we've reached the maximum count, stop here
-		if(new_images.length >= settings.images.count)
-			break;
+	const count_old = data_images.length;
 
-		// add this image if it meets the necessary criteria
-		if(data_images_all[image].score >= settings.images.score)
-			new_images.push(data_images_all[image]);
-	}
+	// pick the images with the highest score
+	data_images = data_images_all.slice();
+	data_images.sort(function(a, b) { return b.score - a.score });
+	data_images.splice(settings.images.count);
 
-	if(new_images.length === 0) {
-		data_images = [];
-
+	if(data_images.length === 0) {
 		// stop the player if there are neither images or songs left to play
 		// otherwise if the player is active and no images are left, clear the image player
 		if(data_music.length === 0)
 			player_detach();
 		else if(player_active() === true)
 			player_images_clear();
-	} else if(new_images.length !== data_images.length) {
-		data_images = new_images;
-
+	} else if(data_images.length !== count_old) {
 		// suffle the images again
 		if(settings.images.shuffle)
 			images_shuffle();
@@ -294,29 +284,21 @@ function music_add(item) {
 
 // data, music, functions, pick
 function music_pick() {
-	var new_music = [];
-	for(song in data_music_all) {
-		// we've reached the maximum count, stop here
-		if(new_music.length >= settings.music.count)
-			break;
+	const count_old = data_music.length;
 
-		// add this song if it meets the necessary criteria
-		if(data_music_all[song].score >= settings.music.score)
-			new_music.push(data_music_all[song]);
-	}
+	// pick the songs with the highest score
+	data_music = data_music_all.slice();
+	data_music.sort(function(a, b) { return b.score - a.score });
+	data_music.splice(settings.music.count);
 
-	if(new_music.length === 0) {
-		data_music = [];
-
+	if(data_music.length === 0) {
 		// stop the player if there are neither images or songs left to play
 		// otherwise if the player is active and no songs are left, clear the music player
 		if(data_images.length === 0)
 			player_detach();
 		else if(player_active() === true)
 			player_music_clear();
-	} else if(new_music.length !== data_music.length) {
-		data_music = new_music;
-
+	} else if(data_music.length !== count_old) {
 		// suffle the songs again
 		if(settings.music.shuffle)
 			music_shuffle();

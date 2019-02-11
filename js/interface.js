@@ -63,13 +63,11 @@ function interface_load(sites) {
 	settings.images.keywords = elements_settings_images["controls_images_search_keywords"].value;
 	settings.images.nsfw = Boolean(elements_settings_images["controls_images_search_nsfw"].checked);
 	settings.images.count = Number(elements_settings_images["controls_images_count"].value);
-	settings.images.score = Number(elements_settings_images["controls_images_score"].value);
 	settings.images.duration = Number(elements_settings_images["controls_images_duration"].value);
 	settings.images.loop = Boolean(elements_settings_images["controls_images_play_loop"].checked);
 	settings.images.shuffle = Boolean(elements_settings_images["controls_images_play_shuffle"].checked);
 	settings.music.keywords = elements_settings_music["controls_music_search_keywords"].value;
 	settings.music.count = Number(elements_settings_music["controls_music_count"].value);
-	settings.music.score = Number(elements_settings_music["controls_music_score"].value);
 	settings.music.loop = Boolean(elements_settings_music["controls_music_play_loop"].checked);
 	settings.music.shuffle = Boolean(elements_settings_music["controls_music_play_shuffle"].checked);
 	settings.music.volume = Number(elements_settings_music["controls_music_volume"].value);
@@ -77,12 +75,10 @@ function interface_load(sites) {
 	// limit the settings to acceptable values
 	// should match the limits defined on the corresponding HTML elements
 	settings.images.keywords = settings.images.keywords.substring(0, 100);
-	settings.images.count = Math.max(Math.min(settings.images.count, 1000), 5);
-	settings.images.score = Math.max(Math.min(settings.images.score, 1000), -1000);
+	settings.images.count = Math.max(Math.min(settings.images.count, 1000), 0);
 	settings.images.duration = Math.max(Math.min(settings.images.duration, 100), 5);
 	settings.music.keywords = settings.music.keywords.substring(0, 100);
-	settings.music.count = Math.max(Math.min(settings.music.count, 100), 1);
-	settings.music.score = Math.max(Math.min(settings.music.score, 1000), -1000);
+	settings.music.count = Math.max(Math.min(settings.music.count, 100), 0);
 	settings.music.volume = Math.max(Math.min(settings.music.volume, 1), 0);
 
 	// update the settings cookie
@@ -468,31 +464,12 @@ function interface_init() {
 				interface.controls_images_count_input.setAttribute("title", "The total number of images to be used in the slideshow");
 				interface.controls_images_count_input.setAttribute("type", "number");
 				interface.controls_images_count_input.setAttribute("value", settings.images.count);
-				interface.controls_images_count_input.setAttribute("step", "5");
-				interface.controls_images_count_input.setAttribute("min", "5");
+				interface.controls_images_count_input.setAttribute("step", "10");
+				interface.controls_images_count_input.setAttribute("min", "0");
 				interface.controls_images_count_input.setAttribute("max", "1000");
 				interface.controls_images_count_input.setAttribute("onclick", "interface_refresh(\"count\", TYPE_IMAGES)");
 				interface.controls_images_count_input.setAttribute("onkeyup", "interface_refresh(\"count\", TYPE_IMAGES)");
 				interface.controls_images_count.appendChild(interface.controls_images_count_input);
-			}
-
-			// interface HTML: controls, images, score
-			interface.controls_images_score = document.createElement("p");
-			interface.controls_images_score.innerHTML = "<b>Score:<b/><br/>";
-			interface.controls_images.appendChild(interface.controls_images_score);
-			{
-				// interface HTML: controls, images, score, input
-				interface.controls_images_score_input = document.createElement("input");
-				interface.controls_images_score_input.setAttribute("id", "controls_images_score");
-				interface.controls_images_score_input.setAttribute("title", "The minimum rating images must have");
-				interface.controls_images_score_input.setAttribute("type", "number");
-				interface.controls_images_score_input.setAttribute("value", settings.images.score);
-				interface.controls_images_score_input.setAttribute("step", "1");
-				interface.controls_images_score_input.setAttribute("min", "-1000");
-				interface.controls_images_score_input.setAttribute("max", "1000");
-				interface.controls_images_score_input.setAttribute("onclick", "interface_refresh(\"score\", TYPE_IMAGES)");
-				interface.controls_images_score_input.setAttribute("onkeyup", "interface_refresh(\"score\", TYPE_IMAGES)");
-				interface.controls_images_score.appendChild(interface.controls_images_score_input);
 			}
 
 			// interface HTML: controls, images, duration
@@ -595,30 +572,11 @@ function interface_init() {
 				interface.controls_music_count_input.setAttribute("type", "number");
 				interface.controls_music_count_input.setAttribute("value", settings.music.count);
 				interface.controls_music_count_input.setAttribute("step", "1");
-				interface.controls_music_count_input.setAttribute("min", "1");
+				interface.controls_music_count_input.setAttribute("min", "0");
 				interface.controls_music_count_input.setAttribute("max", "100");
 				interface.controls_music_count_input.setAttribute("onclick", "interface_refresh(\"count\", TYPE_MUSIC)");
 				interface.controls_music_count_input.setAttribute("onkeyup", "interface_refresh(\"count\", TYPE_MUSIC)");
 				interface.controls_music_count.appendChild(interface.controls_music_count_input);
-			}
-
-			// interface HTML: controls, music, score
-			interface.controls_music_score = document.createElement("p");
-			interface.controls_music_score.innerHTML = "<b>Score:<b/><br/>";
-			interface.controls_music.appendChild(interface.controls_music_score);
-			{
-				// interface HTML: controls, music, score, input
-				interface.controls_music_score_input = document.createElement("input");
-				interface.controls_music_score_input.setAttribute("id", "controls_music_score");
-				interface.controls_music_score_input.setAttribute("title", "The minimum rating songs must have");
-				interface.controls_music_score_input.setAttribute("type", "number");
-				interface.controls_music_score_input.setAttribute("value", settings.music.score);
-				interface.controls_music_score_input.setAttribute("step", "1");
-				interface.controls_music_score_input.setAttribute("min", "-1000");
-				interface.controls_music_score_input.setAttribute("max", "1000");
-				interface.controls_music_score_input.setAttribute("onclick", "interface_refresh(\"score\", TYPE_MUSIC)");
-				interface.controls_music_score_input.setAttribute("onkeyup", "interface_refresh(\"score\", TYPE_MUSIC)");
-				interface.controls_music_score.appendChild(interface.controls_music_score_input);
 			}
 
 			// interface HTML: controls, music, play
