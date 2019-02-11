@@ -12,25 +12,50 @@ const STYLE_MEDIA_POSITION_DETACHED = "top: 80%; left: 0%; width: 85%; height: 2
 const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000c0)";
 const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bottom, #00000005, #00000000)";
 
+// seconds after which to pull data from websites after settings that require refreshing are changed
+// this needs to be big enough to give users enough time to finish typing and to protect sites against spamming
+const AUTOREFRESH = 5;
+
 // whether to also refresh the content when loading new settings
-var interface_refresh_images = false;
-var interface_refresh_music = false;
+var interface_refresh = {
+	images: true,
+	music: true,
+	timer: 0,
+	interval: null
+}
 
 // object containing all of the interface elements
 var interface = {};
 
-// interface, functions, refresh
-function interface_refresh(name, type) {
+// interface, functions, autorefresh
+function interface_autorefresh() {
+	// if the timer has reached 0, clear it and pull new data from source websites
+	// if not then decrease it by 1 every second
+	if(interface_refresh.timer <= 1) {
+		interface_refresh.timer = 0;
+		clearInterval(interface_refresh.interval);
+		interface_load(true);
+	} else {
+		interface_refresh.timer = Math.floor(interface_refresh.timer - 1);
+		interface_update_media(true, false, false);
+	}
+}
+
+// interface, functions, preload
+function interface_preload(name, type) {	
 	// if this setting was used by any plugins, we will want to pull new contents from the server
 	// when the name or type variables are set to true rather than a setting name, force a refresh regardless
-	// if sites don't need to be refreshed, automatically load the new settings instead of asking for a manual refresh later
+	// if sites don't need to be refreshed, automatically load the new settings instead of starting the timer
 	const force = (name === true || type === true);
 	if(force || plugins_settings_used(name, type)) {
 		if(force || type === TYPE_IMAGES)
-			interface_refresh_images = true;
+			interface_refresh.images = true;
 		if(force || type === TYPE_MUSIC)
-			interface_refresh_music = true;
-		interface_update_media(true, false, false);
+			interface_refresh.music = true;
+		clearInterval(interface_refresh.interval);
+		interface_refresh.timer = AUTOREFRESH + 1;
+		interface_refresh.interval = setInterval(interface_autorefresh, 1000);
+		interface_autorefresh();
 	}
 	else {
 		interface_load(false);
@@ -92,22 +117,22 @@ function interface_load(sites) {
 	interface_update_controls_music();
 
 	// if sites need to be refreshed, load every selected plugin
-	if(sites === true && plugins_busy() !== true && player_active() !== true) {
-		if(interface_refresh_images === true)
+	if(sites === true && plugins_busy() !== true) {
+		if(interface_refresh.images === true)
 			images_clear();
-		if(interface_refresh_music === true)
+		if(interface_refresh.music === true)
 			music_clear();
 
 		for(var site in settings.sites) {
 			const name_site = settings.sites[site];
-			if(interface_refresh_images === true && name_site.substring(0, TYPE_IMAGES.length) === TYPE_IMAGES)
+			if(interface_refresh.images === true && name_site.substring(0, TYPE_IMAGES.length) === TYPE_IMAGES)
 				plugins_load(name_site);
-			if(interface_refresh_music === true && name_site.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
+			if(interface_refresh.music === true && name_site.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
 				plugins_load(name_site);
 		}
 
-		interface_refresh_images = false;
-		interface_refresh_music = false;
+		interface_refresh.images = false;
+		interface_refresh.music = false;
 	}
 
 	interface_update_media(true, true, true);
@@ -148,7 +173,7 @@ function interface_update_controls_sites() {
 		interface[id_checkbox].setAttribute("name", item);
 		if(settings.sites.length == 0 || settings.sites.indexOf(item) >= 0)
 			interface[id_checkbox].setAttribute("checked", true);
-		interface[id_checkbox].setAttribute("onclick", "interface_refresh(true, true)");
+		interface[id_checkbox].setAttribute("onclick", "interface_preload(true, true)");
 		interface.controls_sites_list.appendChild(interface[id_checkbox]);
 
 		// interface HTML: controls, images, sites, list, label
@@ -176,7 +201,7 @@ function interface_update_media_images() {
 
 	// configure previous / play / next elements
 	if(active === true && ready === true) {
-		interface.media_images_previous.setAttribute("class", "button_size_small button_color_blue");
+		interface.media_images_previous.setAttribute("class", "button_size_small button_color_cyan");
 		interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
 		interface.media_images_previous.innerHTML = "|◀";
 
@@ -191,7 +216,7 @@ function interface_update_media_images() {
 			interface.media_images_play.innerHTML = "||";
 		}
 
-		interface.media_images_next.setAttribute("class", "button_size_small button_color_blue");
+		interface.media_images_next.setAttribute("class", "button_size_small button_color_cyan");
 		interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
 		interface.media_images_next.innerHTML = "▶|";
 	}
@@ -240,7 +265,7 @@ function interface_update_media_music() {
 
 	// configure previous / play / next elements
 	if(active === true && ready === true) {
-		interface.media_music_previous.setAttribute("class", "button_size_small button_color_blue");
+		interface.media_music_previous.setAttribute("class", "button_size_small button_color_cyan");
 		interface.media_music_previous.setAttribute("onclick", "player_music_skip(player.music.index - 1)");
 		interface.media_music_previous.innerHTML = "|◀";
 
@@ -255,7 +280,7 @@ function interface_update_media_music() {
 			interface.media_music_play.innerHTML = "||";
 		}
 
-		interface.media_music_next.setAttribute("class", "button_size_small button_color_blue");
+		interface.media_music_next.setAttribute("class", "button_size_small button_color_cyan");
 		interface.media_music_next.setAttribute("onclick", "player_music_skip(player.music.index + 1)");
 		interface.media_music_next.innerHTML = "▶|";
 	}
@@ -303,50 +328,56 @@ function interface_update_media_controls() {
 	var total_date = new Date(null);
 	total_date.setSeconds(total_seconds);
 	const total_time = total_date.toISOString().substr(11, 8);
-	const label_status =
+
+	// label text for player status
+	var label_player =
 		"<b>Images:</b> " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + total_time + "<b>)</b><br/>" +
 		"<b>Music:</b> " + data_music.length + " <b>/</b> " + data_music_all.length;
 
-	// configure play / label elements, as well as the window title
+	// label text for plugin status
+	var label_plugin = "<b>Update needed:</b> ";
+	if(interface_refresh.images === true)
+		label_plugin += TYPE_IMAGES + " ";
+	if(interface_refresh.music === true)
+		label_plugin += TYPE_MUSIC + " ";
+	label_plugin += "<br/>Refreshing in " + interface_refresh.timer + " sec";
+
+	// first configuration, based on player status
+	// configure play / label elements, window title
 	if(player_active() === true) {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_green");
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "■";
-		interface.media_controls_label.innerHTML = label_status;
-		document.title = "Slideshow Player - " + data_images.length + " images at " + settings.images.duration + " seconds (▶)";
-	}
-	else if(plugins_busy() === true) {
-		interface.media_controls_play.setAttribute("class", "button_size_large button_color_blue");
-		interface.media_controls_play.removeAttribute("onclick");
-		interface.media_controls_play.innerHTML = "⧗";
-		interface.media_controls_label.innerHTML = "<b>Loading content</b>";
-		document.title = "Slideshow Player (⧗)";
-	}
-	else if(interface_refresh_images === true || interface_refresh_music === true) {
-		interface.media_controls_play.setAttribute("class", "button_size_large button_color_cyan");
-		interface.media_controls_play.setAttribute("onclick", "interface_load(true)");
-		interface.media_controls_play.innerHTML = "⟳";
-		interface.media_controls_label.innerHTML = "<b>Click to apply settings</b>";
-		document.title = "Slideshow Player (⟳)";
+		interface.media_controls_label.innerHTML = label_player;
+		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ▶";
 	}
 	else if(player_available() === true) {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_yellow");
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "▶";
-		interface.media_controls_label.innerHTML = label_status;
-		document.title = "Slideshow Player - " + data_images.length + " images at " + settings.images.duration + " seconds (■)";
+		interface.media_controls_label.innerHTML = label_player;
+		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ■";
 	}
 	else {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_red");
 		interface.media_controls_play.removeAttribute("onclick");
 		interface.media_controls_play.innerHTML = "∅";
 		interface.media_controls_label.innerHTML = "<b>Unable to play</b>";
-		document.title = "Slideshow Player (∅)";
+		document.title = "Slideshow Player ∅";
 	}
 
-	// add an extra refresh icon if the sources become outdated while the system is working
-	if((player_active() === true || plugins_busy() === true) && (interface_refresh_images || interface_refresh_music))
-		interface.media_controls_play.innerHTML += "\n⟳";
+	// second configuration, based on plugin status
+	// configure play / label elements, window title
+	if(plugins_busy() === true) {
+		interface.media_controls_label.innerHTML = "<b>Loading content</b>";
+		interface.media_controls_play.innerHTML += " ⧗";
+		document.title += " ⧗";
+	}
+	else if(interface_refresh.timer > 0) {
+		interface.media_controls_label.innerHTML = label_plugin;
+		interface.media_controls_play.innerHTML += " ⟳";
+		document.title += " ⟳";
+	}
 }
 
 // interface, HTML, create
@@ -428,8 +459,8 @@ function interface_init() {
 				interface.controls_images_search_keywords_input.setAttribute("type", "text");
 				interface.controls_images_search_keywords_input.setAttribute("value", settings.images.keywords);
 				interface.controls_images_search_keywords_input.setAttribute("maxlength", "100");
-				interface.controls_images_search_keywords_input.setAttribute("onclick", "interface_refresh(\"keywords\", TYPE_IMAGES)");
-				interface.controls_images_search_keywords_input.setAttribute("onkeyup", "interface_refresh(\"keywords\", TYPE_IMAGES)");
+				interface.controls_images_search_keywords_input.setAttribute("onclick", "interface_preload(\"keywords\", TYPE_IMAGES)");
+				interface.controls_images_search_keywords_input.setAttribute("onkeyup", "interface_preload(\"keywords\", TYPE_IMAGES)");
 				interface.controls_images_search.appendChild(interface.controls_images_search_keywords_input);
 
 				// interface HTML: controls, images, search, br
@@ -443,7 +474,7 @@ function interface_init() {
 				interface.controls_images_search_nsfw_input.setAttribute("type", "checkbox");
 				if(settings.images.nsfw === true)
 					interface.controls_images_search_nsfw_input.setAttribute("checked", true);
-				interface.controls_images_search_nsfw_input.setAttribute("onclick", "interface_refresh(\"nsfw\", TYPE_IMAGES)");
+				interface.controls_images_search_nsfw_input.setAttribute("onclick", "interface_preload(\"nsfw\", TYPE_IMAGES)");
 				interface.controls_images_search.appendChild(interface.controls_images_search_nsfw_input);
 
 				// interface HTML: controls, images, search, nsfw, label
@@ -466,8 +497,8 @@ function interface_init() {
 				interface.controls_images_count_input.setAttribute("step", "10");
 				interface.controls_images_count_input.setAttribute("min", "0");
 				interface.controls_images_count_input.setAttribute("max", "1000");
-				interface.controls_images_count_input.setAttribute("onclick", "interface_refresh(\"count\", TYPE_IMAGES)");
-				interface.controls_images_count_input.setAttribute("onkeyup", "interface_refresh(\"count\", TYPE_IMAGES)");
+				interface.controls_images_count_input.setAttribute("onclick", "interface_preload(\"count\", TYPE_IMAGES)");
+				interface.controls_images_count_input.setAttribute("onkeyup", "interface_preload(\"count\", TYPE_IMAGES)");
 				interface.controls_images_count.appendChild(interface.controls_images_count_input);
 			}
 
@@ -485,8 +516,8 @@ function interface_init() {
 				interface.controls_images_duration_input.setAttribute("step", "1");
 				interface.controls_images_duration_input.setAttribute("min", "5");
 				interface.controls_images_duration_input.setAttribute("max", "100");
-				interface.controls_images_duration_input.setAttribute("onclick", "interface_refresh(\"duration\", TYPE_IMAGES)");
-				interface.controls_images_duration_input.setAttribute("onkeyup", "interface_refresh(\"duration\", TYPE_IMAGES)");
+				interface.controls_images_duration_input.setAttribute("onclick", "interface_preload(\"duration\", TYPE_IMAGES)");
+				interface.controls_images_duration_input.setAttribute("onkeyup", "interface_preload(\"duration\", TYPE_IMAGES)");
 				interface.controls_images_duration.appendChild(interface.controls_images_duration_input);
 			}
 
@@ -502,7 +533,7 @@ function interface_init() {
 				interface.controls_images_play_loop_input.setAttribute("type", "checkbox");
 				if(settings.images.loop === true)
 					interface.controls_images_play_loop_input.setAttribute("checked", true);
-				interface.controls_images_play_loop_input.setAttribute("onclick", "interface_refresh(\"loop\", TYPE_IMAGES)");
+				interface.controls_images_play_loop_input.setAttribute("onclick", "interface_preload(\"loop\", TYPE_IMAGES)");
 				interface.controls_images_play.appendChild(interface.controls_images_play_loop_input);
 
 				// interface HTML: controls, images, play, loop, label
@@ -517,7 +548,7 @@ function interface_init() {
 				interface.controls_images_play_shuffle_input.setAttribute("type", "checkbox");
 				if(settings.images.shuffle === true)
 					interface.controls_images_play_shuffle_input.setAttribute("checked", true);
-				interface.controls_images_play_shuffle_input.setAttribute("onclick", "interface_refresh(\"shuffle\", TYPE_IMAGES)");
+				interface.controls_images_play_shuffle_input.setAttribute("onclick", "interface_preload(\"shuffle\", TYPE_IMAGES)");
 				interface.controls_images_play.appendChild(interface.controls_images_play_shuffle_input);
 
 				// interface HTML: controls, images, play, shuffle, label
@@ -554,8 +585,8 @@ function interface_init() {
 				interface.controls_music_search_keywords_input.setAttribute("type", "text");
 				interface.controls_music_search_keywords_input.setAttribute("value", settings.music.keywords);
 				interface.controls_music_search_keywords_input.setAttribute("maxlength", "100");
-				interface.controls_music_search_keywords_input.setAttribute("onclick", "interface_refresh(\"keywords\", TYPE_MUSIC)");
-				interface.controls_music_search_keywords_input.setAttribute("onkeyup", "interface_refresh(\"keywords\", TYPE_MUSIC)");
+				interface.controls_music_search_keywords_input.setAttribute("onclick", "interface_preload(\"keywords\", TYPE_MUSIC)");
+				interface.controls_music_search_keywords_input.setAttribute("onkeyup", "interface_preload(\"keywords\", TYPE_MUSIC)");
 				interface.controls_music_search.appendChild(interface.controls_music_search_keywords_input);
 			}
 
@@ -573,8 +604,8 @@ function interface_init() {
 				interface.controls_music_count_input.setAttribute("step", "1");
 				interface.controls_music_count_input.setAttribute("min", "0");
 				interface.controls_music_count_input.setAttribute("max", "100");
-				interface.controls_music_count_input.setAttribute("onclick", "interface_refresh(\"count\", TYPE_MUSIC)");
-				interface.controls_music_count_input.setAttribute("onkeyup", "interface_refresh(\"count\", TYPE_MUSIC)");
+				interface.controls_music_count_input.setAttribute("onclick", "interface_preload(\"count\", TYPE_MUSIC)");
+				interface.controls_music_count_input.setAttribute("onkeyup", "interface_preload(\"count\", TYPE_MUSIC)");
 				interface.controls_music_count.appendChild(interface.controls_music_count_input);
 			}
 
@@ -590,7 +621,7 @@ function interface_init() {
 				interface.controls_music_play_loop_input.setAttribute("type", "checkbox");
 				if(settings.music.loop === true)
 					interface.controls_music_play_loop_input.setAttribute("checked", true);
-				interface.controls_music_play_loop_input.setAttribute("onclick", "interface_refresh(\"loop\", TYPE_MUSIC)");
+				interface.controls_music_play_loop_input.setAttribute("onclick", "interface_preload(\"loop\", TYPE_MUSIC)");
 				interface.controls_music_play.appendChild(interface.controls_music_play_loop_input);
 
 				// interface HTML: controls, music, play, loop, label
@@ -605,7 +636,7 @@ function interface_init() {
 				interface.controls_music_play_shuffle_input.setAttribute("type", "checkbox");
 				if(settings.music.shuffle === true)
 					interface.controls_music_play_shuffle_input.setAttribute("checked", true);
-				interface.controls_music_play_shuffle_input.setAttribute("onclick", "interface_refresh(\"shuffle\", TYPE_MUSIC)");
+				interface.controls_music_play_shuffle_input.setAttribute("onclick", "interface_preload(\"shuffle\", TYPE_MUSIC)");
 				interface.controls_music_play.appendChild(interface.controls_music_play_shuffle_input);
 
 				// interface HTML: controls, music, play, shuffle, label
@@ -628,8 +659,8 @@ function interface_init() {
 				interface.controls_music_volume_input.setAttribute("step", "0.05");
 				interface.controls_music_volume_input.setAttribute("min", "0");
 				interface.controls_music_volume_input.setAttribute("max", "1");
-				interface.controls_music_volume_input.setAttribute("onclick", "interface_refresh(\"volume\", TYPE_MUSIC)");
-				interface.controls_music_volume_input.setAttribute("oninput", "interface_refresh(\"volume\", TYPE_MUSIC)");
+				interface.controls_music_volume_input.setAttribute("onclick", "interface_preload(\"volume\", TYPE_MUSIC)");
+				interface.controls_music_volume_input.setAttribute("oninput", "interface_preload(\"volume\", TYPE_MUSIC)");
 				interface.controls_music_volume.appendChild(interface.controls_music_volume_input);
 
 				// interface HTML: controls, music, volume, label
@@ -808,6 +839,7 @@ function interface_init() {
 		}
 	}
 
-	interface_refresh(true, true);
-	interface_update_media(true, true, true);
+	// request the initial data from available sources
+	// use a timeout as plugins must first have time to register
+	setTimeout(interface_autorefresh, 0);
 }

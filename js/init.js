@@ -152,16 +152,12 @@ var data_images_all = data_images = [];
 
 // data, images, functions, clear
 function images_clear() {
-	player_detach();
 	data_images_all = [];
-	data_images = [];
 	interface_update_media(true, true, false);
 }
 
 // data, images, functions, add
 function images_add(item) {
-	player_detach();
-
 	// check that this image doesn't already exist
 	for(image in data_images_all) {
 		if(data_images_all[image].src === item.src)
@@ -199,7 +195,7 @@ function images_add(item) {
 
 // data, images, functions, pick
 function images_pick() {
-	const count_old = data_images.length;
+	const current_image = data_images[player.images.index];
 
 	// pick the images with the highest score
 	data_images = data_images_all.slice();
@@ -213,13 +209,13 @@ function images_pick() {
 			player_detach();
 		else if(player_active() === true)
 			player_images_clear();
-	} else if(data_images.length !== count_old) {
+	} else {
 		// suffle the images again
 		if(settings.images.shuffle)
 			images_shuffle();
 
 		// refresh the image player if there are changes to apply
-		if(player_active() === true && (player.images.index > data_images.length || settings.images.shuffle))
+		if(player_active() === true && (player.images.index > data_images.length || data_images[player.images.index].src !== current_image.src))
 			player_images_skip(Math.min(player.images.index, data_images.length));
 	}
 }
@@ -237,16 +233,12 @@ var data_music_all = data_music = [];
 
 // data, music, functions, clear
 function music_clear() {
-	player_detach();
 	data_music_all = [];
-	data_music = [];
 	interface_update_media(true, false, true);
 }
 
 // data, music, functions, add
 function music_add(item) {
-	player_detach();
-
 	// check that this song doesn't already exist
 	for(song in data_music_all) {
 		if(data_music_all[song].src === item.src)
@@ -284,7 +276,7 @@ function music_add(item) {
 
 // data, music, functions, pick
 function music_pick() {
-	const count_old = data_music.length;
+	const current_song = data_music[player.music.index];
 
 	// pick the songs with the highest score
 	data_music = data_music_all.slice();
@@ -298,13 +290,13 @@ function music_pick() {
 			player_detach();
 		else if(player_active() === true)
 			player_music_clear();
-	} else if(data_music.length !== count_old) {
+	} else {
 		// suffle the songs again
 		if(settings.music.shuffle)
 			music_shuffle();
 
 		// refresh the music player if there are changes to apply
-		if(player_active() === true && (player.music.index > data_music.length || settings.music.shuffle))
+		if(player_active() === true && (player.music.index > data_music.length || data_music[player.music.index].src !== current_song.src))
 			player_music_skip(Math.min(player.music.index, data_music.length));
 	}
 }

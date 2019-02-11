@@ -399,7 +399,7 @@ function player_music_clear() {
 
 // player, is available
 function player_available() {
-	return ((data_images.length > 0 || data_music.length > 0) && !plugins_busy());
+	return (data_images.length > 0 || data_music.length > 0);
 }
 
 // player, is active
