@@ -187,8 +187,7 @@ function player_images_fade() {
 
 // player, images, switching
 function player_images_next() {
-	// do nothing if there are no images
-	if(data_images.length === 0)
+	if(player_active() !== true || data_images.length === 0)
 		return;
 
 	// start recording the latency
@@ -236,6 +235,9 @@ function player_images_next() {
 
 // player, images, skip
 function player_images_skip(index) {
+	if(player_active() !== true || data_images.length === 0)
+		return;
+
 	const overflow_start = index <= 0;
 	const overflow_end = index > data_images.length;
 	if((overflow_start || overflow_end) && settings.images.loop !== true)
@@ -308,8 +310,7 @@ function player_music_next_canplay() {
 
 // player, music, switching
 function player_music_next() {
-	// do nothing if there are no songs
-	if(data_music.length === 0)
+	if(player_active() !== true || data_music.length === 0)
 		return;
 
 	// stop or restart the slideshow if this is the final song
@@ -341,6 +342,9 @@ function player_music_next() {
 
 // player, music, skip
 function player_music_skip(index) {
+	if(player_active() !== true || data_music.length === 0)
+		return;
+
 	const overflow_start = index <= 0;
 	const overflow_end = index > data_music.length;
 	if((overflow_start || overflow_end) && settings.music.loop !== true)
@@ -462,14 +466,6 @@ function player_attach() {
 	images_pick();
 	music_pick();
 
-	// shuffle the images each time before playing
-	if(settings.images.shuffle)
-		images_shuffle();
-
-	// shuffle the songs each time before playing
-	if(settings.music.shuffle)
-		music_shuffle();
-
 	interface_update_media(true, true, true);
 }
 
@@ -495,10 +491,6 @@ function player_detach() {
 	player.music.index = 0;
 	player.music.stopped = false;
 	player.music.element = null;
-
-	// refresh the images and songs in use
-	images_pick();
-	music_pick();
 
 	interface_update_media(true, true, true);
 }

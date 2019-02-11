@@ -43,7 +43,7 @@ function music_ccmixter() {
 	script.src = url_prefix + encodeURIComponent("http://ccmixter.org/api/query?f=json&tags=" + keywords + "&limit=" + limit_ccmixter) + url_sufix;
 	document.body.appendChild(script);
 
-	plugins_busy_set(name_ccmixter, TYPE_MUSIC, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
+	plugins_busy_set(name_ccmixter, TYPE_MUSIC, 10); // this site returns an invalid object if the given keywords are not found, use a low timeout
 }
 
 // register the plugin

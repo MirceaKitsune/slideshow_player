@@ -63,24 +63,20 @@ function interface_preload(name, type) {
 }
 
 // interface, functions, plugin loader
-function interface_load(sites) {
+function interface_load(pull) {
 	const elements_settings_images = document.forms["controls_images"].elements;
 	const elements_settings_music = document.forms["controls_music"].elements;
 	const elements_list = document.forms["controls_sites"].elements;
 
-	var sites_images = 0;
-	var sites_music = 0;
+	// store some old settings to compare them later below
+	const old_images_count = settings.images.count;
+	const old_images_shuffle = settings.images.shuffle;
+	const old_music_count = settings.music.count;
+	const old_music_shuffle = settings.music.shuffle;
 
 	// configure the system settings
 	settings.sites = [];
 	for(var i = 0; i < elements_list.length; i++) {
-		if(elements_list[i].name.substring(0, TYPE_IMAGES.length) === TYPE_IMAGES)
-			++sites_images;
-		else if(elements_list[i].name.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
-			++sites_music;
-		else
-			continue;
-
 		if(elements_list[i].checked)
 			settings.sites.push(elements_list[i].name);
 	}
@@ -108,16 +104,18 @@ function interface_load(sites) {
 	// update the settings cookie
 	settings_cookie_set();
 
-	// update the images and songs to be used
-	images_pick();
-	music_pick();
+	// update the images and songs if a setting affecting the list changed
+	if(settings.images.count !== old_images_count || settings.images.shuffle !== old_images_shuffle)
+		images_pick();
+	if(settings.music.count !== old_music_count || settings.music.shuffle !== old_music_shuffle)
+		music_pick();
 
 	// update the image and music controls
 	interface_update_controls_images();
 	interface_update_controls_music();
 
 	// if sites need to be refreshed, load every selected plugin
-	if(sites === true && plugins_busy() !== true) {
+	if(pull === true && plugins_busy() === 0) {
 		if(interface_refresh.images === true)
 			images_clear();
 		if(interface_refresh.music === true)
@@ -130,9 +128,6 @@ function interface_load(sites) {
 			if(interface_refresh.music === true && name_site.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
 				plugins_load(name_site);
 		}
-
-		interface_refresh.images = false;
-		interface_refresh.music = false;
 	}
 
 	interface_update_media(true, true, true);
@@ -324,6 +319,7 @@ function interface_update_media_music() {
 
 // interface, update HTML, media controls
 function interface_update_media_controls() {
+	const busy = plugins_busy();
 	const total_seconds = data_images.length * settings.images.duration;
 	var total_date = new Date(null);
 	total_date.setSeconds(total_seconds);
@@ -362,14 +358,14 @@ function interface_update_media_controls() {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_red");
 		interface.media_controls_play.removeAttribute("onclick");
 		interface.media_controls_play.innerHTML = "∅";
-		interface.media_controls_label.innerHTML = "<b>Unable to play</b>";
+		interface.media_controls_label.innerHTML = "<b>No content to play</b>";
 		document.title = "Slideshow Player ∅";
 	}
 
 	// second configuration, based on plugin status
 	// configure play / label elements, window title
-	if(plugins_busy() === true) {
-		interface.media_controls_label.innerHTML = "<b>Loading content</b>";
+	if(busy > 0) {
+		interface.media_controls_label.innerHTML = "<b>Fetching content:</b> " + busy + " left";
 		interface.media_controls_play.innerHTML += " ⧗";
 		document.title += " ⧗";
 	}
@@ -841,5 +837,6 @@ function interface_init() {
 
 	// request the initial data from available sources
 	// use a timeout as plugins must first have time to register
-	setTimeout(interface_autorefresh, 0);
+	interface_load(false);
+	setTimeout(interface_autorefresh, 100);
 }

@@ -106,8 +106,16 @@ function plugins_settings_read(name, type) {
 
 // plugins, functions, ready
 function plugins_ready() {
-	images_pick();
-	music_pick();
+	if(interface_refresh.images === true)
+		images_pick();
+	if(interface_refresh.music === true)
+		music_pick();
+
+	// make sure we don't have another update scheduled before marking images and music as refreshed
+	if(interface_refresh.timer === 0) {
+		interface_refresh.images = false;
+		interface_refresh.music = false;
+	}
 }
 
 // plugins, functions, settings, used
@@ -119,11 +127,12 @@ function plugins_settings_used(name, type) {
 // plugins, busy check
 function plugins_busy() {
 	// return true if any plugin is busy
+	var busy = 0;
 	for(var plugin in plugins) {
 		if(plugins[plugin].busy === true)
-			return true;
+			++busy;
 	}
-	return false;
+	return busy;
 }
 
 // plugins, busy set
@@ -138,11 +147,10 @@ function plugins_busy_set(name, type, timeout) {
 		plugins[name_plugin].busy_timeout = setTimeout(function() {
 			plugins_busy_set(name, type, 0);
 		}, timeout * 1000);
-	}
-
-	// call the ready function if this was the last plugin that finished working
-	if(plugins_busy() === false)
+	} else if(plugins_busy() === 0) {
+		// call the ready function if this was the last plugin that finished working
 		plugins_ready();
+	}
 
 	interface_update_media(true, false, false);
 }
@@ -215,8 +223,11 @@ function images_pick() {
 			images_shuffle();
 
 		// refresh the image player if there are changes to apply
-		if(player_active() === true && (player.images.index > data_images.length || data_images[player.images.index].src !== current_image.src))
-			player_images_skip(Math.min(player.images.index, data_images.length));
+		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index].src !== current_image.src) {
+			if(player_active() === true && player.images.index >= data_images.length)
+				player.images.index = 1;
+			player_images_skip(player.images.index);
+		}
 	}
 }
 
@@ -296,8 +307,11 @@ function music_pick() {
 			music_shuffle();
 
 		// refresh the music player if there are changes to apply
-		if(player_active() === true && (player.music.index > data_music.length || data_music[player.music.index].src !== current_song.src))
-			player_music_skip(Math.min(player.music.index, data_music.length));
+		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index].src !== current_song.src) {
+			if(player_active() === true && player.music.index >= data_music.length)
+				player.music.index = 1;
+			player_music_skip(player.music.index);
+		}
 	}
 }
 
