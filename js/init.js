@@ -218,9 +218,9 @@ function images_pick() {
 		if(settings.images.shuffle)
 			images_shuffle();
 
-		// if the player is active while we changed images, refresh the image player
-		if(player_active() === true)
-			player_images_skip(player.images.index);
+		// refresh the image player if there are changes to apply
+		if(player_active() === true && (player.images.index > data_images.length || settings.images.shuffle))
+			player_images_skip(Math.min(player.images.index, data_images.length));
 	}
 }
 
@@ -303,9 +303,9 @@ function music_pick() {
 		if(settings.music.shuffle)
 			music_shuffle();
 
-		// if the player is active while we changed songs, refresh the music player
-		if(player_active() === true)
-			player_music_skip(player.music.index);
+		// refresh the music player if there are changes to apply
+		if(player_active() === true && (player.music.index > data_music.length || settings.music.shuffle))
+			player_music_skip(Math.min(player.music.index, data_music.length));
 	}
 }
 

@@ -30,12 +30,11 @@ function interface_refresh(name, type) {
 			interface_refresh_images = true;
 		if(force || type === TYPE_MUSIC)
 			interface_refresh_music = true;
+		interface_update_media(true, false, false);
 	}
 	else {
 		interface_load(false);
 	}
-
-	interface_update_media(true, false, false);
 }
 
 // interface, functions, plugin loader
@@ -110,6 +109,8 @@ function interface_load(sites) {
 		interface_refresh_images = false;
 		interface_refresh_music = false;
 	}
+
+	interface_update_media(true, true, true);
 }
 
 // interface, functions, play button
@@ -298,15 +299,13 @@ function interface_update_media_music() {
 
 // interface, update HTML, media controls
 function interface_update_media_controls() {
-	const total_images = data_images.length;
-	const total_duration = settings.images.duration;
-	const total_seconds = total_images * total_duration;
+	const total_seconds = data_images.length * settings.images.duration;
 	var total_date = new Date(null);
 	total_date.setSeconds(total_seconds);
 	const total_time = total_date.toISOString().substr(11, 8);
 	const label_status =
-		"<b>Images:</b> " + total_images + " <b>↺</b> " + total_duration + " sec <b>►</b> " + total_time + "<br/>" +
-		"<b>Music:</b> " + data_music.length;
+		"<b>Images:</b> " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + total_time + "<b>)</b><br/>" +
+		"<b>Music:</b> " + data_music.length + " <b>/</b> " + data_music_all.length;
 
 	// configure play / label elements, as well as the window title
 	if(player_active() === true) {
@@ -314,7 +313,7 @@ function interface_update_media_controls() {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "■";
 		interface.media_controls_label.innerHTML = label_status;
-		document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (▶)";
+		document.title = "Slideshow Player - " + data_images.length + " images at " + settings.images.duration + " seconds (▶)";
 	}
 	else if(plugins_busy() === true) {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_blue");
@@ -335,7 +334,7 @@ function interface_update_media_controls() {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "▶";
 		interface.media_controls_label.innerHTML = label_status;
-		document.title = "Slideshow Player - " + total_images + " images at " + total_duration + " seconds (■)";
+		document.title = "Slideshow Player - " + data_images.length + " images at " + settings.images.duration + " seconds (■)";
 	}
 	else {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_red");
