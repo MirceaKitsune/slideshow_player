@@ -4,9 +4,9 @@
 // to avoid broken image warnings, img elements are initialized using this fake 1x1px transparent gif
 const SRC_BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
-// valid extensions
-const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif"];
-const EXTENSIONS_SND = ["mp3", "ogg", "wav", "flac"];
+// valid extensions, "/" is included to support redirect URL's
+const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif", "/"];
+const EXTENSIONS_SND = ["mp3", "ogg", "wav", "flac", "/"];
 
 // the symbol or word describing a given media type
 const TYPE_IMAGES = "⎙";
