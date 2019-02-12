@@ -7,8 +7,14 @@
 // the name string of this plugin
 const name_derpibooru = "Derpibooru";
 
-// maximum number of results the API may return per page
-const limit_derpibooru = 50;
+// the number of pages to return
+// remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
+const page_count_derpibooru = 5;
+// this should represent the maximum number of results the API may return per page
+const page_limit_derpibooru = 50;
+
+// this counter reaches 0 once all pages finished loading
+var pages_left_derpibooru = 0;
 
 // convert each entry into an image object for the player
 function parse_derpibooru(data) {
@@ -26,7 +32,9 @@ function parse_derpibooru(data) {
 		images_add(this_image);
 	}
 
-	plugins_busy_set(name_derpibooru, TYPE_IMAGES, 0);
+	--pages_left_derpibooru;
+	if(pages_left_derpibooru <= 0)
+		plugins_busy_set(name_derpibooru, TYPE_IMAGES, 0);
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -39,11 +47,14 @@ function images_derpibooru() {
 	keywords = keywords.replace(" ", ","); // json2jsonp.com returns an error when spaces are included in the URL, convert spaces to commas
 	const filter_id = plugins_settings_read("nsfw", TYPE_IMAGES) ? "56027" : "100073"; // pick the appropriate filter from: https://www.derpibooru.org/filters
 
-	var script = document.createElement("script");
-	script.type = "text/javascript";
-	script.src = url_prefix + encodeURIComponent("https://derpibooru.org/search.json?q=" + keywords + "&perpage=" + limit_derpibooru + "&filter_id=" + filter_id) + url_sufix;
-	document.body.appendChild(script);
+	for(var page = 1; page <= page_count_derpibooru; page++) {
+		var script = document.createElement("script");
+		script.type = "text/javascript";
+		script.src = url_prefix + encodeURIComponent("https://derpibooru.org/search.json?q=" + keywords + "&page=" + page + "&perpage=" + page_limit_derpibooru + "&filter_id=" + filter_id) + url_sufix;
+		document.body.appendChild(script);
+	}
 
+	pages_left_derpibooru = page_count_derpibooru;
 	plugins_busy_set(name_derpibooru, TYPE_IMAGES, 30);
 }
 

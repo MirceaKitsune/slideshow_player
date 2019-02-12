@@ -7,8 +7,14 @@
 // the name string of this plugin
 const name_inkbunny = "Inkbunny";
 
-// maximum number of results the API may return per page
-const limit_inkbunny = 100;
+// the number of pages to return
+// remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
+const page_count_inkbunny = 5;
+// this should represent the maximum number of results the API may return per page
+const page_limit_inkbunny = 100;
+
+// this counter reaches 0 once all pages finished loading
+var pages_left_inkbunny = 0;
 
 // indicate that the plugin has finished working
 function parse_inkbunny_ready(data) {
@@ -39,17 +45,21 @@ function parse_inkbunny(data) {
 		images_add(this_image);
 	}
 
-	parse_inkbunny_logout(data);
+	--pages_left_inkbunny;
+	if(pages_left_inkbunny <= 0)
+		parse_inkbunny_logout(data);
 }
 
 // change the rating, then call the image parser with the session id
 function parse_inkbunny_rating(data) {
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 
-	var script = document.createElement("script");
-	script.type = "text/javascript";
-	script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + keywords + "&count_limit=" + limit_inkbunny + "&submissions_per_page=" + limit_inkbunny + "&callback=parse_inkbunny";
-	document.body.appendChild(script);
+	for(var page = 1; page <= page_count_inkbunny; page++) {
+		var script = document.createElement("script");
+		script.type = "text/javascript";
+		script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + keywords + "&page=" + page + "&submissions_per_page=" + page_limit_inkbunny + "&callback=parse_inkbunny";
+		document.body.appendChild(script);
+	}
 }
 
 // create a new session as guest, then call the rating api with its session id
@@ -69,6 +79,7 @@ function images_inkbunny() {
 	script.src = "https://inkbunny.net/api_login.php?output_mode=json&username=guest&callback=parse_inkbunny_login";
 	document.body.appendChild(script);
 
+	pages_left_inkbunny = page_count_inkbunny;
 	plugins_busy_set(name_inkbunny, TYPE_IMAGES, 30);
 }
 
