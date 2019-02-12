@@ -183,6 +183,8 @@ function images_add(item) {
 		return;
 	if(typeof item.url !== "string")
 		return;
+	if(typeof item.score !== "number")
+		return;
 
 	// check that the extension is a valid image
 	var valid_ext = false;
@@ -267,6 +269,8 @@ function music_add(item) {
 	if(typeof item.author !== "string")
 		return;
 	if(typeof item.url !== "string")
+		return;
+	if(typeof item.score !== "number")
 		return;
 
 	// check that the extension is a valid song

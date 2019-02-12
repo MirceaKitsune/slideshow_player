@@ -32,8 +32,8 @@ function interface_autorefresh() {
 	// if the timer has reached 0, clear it and pull new data from source websites
 	// if not then decrease it by 1 every second
 	if(interface_refresh.timer <= 1) {
-		interface_refresh.timer = 0;
 		clearInterval(interface_refresh.interval);
+		interface_refresh.timer = 0;
 		interface_load(true);
 	} else {
 		interface_refresh.timer = Math.floor(interface_refresh.timer - 1);
@@ -53,9 +53,9 @@ function interface_preload(name, type) {
 		if(force || type === TYPE_MUSIC)
 			interface_refresh.music = true;
 		clearInterval(interface_refresh.interval);
-		interface_refresh.timer = AUTOREFRESH + 1;
 		interface_refresh.interval = setInterval(interface_autorefresh, 1000);
-		interface_autorefresh();
+		interface_refresh.timer = AUTOREFRESH;
+		interface_update_media(true, false, false);
 	}
 	else {
 		interface_load(false);
@@ -835,7 +835,10 @@ function interface_init() {
 		}
 	}
 
-	// request the initial data from available sources
-	// use a timeout as plugins must first have time to register
-	setTimeout(interface_autorefresh, 0);
+	// pull the initial data from available sources
+	// use a short delay as plugins must first have time to register
+	clearInterval(interface_refresh.interval);
+	interface_refresh.interval = setInterval(interface_autorefresh, 1000);
+	interface_refresh.timer = 1;
+	interface_update_media(true, true, true);
 }
