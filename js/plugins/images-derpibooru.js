@@ -55,7 +55,7 @@ function images_derpibooru() {
 	}
 
 	pages_left_derpibooru = page_count_derpibooru;
-	plugins_busy_set(name_derpibooru, TYPE_IMAGES, 30);
+	plugins_busy_set(name_derpibooru, TYPE_IMAGES, 10);
 }
 
 // register the plugin

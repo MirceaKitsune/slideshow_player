@@ -54,7 +54,7 @@ function music_ccmixter() {
 	}
 
 	pages_left_ccmixter = page_count_ccmixter;
-	plugins_busy_set(name_ccmixter, TYPE_MUSIC, 10); // this site returns an invalid object if the given keywords are not found, use a low timeout
+	plugins_busy_set(name_ccmixter, TYPE_MUSIC, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
 }
 
 // register the plugin

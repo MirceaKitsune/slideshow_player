@@ -80,7 +80,7 @@ function images_inkbunny() {
 	document.body.appendChild(script);
 
 	pages_left_inkbunny = page_count_inkbunny;
-	plugins_busy_set(name_inkbunny, TYPE_IMAGES, 30);
+	plugins_busy_set(name_inkbunny, TYPE_IMAGES, 10);
 }
 
 // register the plugin

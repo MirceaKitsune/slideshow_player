@@ -44,7 +44,7 @@ function music_hearthis() {
 	const url_sufix = "&callback=parse_hearthis";
 
 	var keywords = plugins_settings_read("keywords", TYPE_MUSIC); // load the keywords
-	keywords = keywords.replace(" ", ","); // json2jsonp.com returns an error when spaces are included in the URL, convert spaces to commas
+	keywords = keywords.split(" ")[0].split(",")[0]; // only one word is supported for this API
 
 	for(var page = 1; page <= page_count_hearthis; page++) {
 		var script = document.createElement("script");
@@ -54,7 +54,7 @@ function music_hearthis() {
 	}
 
 	pages_left_hearthis = page_count_hearthis;
-	plugins_busy_set(name_hearthis, TYPE_MUSIC, 10); // this site returns an invalid object if the given keywords are not found, use a low timeout
+	plugins_busy_set(name_hearthis, TYPE_MUSIC, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
 }
 
 // register the plugin

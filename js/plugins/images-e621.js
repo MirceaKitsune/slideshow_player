@@ -50,7 +50,7 @@ function images_e621() {
 	}
 
 	pages_left_e621 = page_count_e621;
-	plugins_busy_set(name_e621, TYPE_IMAGES, 30);
+	plugins_busy_set(name_e621, TYPE_IMAGES, 10);
 }
 
 // register the plugin

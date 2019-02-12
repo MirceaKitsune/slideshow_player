@@ -121,12 +121,19 @@ function interface_load(pull) {
 		if(interface_refresh.music === true)
 			music_clear();
 
-		for(var site in settings.sites) {
-			const name_site = settings.sites[site];
-			if(interface_refresh.images === true && name_site.substring(0, TYPE_IMAGES.length) === TYPE_IMAGES)
-				plugins_load(name_site);
-			if(interface_refresh.music === true && name_site.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
-				plugins_load(name_site);
+		// load the plugins if we have any sources enabled, clear everything if not
+		if(settings.sites.length > 0) {
+			for(var site in settings.sites) {
+				const name_site = settings.sites[site];
+				if(interface_refresh.images === true && name_site.substring(0, TYPE_IMAGES.length) === TYPE_IMAGES)
+					plugins_load(name_site);
+				if(interface_refresh.music === true && name_site.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
+					plugins_load(name_site);
+			}
+		} else {
+			player_detach();
+			data_images = [];
+			data_music = [];
 		}
 	}
 
