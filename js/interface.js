@@ -115,7 +115,7 @@ function interface_load(pull) {
 	interface_update_controls_music();
 
 	// if sites need to be refreshed, load every selected plugin
-	if(pull === true && plugins_busy() === 0) {
+	if(pull === true) {
 		if(interface_refresh.images === true)
 			images_clear();
 		if(interface_refresh.music === true)
@@ -837,6 +837,5 @@ function interface_init() {
 
 	// request the initial data from available sources
 	// use a timeout as plugins must first have time to register
-	interface_load(false);
-	setTimeout(interface_autorefresh, 100);
+	setTimeout(interface_autorefresh, 0);
 }
