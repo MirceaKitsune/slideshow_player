@@ -39,7 +39,7 @@ function parse_e621(data) {
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
-	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) === true ? "e621" : "e926"; // e926 is the SFW version of e621
+	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) ? "e621" : "e926"; // e926 is the SFW version of e621
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 
 	for(var page = 1; page <= page_count_e621; page++) {

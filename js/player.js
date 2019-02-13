@@ -56,7 +56,7 @@ function player_images_fullscreen_timer() {
 
 // player, images, has fullscreen
 function player_images_fullscreen_has() {
-	return (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+	return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
 }
 
 // player, images, fullscreen mouse movement
@@ -133,7 +133,7 @@ var player_images_latency = {
 
 // player, images, latency, start recording
 function player_images_latency_start() {
-	if(player_images_latency.recording === true)
+	if(player_images_latency.recording)
 		return;
 
 	player_images_latency.recording = true;
@@ -158,7 +158,7 @@ function player_images_latency_stop() {
 
 // player, images, transition
 function player_images_fade() {
-	if(player.images.preloading === true)
+	if(player.images.preloading)
 		return;
 
 	// stop recording the latency
@@ -168,7 +168,7 @@ function player_images_fade() {
 	if(player.images.transition >= 1) {
 		// schedule the next image
 		// the latency calculated based on the loading time of previous images is deducted from the duration of this image
-		if(player.images.stopped !== true) {
+		if(!player.images.stopped) {
 			const duration = Math.max(settings.images.duration - player_images_latency.time_average, 5);
 			player.images.timer_next = setTimeout(player_images_next, duration * 1000);
 		}
@@ -187,7 +187,7 @@ function player_images_fade() {
 
 // player, images, switching
 function player_images_next() {
-	if(player_active() !== true || data_images.length === 0)
+	if(!player_active() || data_images.length == 0)
 		return;
 
 	// start recording the latency
@@ -195,7 +195,7 @@ function player_images_next() {
 
 	// stop or restart the slideshow if this is the final image
 	if(player.images.index >= data_images.length) {
-		if(settings.images.loop === true) {
+		if(settings.images.loop) {
 			player.images.index = 0;
 			player.images.element_1.setAttribute("src", player.images.element_2.getAttribute("src"));
 			player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
@@ -235,12 +235,12 @@ function player_images_next() {
 
 // player, images, skip
 function player_images_skip(index) {
-	if(player_active() !== true || data_images.length === 0)
+	if(!player_active() || data_images.length == 0)
 		return;
 
 	const overflow_start = index <= 0;
 	const overflow_end = index > data_images.length;
-	if((overflow_start || overflow_end) && settings.images.loop !== true)
+	if((overflow_start || overflow_end) && !settings.images.loop)
 		return;
 
 	if(overflow_start)
@@ -260,7 +260,7 @@ function player_images_skip(index) {
 // player, images, play
 function player_images_play() {
 	clearTimeout(player.images.timer_next);
-	if(player.images.stopped === true) {
+	if(player.images.stopped) {
 		player.images.timer_next = setTimeout(player_images_next, 0);
 		player.images.stopped = false;
 	}
@@ -273,7 +273,7 @@ function player_images_play() {
 
 // player, images, clear
 function player_images_clear() {
-	if(player_active() !== true)
+	if(!player_active())
 		return;
 
 	player.images.index = 1;
@@ -288,7 +288,7 @@ function player_images_clear() {
 
 // player, music, switching, canplay
 function player_music_next_canplay() {
-	if(player.music.preloading !== true)
+	if(!player.music.preloading)
 		return;
 	player.music.preloading = false;
 
@@ -302,7 +302,7 @@ function player_music_next_canplay() {
 	player.music.timer_next = setTimeout(player_music_next, duration * 1000);
 
 	// start playing the song
-	if(player.music.stopped !== true)
+	if(!player.music.stopped)
 		player.music.element.play();
 
 	interface_update_media(false, false, true);
@@ -310,12 +310,12 @@ function player_music_next_canplay() {
 
 // player, music, switching
 function player_music_next() {
-	if(player_active() !== true || data_music.length === 0)
+	if(!player_active() || data_music.length == 0)
 		return;
 
 	// stop or restart the slideshow if this is the final song
 	if(player.music.index >= data_music.length) {
-		if(settings.music.loop === true) {
+		if(settings.music.loop) {
 			player.music.index = 0;
 
 			// also shuffle the music again
@@ -342,12 +342,12 @@ function player_music_next() {
 
 // player, music, skip
 function player_music_skip(index) {
-	if(player_active() !== true || data_music.length === 0)
+	if(!player_active() || data_music.length == 0)
 		return;
 
 	const overflow_start = index <= 0;
 	const overflow_end = index > data_music.length;
-	if((overflow_start || overflow_end) && settings.music.loop !== true)
+	if((overflow_start || overflow_end) && !settings.music.loop)
 		return;
 
 	if(overflow_start)
@@ -367,9 +367,9 @@ function player_music_skip(index) {
 // player, music, play
 function player_music_play() {
 	clearTimeout(player.music.timer_next);
-	if(player.music.stopped === true) {
+	if(player.music.stopped) {
 		// we need to know the duration of the current song in order to reschedule, don't unpause if preloading
-		if(player.music.preloading === true)
+		if(player.music.preloading)
 			return;
 
 		// reschedule switching to the next song
@@ -389,7 +389,7 @@ function player_music_play() {
 
 // player, music, clear
 function player_music_clear() {
-	if(player_active() !== true)
+	if(!player_active())
 		return;
 
 	player.music.index = 1;
@@ -403,27 +403,27 @@ function player_music_clear() {
 
 // player, is available
 function player_available() {
-	return (data_images.length > 0 || data_music.length > 0);
+	return data_images.length > 0 || data_music.length > 0;
 }
 
 // player, is active
 function player_active() {
-	return (document.body.contains(player.element));
+	return document.body.contains(player.element);
 }
 
 // player, is busy, images
 function player_busy_images() {
-	return (player.images.index == 0 || player.images.transition < 1 || player.images.preloading === true);
+	return player.images.index <= 0 || player.images.transition < 1 || player.images.preloading;
 }
 
 // player, is busy, music
 function player_busy_music() {
-	return (player.music.index == 0 || player.music.preloading === true);
+	return player.music.index <= 0 || player.music.preloading;
 }
 
 // player, HTML, create
 function player_attach() {
-	if(player_active() === true)
+	if(player_active())
 		return;
 
 	// don't spawn the player if there is no content to play
@@ -471,7 +471,7 @@ function player_attach() {
 
 // player, HTML, destroy
 function player_detach() {
-	if(player_active() !== true)
+	if(!player_active())
 		return;
 
 	// destroy the player element

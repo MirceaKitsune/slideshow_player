@@ -65,7 +65,7 @@ function parse_inkbunny_rating(data) {
 // create a new session as guest, then call the rating api with its session id
 function parse_inkbunny_login(data) {
 	// whether or not to enable the NSFW tags
-	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) === true ? "yes" : "no";
+	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "yes" : "no";
 
 	var script = document.createElement("script");
 	script.type = "text/javascript";

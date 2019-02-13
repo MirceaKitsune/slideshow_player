@@ -50,18 +50,18 @@ function settings_cookie_get() {
 var settings = {
 	sites: [],
 	images: {
-		keywords: "artwork",
+		keywords: "anthro",
 		count: 100,
 		duration: 10,
 		nsfw: false,
-		loop: false,
-		shuffle: false
+		loop: true,
+		shuffle: true
 	},
 	music: {
-		keywords: "instrumental",
+		keywords: "trance",
 		count: 10,
-		loop: false,
-		shuffle: false,
+		loop: true,
+		shuffle: true,
 		volume: 1
 	}
 };
@@ -106,13 +106,13 @@ function plugins_settings_read(name, type) {
 
 // plugins, functions, ready
 function plugins_ready() {
-	if(interface_refresh.images === true)
+	if(interface_refresh.images)
 		images_pick();
-	if(interface_refresh.music === true)
+	if(interface_refresh.music)
 		music_pick();
 
 	// make sure we don't have another update scheduled before marking images and music as refreshed
-	if(interface_refresh.timer === 0) {
+	if(interface_refresh.timer == 0) {
 		interface_refresh.images = false;
 		interface_refresh.music = false;
 	}
@@ -121,7 +121,7 @@ function plugins_ready() {
 // plugins, functions, settings, used
 function plugins_settings_used(name, type) {
 	const name_settings = type + "_" + name;
-	return (plugins_settings.indexOf(name_settings) >= 0);
+	return plugins_settings.indexOf(name_settings) >= 0;
 }
 
 // plugins, busy check
@@ -129,7 +129,7 @@ function plugins_busy() {
 	// return true if any plugin is busy
 	var busy = 0;
 	for(var plugin in plugins) {
-		if(plugins[plugin].busy === true)
+		if(plugins[plugin].busy)
 			++busy;
 	}
 	return busy;
@@ -143,11 +143,11 @@ function plugins_busy_set(name, type, timeout) {
 
 	// automatically mark the plugin as no longer busy after the given timeout
 	clearTimeout(plugins[name_plugin].busy_timeout);
-	if(busy === true) {
+	if(busy) {
 		plugins[name_plugin].busy_timeout = setTimeout(function() {
 			plugins_busy_set(name, type, 0);
 		}, timeout * 1000);
-	} else if(plugins_busy() === 0) {
+	} else if(plugins_busy() == 0) {
 		// call the ready function if this was the last plugin that finished working
 		plugins_ready();
 	}
@@ -197,7 +197,7 @@ function images_add(item) {
 			break;
 		}
 	}
-	if(valid_ext !== true)
+	if(!valid_ext)
 		return;
 
 	data_images_all.push(item);
@@ -213,12 +213,12 @@ function images_pick() {
 	data_images.sort(function(a, b) { return b.score - a.score });
 	data_images.splice(settings.images.count);
 
-	if(data_images.length === 0) {
+	if(data_images.length == 0) {
 		// stop the player if there are neither images or songs left to play
 		// otherwise if the player is active and no images are left, clear the image player
-		if(data_music.length === 0)
+		if(data_music.length == 0)
 			player_detach();
-		else if(player_active() === true)
+		else if(player_active())
 			player_images_clear();
 	} else {
 		// suffle the images again
@@ -227,7 +227,7 @@ function images_pick() {
 
 		// refresh the image player if there are changes to apply
 		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index].src !== current_image.src) {
-			if(player_active() === true && player.images.index >= data_images.length)
+			if(player_active() && (player.images.index <= 0 || player.images.index >= data_images.length))
 				player.images.index = 1;
 			player_images_skip(player.images.index);
 		}
@@ -284,7 +284,7 @@ function music_add(item) {
 			break;
 		}
 	}
-	if(valid_ext !== true)
+	if(!valid_ext)
 		return;
 
 	data_music_all.push(item);
@@ -300,12 +300,12 @@ function music_pick() {
 	data_music.sort(function(a, b) { return b.score - a.score });
 	data_music.splice(settings.music.count);
 
-	if(data_music.length === 0) {
+	if(data_music.length == 0) {
 		// stop the player if there are neither images or songs left to play
 		// otherwise if the player is active and no songs are left, clear the music player
-		if(data_images.length === 0)
+		if(data_images.length == 0)
 			player_detach();
-		else if(player_active() === true)
+		else if(player_active())
 			player_music_clear();
 	} else {
 		// suffle the songs again
@@ -314,7 +314,7 @@ function music_pick() {
 
 		// refresh the music player if there are changes to apply
 		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index].src !== current_song.src) {
-			if(player_active() === true && player.music.index >= data_music.length)
+			if(player_active() && (player.music.index <= 0 || player.music.index >= data_music.length))
 				player.music.index = 1;
 			player_music_skip(player.music.index);
 		}
@@ -377,7 +377,7 @@ document.onkeydown = function(event) {
 
 // ask the user to confirm they want to leave if the player is busy
 window.onbeforeunload = function() {
-	if(player_active() === true)
+	if(player_active())
 		return "Closing this page will end the current slideshow. Are you sure?";
 }
 
