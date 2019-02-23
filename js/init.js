@@ -201,7 +201,7 @@ function images_add(item) {
 		return;
 
 	data_images_all.push(item);
-	data_images_all.splice(9999);
+	data_images_all.splice(1000000);
 }
 
 // data, images, functions, pick
@@ -288,7 +288,7 @@ function music_add(item) {
 		return;
 
 	data_music_all.push(item);
-	data_music_all.splice(9999);
+	data_music_all.splice(1000000);
 }
 
 // data, music, functions, pick

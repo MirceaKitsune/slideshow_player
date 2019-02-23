@@ -95,10 +95,10 @@ function interface_load(pull) {
 	// limit the settings to acceptable values
 	// should match the limits defined on the corresponding HTML elements
 	settings.images.keywords = settings.images.keywords.substring(0, 100);
-	settings.images.count = Math.max(Math.min(settings.images.count, 1000), 0);
-	settings.images.duration = Math.max(Math.min(settings.images.duration, 100), 5);
+	settings.images.count = Math.max(Math.min(settings.images.count, 1000000), 0);
+	settings.images.duration = Math.max(Math.min(settings.images.duration, 1000), 5);
 	settings.music.keywords = settings.music.keywords.substring(0, 100);
-	settings.music.count = Math.max(Math.min(settings.music.count, 1000), 0);
+	settings.music.count = Math.max(Math.min(settings.music.count, 1000000), 0);
 	settings.music.volume = Math.max(Math.min(settings.music.volume, 1), 0);
 
 	// update the settings cookie
@@ -327,10 +327,13 @@ function interface_update_media_music() {
 // interface, update HTML, media controls
 function interface_update_media_controls() {
 	const busy = plugins_busy();
-	const total_seconds = data_images.length * settings.images.duration;
-	var total_date = new Date(null);
-	total_date.setSeconds(total_seconds);
-	const total_time = total_date.toISOString().substr(11, 8);
+	const total_seconds = data_images.length * (settings.images.duration + (settings.images.duration * TRANSITION));
+	var total_time = "+1 day";
+	if(total_seconds <= 86400) {
+		var total_date = new Date(null);
+		total_date.setSeconds(total_seconds);
+		total_time = total_date.toISOString().substr(11, 8);
+	}
 
 	// label text for player status
 	var label_player =
@@ -499,7 +502,7 @@ function interface_init() {
 				interface.controls_images_count_input.setAttribute("value", settings.images.count);
 				interface.controls_images_count_input.setAttribute("step", "10");
 				interface.controls_images_count_input.setAttribute("min", "0");
-				interface.controls_images_count_input.setAttribute("max", "1000");
+				interface.controls_images_count_input.setAttribute("max", "1000000");
 				interface.controls_images_count_input.setAttribute("onclick", "interface_preload(\"count\", TYPE_IMAGES)");
 				interface.controls_images_count_input.setAttribute("onkeyup", "interface_preload(\"count\", TYPE_IMAGES)");
 				interface.controls_images_count.appendChild(interface.controls_images_count_input);
@@ -518,7 +521,7 @@ function interface_init() {
 				interface.controls_images_duration_input.setAttribute("value", settings.images.duration);
 				interface.controls_images_duration_input.setAttribute("step", "1");
 				interface.controls_images_duration_input.setAttribute("min", "5");
-				interface.controls_images_duration_input.setAttribute("max", "100");
+				interface.controls_images_duration_input.setAttribute("max", "1000");
 				interface.controls_images_duration_input.setAttribute("onclick", "interface_preload(\"duration\", TYPE_IMAGES)");
 				interface.controls_images_duration_input.setAttribute("onkeyup", "interface_preload(\"duration\", TYPE_IMAGES)");
 				interface.controls_images_duration.appendChild(interface.controls_images_duration_input);
@@ -606,7 +609,7 @@ function interface_init() {
 				interface.controls_music_count_input.setAttribute("value", settings.music.count);
 				interface.controls_music_count_input.setAttribute("step", "10");
 				interface.controls_music_count_input.setAttribute("min", "0");
-				interface.controls_music_count_input.setAttribute("max", "1000");
+				interface.controls_music_count_input.setAttribute("max", "1000000");
 				interface.controls_music_count_input.setAttribute("onclick", "interface_preload(\"count\", TYPE_MUSIC)");
 				interface.controls_music_count_input.setAttribute("onkeyup", "interface_preload(\"count\", TYPE_MUSIC)");
 				interface.controls_music_count.appendChild(interface.controls_music_count_input);
