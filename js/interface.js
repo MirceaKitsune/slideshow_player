@@ -372,6 +372,7 @@ function interface_update_recommendations_images_clear() {
 // interface, update HTML, recommendation images, set
 function interface_update_recommendations_images_set(tag) {
 	interface.controls_images_search_keywords_input.setAttribute("value", tag);
+	interface.controls_images_search_keywords_input.value = tag;
 	interface_preload("keywords", TYPE_IMAGES);
 	interface_update_media(false, false, false, true, false);
 }
@@ -410,6 +411,7 @@ function interface_update_recommendations_music_clear() {
 // interface, update HTML, recommendation music, set
 function interface_update_recommendations_music_set(tag) {
 	interface.controls_music_search_keywords_input.setAttribute("value", tag);
+	interface.controls_music_search_keywords_input.value = tag;
 	interface_preload("keywords", TYPE_MUSIC);
 	interface_update_media(false, false, false, false, true);
 }
