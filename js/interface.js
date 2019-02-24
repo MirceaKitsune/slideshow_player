@@ -40,7 +40,7 @@ function interface_autorefresh() {
 		interface_load(true);
 	} else {
 		interface_refresh.timer = Math.floor(interface_refresh.timer - 1);
-		interface_update_media(true, false, false, false, false);
+		interface_update_media(true, false, false);
 	}
 }
 
@@ -58,7 +58,7 @@ function interface_preload(name, type) {
 		clearInterval(interface_refresh.interval);
 		interface_refresh.interval = setInterval(interface_autorefresh, 1000);
 		interface_refresh.timer = AUTOREFRESH;
-		interface_update_media(true, false, false, false, false);
+		interface_update_media(true, false, false);
 	}
 	else {
 		interface_load(false);
@@ -140,7 +140,7 @@ function interface_load(pull) {
 		}
 	}
 
-	interface_update_media(true, true, true, false, false);
+	interface_update_media(true, true, true);
 }
 
 // interface, functions, play button
@@ -217,17 +217,18 @@ function interface_update_controls_sites() {
 }
 
 // interface, functions, media
-function interface_update_media(update_controls, update_images, update_music, update_recommendations_images, update_recommendations_music) {
-	if(update_controls)
+function interface_update_media(update_controls, update_images, update_music) {
+	if(update_controls) {
 		interface_update_media_controls();
-	if(update_images)
+	}
+	if(update_images) {
 		interface_update_media_images();
-	if(update_music)
-		interface_update_media_music();
-	if(update_recommendations_images)
 		interface_update_recommendations_images();
-	if(update_recommendations_music)
+	}
+	if(update_music) {
+		interface_update_media_music();
 		interface_update_recommendations_music();
+	}
 }
 
 // interface, update HTML, media images
@@ -362,7 +363,7 @@ function interface_update_media_music() {
 function interface_update_recommendations_images_clear() {
 	recommendations.images = {};
 	recommendations_timer();
-	interface_update_media(false, false, false, true, false);
+	interface_update_media(false, true, false);
 }
 
 // interface, update HTML, recommendation images, set
@@ -370,23 +371,27 @@ function interface_update_recommendations_images_set(tag) {
 	interface.controls_images_search_keywords_input.setAttribute("value", tag);
 	interface.controls_images_search_keywords_input.value = tag;
 	interface_preload("keywords", TYPE_IMAGES);
-	interface_update_media(false, false, false, true, false);
+	interface_update_media(false, true, false);
 }
 
 // interface, update HTML, recommendation images
 function interface_update_recommendations_images() {
-	// sort and trim the recommended tags into an array
-	// also remove the current keyword from the list as showing it is useless
-	const current_tag = interface.controls_images_search_keywords_input.getAttribute("value") || interface.controls_images_search_keywords_input.value;
+	// sort the recommended tags into an array
 	const recommendations_sorted = Object.keys(recommendations.images).sort(function(a, b) { return recommendations.images[b] - recommendations.images[a] });
-	if(recommendations_sorted.indexOf(current_tag) >= 0)
-		recommendations_sorted.splice(recommendations_sorted.indexOf(current_tag), 1);
-	recommendations_sorted.splice(RECOMMENDATIONS_LIMIT);
+	const current_tag = interface.controls_images_search_keywords_input.getAttribute("value") || interface.controls_images_search_keywords_input.value;
 
-	if(recommendations_sorted.length > 0) {
-		interface.media_images_recommendations_list.innerHTML = "";
+	interface.media_images_recommendations_list.innerHTML = "No recommended tags available";
+	if(recommendations_sorted.length > 0 && player.images.index > 0) {
+		var tags = 0;
 		for(var tag in recommendations_sorted) {
 			const tag_name = recommendations_sorted[tag];
+
+			// only count tags present on this item
+			// also remove the current keyword from the list as showing it is useless
+			if(tag_name == current_tag || data_images[player.images.index - 1].tags.indexOf(tag_name) < 0)
+				continue;
+			else if(tags == 0)
+				interface.media_images_recommendations_list.innerHTML = "";
 
 			// interface HTML: media, images, recommendations, tag
 			var tag_element = document.createElement("label");
@@ -395,9 +400,12 @@ function interface_update_recommendations_images() {
 			tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
 			tag_element.setAttribute("onclick", "interface_update_recommendations_images_set(\"" + tag_name + "\")");
 			interface.media_images_recommendations_list.appendChild(tag_element);
+
+			// stop here if we've reached the display limit
+			++tags;
+			if(tags >= RECOMMENDATIONS_LIMIT)
+				break;
 		}
-	} else {
-		interface.media_images_recommendations_list.innerHTML = "No recommended tags available";
 	}
 }
 
@@ -405,7 +413,7 @@ function interface_update_recommendations_images() {
 function interface_update_recommendations_music_clear() {
 	recommendations.music = {};
 	recommendations_timer();
-	interface_update_media(false, false, false, false, true);
+	interface_update_media(false, false, true);
 }
 
 // interface, update HTML, recommendation music, set
@@ -413,23 +421,27 @@ function interface_update_recommendations_music_set(tag) {
 	interface.controls_music_search_keywords_input.setAttribute("value", tag);
 	interface.controls_music_search_keywords_input.value = tag;
 	interface_preload("keywords", TYPE_MUSIC);
-	interface_update_media(false, false, false, false, true);
+	interface_update_media(false, false, true);
 }
 
 // interface, update HTML, recommendation music
 function interface_update_recommendations_music() {
-	// sort and trim the recommended tags into an array
-	// also remove the current keyword from the list as showing it is useless
-	const current_tag = interface.controls_music_search_keywords_input.getAttribute("value") || interface.controls_music_search_keywords_input.value;
+	// sort the recommended tags into an array
 	const recommendations_sorted = Object.keys(recommendations.music).sort(function(a, b) { return recommendations.music[b] - recommendations.music[a] });
-	if(recommendations_sorted.indexOf(current_tag) >= 0)
-		recommendations_sorted.splice(recommendations_sorted.indexOf(current_tag), 1);
-	recommendations_sorted.splice(RECOMMENDATIONS_LIMIT);
+	const current_tag = interface.controls_music_search_keywords_input.getAttribute("value") || interface.controls_music_search_keywords_input.value;
 
-	if(recommendations_sorted.length > 0) {
-		interface.media_music_recommendations_list.innerHTML = "";
+	interface.media_music_recommendations_list.innerHTML = "No recommended tags available";
+	if(recommendations_sorted.length > 0 && player.music.index > 0) {
+		var tags = 0;
 		for(var tag in recommendations_sorted) {
 			const tag_name = recommendations_sorted[tag];
+
+			// only count tags present on this item
+			// also remove the current keyword from the list as showing it is useless
+			if(tag_name == current_tag || data_music[player.music.index - 1].tags.indexOf(tag_name) < 0)
+				continue;
+			else if(tags == 0)
+				interface.media_music_recommendations_list.innerHTML = "";
 
 			// interface HTML: media, music, recommendations, tag
 			var tag_element = document.createElement("label");
@@ -438,9 +450,12 @@ function interface_update_recommendations_music() {
 			tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
 			tag_element.setAttribute("onclick", "interface_update_recommendations_music_set(\"" + tag_name + "\")");
 			interface.media_music_recommendations_list.appendChild(tag_element);
+
+			// stop here if we've reached the display limit
+			++tags;
+			if(tags >= RECOMMENDATIONS_LIMIT)
+				break;
 		}
-	} else {
-		interface.media_music_recommendations_list.innerHTML = "No recommended tags available";
 	}
 }
 
@@ -1006,5 +1021,5 @@ function interface_init() {
 	clearInterval(interface_refresh.interval);
 	interface_refresh.interval = setInterval(interface_autorefresh, 1000);
 	interface_refresh.timer = 1;
-	interface_update_media(true, true, true, true, true);
+	interface_update_media(true, true, true);
 }

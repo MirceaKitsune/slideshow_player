@@ -63,9 +63,10 @@ function recommendations_timer() {
 	if(!player_active())
 		return;
 
-	// each time an image or song is actively on the screen, we increase the rating of all its tags
-	// this operates an the assumption that the more you like something, the more you will keep it on your screen
-	// oppositely, the less you like an item, the faster you're going to switch away from it
+	// each time an image or song is active, we increase the rating of all its tags in the global tag table
+	// this operates on the assumption that the more you like something, the more you keep looking at or listening to it
+	// oppositely, the less you like an item, the faster it's assumed you're going to switch away from it
+	// if the player is busy, don't increment the rating of a tag, since that doesn't count as deliberately selecting an item
 	for(var tag in data_images[player.images.index - 1].tags) {
 		const tag_name = data_images[player.images.index - 1].tags[tag].toLowerCase();
 		if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
@@ -73,7 +74,7 @@ function recommendations_timer() {
 
 		if(recommendations.images[tag_name] === null || recommendations.images[tag_name] === undefined)
 			recommendations.images[tag_name] = 0;
-		else if(recommendations.images[tag_name] < 1000000)
+		else if(!player_busy_images() && recommendations.images[tag_name] < 1000000)
 			recommendations.images[tag_name] += 1;
 	}
 	for(var tag in data_music[player.music.index - 1].tags) {
@@ -83,11 +84,9 @@ function recommendations_timer() {
 
 		if(recommendations.music[tag_name] === null || recommendations.music[tag_name] === undefined)
 			recommendations.music[tag_name] = 0;
-		else if(recommendations.music[tag_name] < 1000000)
+		else if(!player_busy_music() && recommendations.music[tag_name] < 1000000)
 			recommendations.music[tag_name] += 1;
 	}
-
-	interface_update_media(false, false, false, true, true);
 }
 
 // player, images, timer function for fullscreen
@@ -206,7 +205,7 @@ function player_images_fade() {
 
 		// deactivate the fading function
 		clearInterval(player.images.timer_fade);
-		interface_update_media(false, true, false, false, false);
+		interface_update_media(false, true, false);
 	}
 	else {
 		// advance the transition and apply the new transparency to the image elements
@@ -262,6 +261,9 @@ function player_images_next() {
 		player.images.element_2.setAttribute("onload", "player.images.preloading = false");
 		player.images.element_2.setAttribute("onerror", "player_detach()");
 	}
+
+	// refresh recommended tags
+	recommendations_timer();
 }
 
 // player, images, skip
@@ -285,7 +287,7 @@ function player_images_skip(index) {
 	clearTimeout(player.images.timer_next);
 	player.images.timer_next = setTimeout(player_images_next, 0);
 
-	interface_update_media(false, true, false, false, false);
+	interface_update_media(false, true, false);
 }
 
 // player, images, play
@@ -299,7 +301,7 @@ function player_images_play() {
 		player.images.stopped = true;
 	}
 
-	interface_update_media(false, true, false, false, false);
+	interface_update_media(false, true, false);
 }
 
 // player, images, clear
@@ -314,7 +316,7 @@ function player_images_clear() {
 	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
 	player.images.element_2.setAttribute("src", SRC_BLANK);
 
-	interface_update_media(false, true, false, false, false);
+	interface_update_media(false, true, false);
 }
 
 // player, music, switching, canplay
@@ -336,7 +338,7 @@ function player_music_next_canplay() {
 	if(!player.music.stopped)
 		player.music.element.play();
 
-	interface_update_media(false, false, true, false, false);
+	interface_update_media(false, false, true);
 }
 
 // player, music, switching
@@ -369,6 +371,9 @@ function player_music_next() {
 		player.music.element.setAttribute("oncanplay", "player_music_next_canplay()");
 		player.music.element.volume = settings.music.volume;
 	}
+
+	// refresh recommended tags
+	recommendations_timer();
 }
 
 // player, music, skip
@@ -392,7 +397,7 @@ function player_music_skip(index) {
 	clearTimeout(player.music.timer_next);
 	player.music.timer_next = setTimeout(player_music_next, 0);
 
-	interface_update_media(false, false, true, false, false);
+	interface_update_media(false, false, true);
 }
 
 // player, music, play
@@ -415,7 +420,7 @@ function player_music_play() {
 		player.music.stopped = true;
 	}
 
-	interface_update_media(false, false, true, false, false);
+	interface_update_media(false, false, true);
 }
 
 // player, music, clear
@@ -429,7 +434,7 @@ function player_music_clear() {
 	player.music.element.currentTime = 0;
 	player.music.element.removeAttribute("src");
 
-	interface_update_media(false, false, true, false, false);
+	interface_update_media(false, false, true);
 }
 
 // player, is available
@@ -500,7 +505,7 @@ function player_attach() {
 	images_pick();
 	music_pick();
 
-	interface_update_media(true, true, true, false, false);
+	interface_update_media(true, true, true);
 }
 
 // player, HTML, destroy
@@ -527,5 +532,5 @@ function player_detach() {
 	player.music.stopped = false;
 	player.music.element = null;
 
-	interface_update_media(true, true, true, false, false);
+	interface_update_media(true, true, true);
 }

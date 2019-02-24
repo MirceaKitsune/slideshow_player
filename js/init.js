@@ -157,7 +157,7 @@ function plugins_busy_set(name, type, timeout) {
 		plugins_ready();
 	}
 
-	interface_update_media(true, false, false, false, false);
+	interface_update_media(true, false, false);
 }
 
 // data, images, global list
@@ -166,7 +166,7 @@ var data_images_all = data_images = [];
 // data, images, functions, clear
 function images_clear() {
 	data_images_all = [];
-	interface_update_media(true, true, false, false, false);
+	interface_update_media(true, true, false);
 }
 
 // data, images, functions, add
@@ -255,7 +255,7 @@ var data_music_all = data_music = [];
 // data, music, functions, clear
 function music_clear() {
 	data_music_all = [];
-	interface_update_media(true, false, true, false, false);
+	interface_update_media(true, false, true);
 }
 
 // data, music, functions, add
