@@ -17,7 +17,7 @@ const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bo
 const AUTOREFRESH = 5;
 
 // how many tags to show in the recommended panels
-const RECOMMENDATIONS_LIMIT = 5;
+const RECOMMENDATIONS_LIMIT = 100;
 
 // whether to also refresh the content when loading new settings
 var interface_refresh = {
@@ -840,7 +840,7 @@ function interface_init() {
 	{
 		// interface HTML: media, images, recommendations
 		interface.media_images_recommendations = document.createElement("div");
-		interface.media_images_recommendations.setAttribute("style", "position: absolute; overflow: hidden; top: 0%; left: 0%; width: 20%; height: 100%");
+		interface.media_images_recommendations.setAttribute("style", "position: absolute; direction: rtl; overflow: auto; top: 0%; left: 0%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_images_recommendations);
 		{
 			// interface HTML: controls, images, recommendations, label
@@ -851,7 +851,7 @@ function interface_init() {
 			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_label);
 
 			// interface HTML: controls, images, recommendations, list
-			interface.media_images_recommendations_list = document.createElement("p");
+			interface.media_images_recommendations_list = document.createElement("div");
 			interface.media_images_recommendations_list.setAttribute("class", "text_black");
 			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_list);
 		}
@@ -999,7 +999,7 @@ function interface_init() {
 
 		// interface HTML: media, music, recommendations
 		interface.media_music_recommendations = document.createElement("div");
-		interface.media_music_recommendations.setAttribute("style", "position: absolute; overflow: hidden; top: 0%; left: 80%; width: 20%; height: 100%");
+		interface.media_music_recommendations.setAttribute("style", "position: absolute; direction: ltr; overflow: auto; top: 0%; left: 80%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_music_recommendations);
 		{
 			// interface HTML: controls, music, recommendations, label
@@ -1010,7 +1010,7 @@ function interface_init() {
 			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_label);
 
 			// interface HTML: controls, music, recommendations, list
-			interface.media_music_recommendations_list = document.createElement("p");
+			interface.media_music_recommendations_list = document.createElement("div");
 			interface.media_music_recommendations_list.setAttribute("class", "text_black");
 			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_list);
 		}
