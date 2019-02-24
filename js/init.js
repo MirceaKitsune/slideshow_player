@@ -107,10 +107,14 @@ function plugins_settings_read(name, type) {
 
 // plugins, functions, ready
 function plugins_ready() {
-	if(interface_refresh.images)
+	if(interface_refresh.images) {
 		images_pick();
-	if(interface_refresh.music)
+		interface_update_recommendations_images_clear();
+	}
+	if(interface_refresh.music) {
 		music_pick();
+		interface_update_recommendations_music_clear();
+	}
 
 	// make sure we don't have another update scheduled before marking images and music as refreshed
 	if(interface_refresh.timer == 0) {

@@ -119,14 +119,10 @@ function interface_load(pull) {
 
 	// if sites need to be refreshed, load every selected plugin
 	if(pull) {
-		if(interface_refresh.images) {
+		if(interface_refresh.images)
 			images_clear();
-			interface_update_recommendations_images_clear();
-		}
-		if(interface_refresh.music) {
+		if(interface_refresh.music)
 			music_clear();
-			interface_update_recommendations_music_clear();
-		}
 
 		// load the plugins if we have any sources enabled, clear everything if not
 		if(settings.sites.length > 0) {
@@ -381,23 +377,27 @@ function interface_update_recommendations_images_set(tag) {
 function interface_update_recommendations_images() {
 	// sort and trim the recommended tags into an array
 	// also remove the current keyword from the list as showing it is useless
-	const current_tag = interface.controls_images_search_keywords_input.getAttribute("value");
+	const current_tag = interface.controls_images_search_keywords_input.getAttribute("value") || interface.controls_images_search_keywords_input.value;
 	const recommendations_sorted = Object.keys(recommendations.images).sort(function(a, b) { return recommendations.images[b] - recommendations.images[a] });
 	if(recommendations_sorted.indexOf(current_tag) >= 0)
 		recommendations_sorted.splice(recommendations_sorted.indexOf(current_tag), 1);
 	recommendations_sorted.splice(RECOMMENDATIONS_LIMIT);
 
-	interface.media_images_recommendations_list.innerHTML = "";
-	for(var tag in recommendations_sorted) {
-		const tag_name = recommendations_sorted[tag];
+	if(recommendations_sorted.length > 0) {
+		interface.media_images_recommendations_list.innerHTML = "";
+		for(var tag in recommendations_sorted) {
+			const tag_name = recommendations_sorted[tag];
 
-		// interface HTML: media, images, recommendations, tag
-		var tag_element = document.createElement("label");
-		tag_element.innerHTML += tag_name + "<br/>";
-		tag_element.setAttribute("title", "Click to apply this tag");
-		tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
-		tag_element.setAttribute("onclick", "interface_update_recommendations_images_set(\"" + tag_name + "\")");
-		interface.media_images_recommendations_list.appendChild(tag_element);
+			// interface HTML: media, images, recommendations, tag
+			var tag_element = document.createElement("label");
+			tag_element.innerHTML += tag_name + "<br/>";
+			tag_element.setAttribute("title", "Click to apply this tag");
+			tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
+			tag_element.setAttribute("onclick", "interface_update_recommendations_images_set(\"" + tag_name + "\")");
+			interface.media_images_recommendations_list.appendChild(tag_element);
+		}
+	} else {
+		interface.media_images_recommendations_list.innerHTML = "No recommended tags available";
 	}
 }
 
@@ -420,23 +420,27 @@ function interface_update_recommendations_music_set(tag) {
 function interface_update_recommendations_music() {
 	// sort and trim the recommended tags into an array
 	// also remove the current keyword from the list as showing it is useless
-	const current_tag = interface.controls_music_search_keywords_input.getAttribute("value");
+	const current_tag = interface.controls_music_search_keywords_input.getAttribute("value") || interface.controls_music_search_keywords_input.value;
 	const recommendations_sorted = Object.keys(recommendations.music).sort(function(a, b) { return recommendations.music[b] - recommendations.music[a] });
 	if(recommendations_sorted.indexOf(current_tag) >= 0)
 		recommendations_sorted.splice(recommendations_sorted.indexOf(current_tag), 1);
 	recommendations_sorted.splice(RECOMMENDATIONS_LIMIT);
 
-	interface.media_music_recommendations_list.innerHTML = "";
-	for(var tag in recommendations_sorted) {
-		const tag_name = recommendations_sorted[tag];
+	if(recommendations_sorted.length > 0) {
+		interface.media_music_recommendations_list.innerHTML = "";
+		for(var tag in recommendations_sorted) {
+			const tag_name = recommendations_sorted[tag];
 
-		// interface HTML: media, music, recommendations, tag
-		var tag_element = document.createElement("label");
-		tag_element.innerHTML += tag_name + "<br/>";
-		tag_element.setAttribute("title", "Click to apply this tag");
-		tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
-		tag_element.setAttribute("onclick", "interface_update_recommendations_music_set(\"" + tag_name + "\")");
-		interface.media_music_recommendations_list.appendChild(tag_element);
+			// interface HTML: media, music, recommendations, tag
+			var tag_element = document.createElement("label");
+			tag_element.innerHTML += tag_name + "<br/>";
+			tag_element.setAttribute("title", "Click to apply this tag");
+			tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
+			tag_element.setAttribute("onclick", "interface_update_recommendations_music_set(\"" + tag_name + "\")");
+			interface.media_music_recommendations_list.appendChild(tag_element);
+		}
+	} else {
+		interface.media_music_recommendations_list.innerHTML = "No recommended tags available";
 	}
 }
 
@@ -821,7 +825,7 @@ function interface_init() {
 	{
 		// interface HTML: media, images, recommendations
 		interface.media_images_recommendations = document.createElement("div");
-		interface.media_images_recommendations.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 20%; height: 100%");
+		interface.media_images_recommendations.setAttribute("style", "position: absolute; overflow: hidden; top: 0%; left: 0%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_images_recommendations);
 		{
 			// interface HTML: controls, images, recommendations, label
@@ -839,7 +843,7 @@ function interface_init() {
 
 		// interface HTML: media, images
 		interface.media_images = document.createElement("div");
-		interface.media_images.setAttribute("style", "position: absolute; top: 0%; left: 20%; width: 20%; height: 100%");
+		interface.media_images.setAttribute("style", "position: absolute; overflow: hidden; top: 0%; left: 20%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_images);
 		{
 			// interface HTML: media, images, previous
@@ -895,7 +899,7 @@ function interface_init() {
 
 		// interface HTML: media, controls
 		interface.media_controls = document.createElement("div");
-		interface.media_controls.setAttribute("style", "position: absolute; top: 0%; left: 40%; width: 20%; height: 100%");
+		interface.media_controls.setAttribute("style", "position: absolute; overflow: hidden; top: 0%; left: 40%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_controls);
 		{
 			// interface HTML: media, controls, play
@@ -924,7 +928,7 @@ function interface_init() {
 
 		// interface HTML: media, music
 		interface.media_music = document.createElement("div");
-		interface.media_music.setAttribute("style", "position: absolute; top: 0%; left: 60%; width: 20%; height: 100%");
+		interface.media_music.setAttribute("style", "position: absolute; overflow: hidden; top: 0%; left: 60%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_music);
 		{
 			// interface HTML: media, music, previous
@@ -980,7 +984,7 @@ function interface_init() {
 
 		// interface HTML: media, music, recommendations
 		interface.media_music_recommendations = document.createElement("div");
-		interface.media_music_recommendations.setAttribute("style", "position: absolute; top: 0%; left: 80%; width: 20%; height: 100%");
+		interface.media_music_recommendations.setAttribute("style", "position: absolute; overflow: hidden; top: 0%; left: 80%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_music_recommendations);
 		{
 			// interface HTML: controls, music, recommendations, label
