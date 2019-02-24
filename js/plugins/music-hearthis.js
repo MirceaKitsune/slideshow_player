@@ -28,6 +28,7 @@ function parse_hearthis(data) {
 		this_song.author = String(this_data.user.username);
 		this_song.url = String(this_data.permalink_url);
 		this_song.score = Number(this_data.playback_count);
+		this_song.tags = [this_data.genre.toLowerCase()];
 
 		music_add(this_song);
 	}

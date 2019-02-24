@@ -41,6 +41,7 @@ function parse_inkbunny(data) {
 		this_image.author = String(this_data.username);
 		this_image.url = String(this_data.file_url_full); // API doesn't provide the page URL, use the image file instead
 		this_image.score = 0;
+		this_image.tags = []; // API doesn't provide tags
 
 		images_add(this_image);
 	}

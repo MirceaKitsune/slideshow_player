@@ -152,7 +152,7 @@ function plugins_busy_set(name, type, timeout) {
 		plugins_ready();
 	}
 
-	interface_update_media(true, false, false);
+	interface_update_media(true, false, false, false, false);
 }
 
 // data, images, global list
@@ -161,7 +161,7 @@ var data_images_all = data_images = [];
 // data, images, functions, clear
 function images_clear() {
 	data_images_all = [];
-	interface_update_media(true, true, false);
+	interface_update_media(true, true, false, false, false);
 }
 
 // data, images, functions, add
@@ -184,6 +184,8 @@ function images_add(item) {
 	if(typeof item.url !== "string")
 		return;
 	if(typeof item.score !== "number")
+		return;
+	if(typeof item.tags !== "object")
 		return;
 
 	// check that the extension is a valid image
@@ -248,7 +250,7 @@ var data_music_all = data_music = [];
 // data, music, functions, clear
 function music_clear() {
 	data_music_all = [];
-	interface_update_media(true, false, true);
+	interface_update_media(true, false, true, false, false);
 }
 
 // data, music, functions, add
@@ -271,6 +273,8 @@ function music_add(item) {
 	if(typeof item.url !== "string")
 		return;
 	if(typeof item.score !== "number")
+		return;
+	if(typeof item.tags !== "object")
 		return;
 
 	// check that the extension is a valid song

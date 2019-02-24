@@ -28,6 +28,7 @@ function parse_ccmixter(data) {
 		this_song.author = String(this_data.user_real_name);
 		this_song.url = String(this_data.file_page_url);
 		this_song.score = Number(this_data.upload_num_scores);
+		this_song.tags = this_data.upload_tags.toLowerCase().split(",");
 
 		music_add(this_song);
 	}

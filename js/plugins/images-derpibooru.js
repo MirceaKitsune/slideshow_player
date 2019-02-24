@@ -28,6 +28,7 @@ function parse_derpibooru(data) {
 		this_image.author = String(this_data.uploader);
 		this_image.url = "https:" + String(this_data.representations.full); // API doesn't provide a page link, use the image instead
 		this_image.score = Number(this_data.score);
+		this_image.tags = this_data.tags.toLowerCase().split(",").split(" ");
 
 		images_add(this_image);
 	}

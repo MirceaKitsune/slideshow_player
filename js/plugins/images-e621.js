@@ -25,9 +25,10 @@ function parse_e621(data) {
 		this_image.src = String(this_data.file_url);
 		this_image.thumb = String(this_data.preview_url);
 		this_image.title = String(this_data.source); // API doesn't provide the title, use the file name instead
-		this_image.author = String(this_data.artist);
+		this_image.author = String(this_data.artist[0]);
 		this_image.url = String(this_data.source);
 		this_image.score = Number(this_data.score);
+		this_image.tags = this_data.tags.toLowerCase().split(" ");
 
 		images_add(this_image);
 	}
