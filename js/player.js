@@ -14,7 +14,7 @@ const TRANSITION = 0.1;
 
 // the recommendation algorithm preforms scans this many seconds
 // smaller values offer more accuracy but use more processing power
-const RECOMMEND = 1;
+const RECOMMENDATIONS_RATE = 1;
 
 // latency strength: 0.5 = half, 1.0 = full, 2.0 = double
 // latency step: resolution of the latency check in seconds, lower is more accurate but also more expensive
@@ -60,18 +60,27 @@ var fullscreen_mouse_end = 0;
 
 // recommendations, timer
 function recommendations_timer() {
+	if(!player_active())
+		return;
+
 	// each time an image or song is actively on the screen, we increase the rating of all its tags
 	// this operates an the assumption that the more you like something, the more you will keep it on your screen
 	// oppositely, the less you like an item, the faster you're going to switch away from it
 	for(var tag in data_images[player.images.index - 1].tags) {
-		const tag_name = data_images[player.images.index - 1].tags[tag];
+		const tag_name = data_images[player.images.index - 1].tags[tag].toLowerCase();
+		if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
+			continue;
+
 		if(recommendations.images[tag_name] === null || recommendations.images[tag_name] === undefined)
 			recommendations.images[tag_name] = 0;
 		else if(recommendations.images[tag_name] < 1000000)
 			recommendations.images[tag_name] += 1;
 	}
 	for(var tag in data_music[player.music.index - 1].tags) {
-		const tag_name = data_music[player.music.index - 1].tags[tag];
+		const tag_name = data_music[player.music.index - 1].tags[tag].toLowerCase();
+		if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
+			continue;
+
 		if(recommendations.music[tag_name] === null || recommendations.music[tag_name] === undefined)
 			recommendations.music[tag_name] = 0;
 		else if(recommendations.music[tag_name] < 1000000)
@@ -112,18 +121,8 @@ function player_images_fullscreen_toggle(force_to) {
 		// configure player / media / media_images_label / media_images_info / media_controls_label elements
 		interface.player.setAttribute("style", STYLE_PLAYER_POSITION_DETACHED);
 		interface.player.removeAttribute("onmousemove");
-		if(document.body && interface.player && interface.player.contains(interface.media)) {
-			interface.media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
-			interface.media_images_label.setAttribute("class", "text_black");
-			interface.media_images_info.setAttribute("class", "text_black");
-			interface.media_controls_label.setAttribute("class", "text_black");
-			interface.media_images_recommendations_label.setAttribute("class", "text_black");
-			interface.media_images_recommendations_list.setAttribute("class", "text_black");
-			interface.media_music_recommendations_label.setAttribute("class", "text_black");
-			interface.media_music_recommendations_list.setAttribute("class", "text_black");
-			interface.player.removeChild(interface.media);
-			document.body.appendChild(interface.media);
-		}
+		if(document.body && interface.player && interface.player.contains(interface.media))
+			interface_update_attached(true);
 
 		// set mouse properties
 		fullscreen_mouse_start = 0;
@@ -143,18 +142,8 @@ function player_images_fullscreen_toggle(force_to) {
 		// configure player / media / media_images_label / media_images_info / media_controls_label elements
 		interface.player.setAttribute("style", STYLE_PLAYER_POSITION_ATTACHED);
 		interface.player.setAttribute("onmousemove", "player_images_fullscreen_mouse(event)");
-		if(interface.player && document.body && document.body.contains(interface.media)) {
-			interface.media.setAttribute("style", STYLE_MEDIA_POSITION_ATTACHED + "; " + STYLE_MEDIA_BACKGROUND_ATTACHED);
-			interface.media_images_label.setAttribute("class", "text_white");
-			interface.media_images_info.setAttribute("class", "text_white");
-			interface.media_controls_label.setAttribute("class", "text_white");
-			interface.media_images_recommendations_label.setAttribute("class", "text_white");
-			interface.media_images_recommendations_list.setAttribute("class", "text_white");
-			interface.media_music_recommendations_label.setAttribute("class", "text_white");
-			interface.media_music_recommendations_list.setAttribute("class", "text_white");
-			document.body.removeChild(interface.media);
-			interface.player.appendChild(interface.media);
-		}
+		if(interface.player && document.body && document.body.contains(interface.media))
+			interface_update_attached(false);
 
 		// set mouse properties
 		fullscreen_mouse_start = interface.player.offsetHeight - interface.media.offsetHeight - FULLSCREEN_MOUSE_FADE;
@@ -505,7 +494,7 @@ function player_attach() {
 	player.music.stopped = false;
 
 	// set the recommendations interval
-	recommendations.timer = setInterval(recommendations_timer, RECOMMEND * 1000);
+	recommendations.timer = setInterval(recommendations_timer, RECOMMENDATIONS_RATE * 1000);
 
 	// refresh the images and songs in use
 	images_pick();

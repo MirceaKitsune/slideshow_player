@@ -28,7 +28,7 @@ function parse_e621(data) {
 		this_image.author = String(this_data.artist[0]);
 		this_image.url = String(this_data.source);
 		this_image.score = Number(this_data.score);
-		this_image.tags = this_data.tags.toLowerCase().split(" ");
+		this_image.tags = this_data.tags.split(" ");
 
 		images_add(this_image);
 	}

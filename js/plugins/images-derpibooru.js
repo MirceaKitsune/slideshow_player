@@ -28,7 +28,13 @@ function parse_derpibooru(data) {
 		this_image.author = String(this_data.uploader);
 		this_image.url = "https:" + String(this_data.representations.full); // API doesn't provide a page link, use the image instead
 		this_image.score = Number(this_data.score);
-		this_image.tags = this_data.tags.toLowerCase().split(",").split(" ");
+		this_image.tags = this_data.tags.split(",");
+
+		// remove spaces from the beginning of tag names
+		for(var tag in this_image.tags) {
+			if(this_image.tags[tag].substring(0, 1) == " ")
+				this_image.tags[tag] = this_image.tags[tag].substring(1);
+		}
 
 		images_add(this_image);
 	}

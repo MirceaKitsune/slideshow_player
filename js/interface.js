@@ -17,7 +17,7 @@ const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bo
 const AUTOREFRESH = 5;
 
 // how many tags to show in the recommended panels
-const TAGS = 4;
+const RECOMMENDATIONS_LIMIT = 5;
 
 // whether to also refresh the content when loading new settings
 var interface_refresh = {
@@ -150,6 +150,33 @@ function interface_play() {
 		player_attach();
 	else
 		player_detach();
+}
+
+// interface, update, attached
+function interface_update_attached(attached) {
+	if(attached) {
+		interface.media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
+		interface.media_images_label.setAttribute("class", "text_black");
+		interface.media_images_info.setAttribute("class", "text_black");
+		interface.media_controls_label.setAttribute("class", "text_black");
+		interface.media_images_recommendations_label.setAttribute("class", "text_black");
+		interface.media_images_recommendations_list.setAttribute("class", "text_black");
+		interface.media_music_recommendations_label.setAttribute("class", "text_black");
+		interface.media_music_recommendations_list.setAttribute("class", "text_black");
+		interface.player.removeChild(interface.media);
+		document.body.appendChild(interface.media);
+	} else {
+		interface.media.setAttribute("style", STYLE_MEDIA_POSITION_ATTACHED + "; " + STYLE_MEDIA_BACKGROUND_ATTACHED);
+		interface.media_images_label.setAttribute("class", "text_white");
+		interface.media_images_info.setAttribute("class", "text_white");
+		interface.media_controls_label.setAttribute("class", "text_white");
+		interface.media_images_recommendations_label.setAttribute("class", "text_white");
+		interface.media_images_recommendations_list.setAttribute("class", "text_white");
+		interface.media_music_recommendations_label.setAttribute("class", "text_white");
+		interface.media_music_recommendations_list.setAttribute("class", "text_white");
+		document.body.removeChild(interface.media);
+		interface.player.appendChild(interface.media);
+	}
 }
 
 // interface, update HTML, controls, images
@@ -353,17 +380,16 @@ function interface_update_recommendations_images() {
 	const recommendations_sorted = Object.keys(recommendations.images).sort(function(a, b) { return recommendations.images[b] - recommendations.images[a] });
 	if(recommendations_sorted.indexOf(current_tag) >= 0)
 		recommendations_sorted.splice(recommendations_sorted.indexOf(current_tag), 1);
-	recommendations_sorted.splice(TAGS);
+	recommendations_sorted.splice(RECOMMENDATIONS_LIMIT);
 
 	interface.media_images_recommendations_list.innerHTML = "";
 	for(var tag in recommendations_sorted) {
 		const tag_name = recommendations_sorted[tag];
-		const tag_value = recommendations.images[tag_name];
 
 		// interface HTML: media, images, recommendations, tag
 		var tag_element = document.createElement("label");
-		tag_element.innerHTML += "#" + tag_name + " (" + tag_value + ")<br/>";
-		tag_element.setAttribute("title", "Click to apply this tag");
+		tag_element.innerHTML += tag_name + "<br/>";
+		tag_element.setAttribute("title", "Click to apply");
 		tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
 		tag_element.setAttribute("onclick", "interface_update_recommendations_images_set(\"" + tag_name + "\")");
 		interface.media_images_recommendations_list.appendChild(tag_element);
@@ -392,17 +418,16 @@ function interface_update_recommendations_music() {
 	const recommendations_sorted = Object.keys(recommendations.music).sort(function(a, b) { return recommendations.music[b] - recommendations.music[a] });
 	if(recommendations_sorted.indexOf(current_tag) >= 0)
 		recommendations_sorted.splice(recommendations_sorted.indexOf(current_tag), 1);
-	recommendations_sorted.splice(TAGS);
+	recommendations_sorted.splice(RECOMMENDATIONS_LIMIT);
 
 	interface.media_music_recommendations_list.innerHTML = "";
 	for(var tag in recommendations_sorted) {
 		const tag_name = recommendations_sorted[tag];
-		const tag_value = recommendations.music[tag_name];
 
 		// interface HTML: media, music, recommendations, tag
 		var tag_element = document.createElement("label");
-		tag_element.innerHTML += "#" + tag_name + " (" + tag_value + ")<br/>";
-		tag_element.setAttribute("title", "Click to apply this tag");
+		tag_element.innerHTML += tag_name + "<br/>";
+		tag_element.setAttribute("title", "Click to apply");
 		tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
 		tag_element.setAttribute("onclick", "interface_update_recommendations_music_set(\"" + tag_name + "\")");
 		interface.media_music_recommendations_list.appendChild(tag_element);
@@ -535,7 +560,7 @@ function interface_init() {
 			// interface HTML: media, images, title
 			interface.controls_images_title = document.createElement("p");
 			interface.controls_images_title.setAttribute("style", "text-align: center");
-			interface.controls_images_title.innerHTML = "<font size=\"4\"><b>Image settings</b></font>";
+			interface.controls_images_title.innerHTML = "<font size=\"4\"><b>" + TYPE_IMAGES + " Image settings</b></font>";
 			interface.controls_images.appendChild(interface.controls_images_title);
 
 			// interface HTML: controls, images, search
@@ -661,7 +686,7 @@ function interface_init() {
 			// interface HTML: media, music, title
 			interface.controls_music_title = document.createElement("p");
 			interface.controls_music_title.setAttribute("style", "text-align: center");
-			interface.controls_music_title.innerHTML = "<font size=\"4\"><b>Music settings</b></font>";
+			interface.controls_music_title.innerHTML = "<font size=\"4\"><b>" + TYPE_MUSIC + " Music settings</b></font>";
 			interface.controls_music.appendChild(interface.controls_music_title);
 
 			// interface HTML: controls, music, search
@@ -773,7 +798,7 @@ function interface_init() {
 			// interface HTML: controls, sites, title
 			interface.controls_sites_title = document.createElement("p");
 			interface.controls_sites_title.setAttribute("style", "text-align: center");
-			interface.controls_sites_title.innerHTML = "<font size=\"4\"><b>Sources</b></font>";
+			interface.controls_sites_title.innerHTML = "<font size=\"4\"><b>" + TYPE_SOURCES + " Sources</b></font>";
 			interface.controls_sites.appendChild(interface.controls_sites_title);
 
 			// interface HTML: controls, sites, list
@@ -788,9 +813,29 @@ function interface_init() {
 	interface.media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
 	document.body.appendChild(interface.media);
 	{
+		// interface HTML: media, images, recommendations
+		interface.media_images_recommendations = document.createElement("div");
+		interface.media_images_recommendations.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 20%; height: 100%");
+		interface.media.appendChild(interface.media_images_recommendations);
+		{
+			// interface HTML: controls, images, recommendations, label
+			interface.media_images_recommendations_label = document.createElement("p");
+			interface.media_images_recommendations_label.setAttribute("class", "text_black");
+			interface.media_images_recommendations_label.setAttribute("title", "Click to reset");
+			interface.media_images_recommendations_label.setAttribute("style", "text-align: center; pointer-events: all; cursor: pointer");
+			interface.media_images_recommendations_label.setAttribute("onclick", "interface_update_recommendations_images_clear()");
+			interface.media_images_recommendations_label.innerHTML = "<b>" + TYPE_IMAGES + " Recommendations<b/>";
+			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_label);
+
+			// interface HTML: controls, images, recommendations, list
+			interface.media_images_recommendations_list = document.createElement("p");
+			interface.media_images_recommendations_list.setAttribute("class", "text_black");
+			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_list);
+		}
+
 		// interface HTML: media, images
 		interface.media_images = document.createElement("div");
-		interface.media_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 20%; height: 100%");
+		interface.media_images.setAttribute("style", "position: absolute; top: 0%; left: 20%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_images);
 		{
 			// interface HTML: media, images, previous
@@ -844,26 +889,6 @@ function interface_init() {
 			interface.media_images.appendChild(interface.media_images_info);
 		}
 
-		// interface HTML: media, images, recommendations
-		interface.media_images_recommendations = document.createElement("div");
-		interface.media_images_recommendations.setAttribute("style", "position: absolute; top: 0%; left: 20%; width: 20%; height: 100%");
-		interface.media.appendChild(interface.media_images_recommendations);
-		{
-			// interface HTML: controls, images, recommendations, label
-			interface.media_images_recommendations_label = document.createElement("p");
-			interface.media_images_recommendations_label.setAttribute("class", "text_black");
-			interface.media_images_recommendations_label.setAttribute("title", "Click to reset");
-			interface.media_images_recommendations_label.setAttribute("style", "text-align: center; pointer-events: all; cursor: pointer");
-			interface.media_images_recommendations_label.setAttribute("onclick", "interface_update_recommendations_images_clear()");
-			interface.media_images_recommendations_label.innerHTML = "<b>" + TYPE_IMAGES + " Recommendations:<b/>";
-			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_label);
-
-			// interface HTML: controls, images, recommendations, list
-			interface.media_images_recommendations_list = document.createElement("p");
-			interface.media_images_recommendations_list.setAttribute("class", "text_black");
-			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_list);
-		}
-
 		// interface HTML: media, controls
 		interface.media_controls = document.createElement("div");
 		interface.media_controls.setAttribute("style", "position: absolute; top: 0%; left: 40%; width: 20%; height: 100%");
@@ -893,29 +918,9 @@ function interface_init() {
 			interface.media_controls.appendChild(interface.media_controls_fullscreen);
 		}
 
-		// interface HTML: media, music, recommendations
-		interface.media_music_recommendations = document.createElement("div");
-		interface.media_music_recommendations.setAttribute("style", "position: absolute; top: 0%; left: 60%; width: 20%; height: 100%");
-		interface.media.appendChild(interface.media_music_recommendations);
-		{
-			// interface HTML: controls, music, recommendations, label
-			interface.media_music_recommendations_label = document.createElement("p");
-			interface.media_music_recommendations_label.setAttribute("class", "text_black");
-			interface.media_music_recommendations_label.setAttribute("title", "Click to reset");
-			interface.media_music_recommendations_label.setAttribute("style", "text-align: center; pointer-events: all; cursor: pointer");
-			interface.media_music_recommendations_label.setAttribute("onclick", "interface_update_recommendations_music_clear()");
-			interface.media_music_recommendations_label.innerHTML = "<b>" + TYPE_MUSIC + " Recommendations:<b/>";
-			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_label);
-
-			// interface HTML: controls, music, recommendations, list
-			interface.media_music_recommendations_list = document.createElement("p");
-			interface.media_music_recommendations_list.setAttribute("class", "text_black");
-			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_list);
-		}
-
 		// interface HTML: media, music
 		interface.media_music = document.createElement("div");
-		interface.media_music.setAttribute("style", "position: absolute; top: 0%; left: 80%; width: 20%; height: 100%");
+		interface.media_music.setAttribute("style", "position: absolute; top: 0%; left: 60%; width: 20%; height: 100%");
 		interface.media.appendChild(interface.media_music);
 		{
 			// interface HTML: media, music, previous
@@ -967,6 +972,26 @@ function interface_init() {
 			interface.media_music_info.setAttribute("class", "text_black");
 			interface.media_music_info.setAttribute("style", "position: absolute; top: 144px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_info);
+		}
+
+		// interface HTML: media, music, recommendations
+		interface.media_music_recommendations = document.createElement("div");
+		interface.media_music_recommendations.setAttribute("style", "position: absolute; top: 0%; left: 80%; width: 20%; height: 100%");
+		interface.media.appendChild(interface.media_music_recommendations);
+		{
+			// interface HTML: controls, music, recommendations, label
+			interface.media_music_recommendations_label = document.createElement("p");
+			interface.media_music_recommendations_label.setAttribute("class", "text_black");
+			interface.media_music_recommendations_label.setAttribute("title", "Click to reset");
+			interface.media_music_recommendations_label.setAttribute("style", "text-align: center; pointer-events: all; cursor: pointer");
+			interface.media_music_recommendations_label.setAttribute("onclick", "interface_update_recommendations_music_clear()");
+			interface.media_music_recommendations_label.innerHTML = "<b>" + TYPE_MUSIC + " Recommendations<b/>";
+			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_label);
+
+			// interface HTML: controls, music, recommendations, list
+			interface.media_music_recommendations_list = document.createElement("p");
+			interface.media_music_recommendations_list.setAttribute("class", "text_black");
+			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_list);
 		}
 	}
 

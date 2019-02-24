@@ -11,6 +11,7 @@ const EXTENSIONS_SND = ["mp3", "ogg", "wav", "flac", "/"];
 // the symbol or word describing a given media type
 const TYPE_IMAGES = "⎙";
 const TYPE_MUSIC = "♫";
+const TYPE_SOURCES = "✉";
 
 // shortcut definitions
 const KEY_PLAY = "Enter";
