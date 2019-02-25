@@ -381,7 +381,7 @@ function interface_update_recommendations_images() {
 	const current_tag = interface.controls_images_search_keywords_input.getAttribute("value") || interface.controls_images_search_keywords_input.value;
 
 	interface.media_images_recommendations_list.innerHTML = "No recommended tags available";
-	if(recommendations_sorted.length > 0 && player.images.index > 0) {
+	if(recommendations_sorted.length > 0) {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
 			const tag_name = recommendations_sorted[tag];
@@ -395,7 +395,7 @@ function interface_update_recommendations_images() {
 
 			// interface HTML: media, images, recommendations, tag
 			var tag_element = document.createElement("label");
-			if(data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
+			if(player_active() && player.images.index > 0 && data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML += "<u>" + tag_name + "</u><br/>";
 			else
 				tag_element.innerHTML += tag_name + "<br/>";
@@ -434,7 +434,7 @@ function interface_update_recommendations_music() {
 	const current_tag = interface.controls_music_search_keywords_input.getAttribute("value") || interface.controls_music_search_keywords_input.value;
 
 	interface.media_music_recommendations_list.innerHTML = "No recommended tags available";
-	if(recommendations_sorted.length > 0 && player.music.index > 0) {
+	if(recommendations_sorted.length > 0) {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
 			const tag_name = recommendations_sorted[tag];
@@ -448,7 +448,7 @@ function interface_update_recommendations_music() {
 
 			// interface HTML: media, music, recommendations, tag
 			var tag_element = document.createElement("label");
-			if(data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
+			if(player_active() && player.music.index > 0 && data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML += "<u>" + tag_name + "</u><br/>";
 			else
 				tag_element.innerHTML += tag_name + "<br/>";
