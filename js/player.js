@@ -87,6 +87,8 @@ function recommendations_timer() {
 		else if(!player_busy_music() && recommendations.music[tag_name] < 1000000)
 			recommendations.music[tag_name] += 1;
 	}
+
+	interface_update_media(false, true, false);
 }
 
 // player, images, timer function for fullscreen

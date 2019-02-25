@@ -386,16 +386,19 @@ function interface_update_recommendations_images() {
 		for(var tag in recommendations_sorted) {
 			const tag_name = recommendations_sorted[tag];
 
-			// only count tags present on this item
-			// also remove the current keyword from the list as showing it is useless
-			if(tag_name == current_tag || data_images[player.images.index - 1].tags.indexOf(tag_name) < 0)
+			// remove the current keyword from the list as showing it is useless
+			// tags that are present on this item will be underlined
+			if(tag_name == current_tag)
 				continue;
 			else if(tags == 0)
 				interface.media_images_recommendations_list.innerHTML = "";
 
 			// interface HTML: media, images, recommendations, tag
 			var tag_element = document.createElement("label");
-			tag_element.innerHTML += tag_name + "<br/>";
+			if(data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
+				tag_element.innerHTML += "<u>" + tag_name + "</u><br/>";
+			else
+				tag_element.innerHTML += tag_name + "<br/>";
 			tag_element.setAttribute("title", "Click to apply this tag");
 			tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
 			tag_element.setAttribute("onclick", "interface_update_recommendations_images_set(\"" + tag_name + "\")");
@@ -436,16 +439,19 @@ function interface_update_recommendations_music() {
 		for(var tag in recommendations_sorted) {
 			const tag_name = recommendations_sorted[tag];
 
-			// only count tags present on this item
-			// also remove the current keyword from the list as showing it is useless
-			if(tag_name == current_tag || data_music[player.music.index - 1].tags.indexOf(tag_name) < 0)
+			// remove the current keyword from the list as showing it is useless
+			// tags that are present on this item will be underlined
+			if(tag_name == current_tag)
 				continue;
 			else if(tags == 0)
 				interface.media_music_recommendations_list.innerHTML = "";
 
 			// interface HTML: media, music, recommendations, tag
 			var tag_element = document.createElement("label");
-			tag_element.innerHTML += tag_name + "<br/>";
+			if(data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
+				tag_element.innerHTML += "<u>" + tag_name + "</u><br/>";
+			else
+				tag_element.innerHTML += tag_name + "<br/>";
 			tag_element.setAttribute("title", "Click to apply this tag");
 			tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
 			tag_element.setAttribute("onclick", "interface_update_recommendations_music_set(\"" + tag_name + "\")");
