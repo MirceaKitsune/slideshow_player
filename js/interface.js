@@ -385,24 +385,24 @@ function interface_update_recommendations_images() {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
 			const tag_name = recommendations_sorted[tag];
-
-			// remove the current keyword from the list as showing it is useless
-			// tags that are present on this item will be underlined
-			if(tag_name == current_tag)
-				continue;
-			else if(tags == 0)
+			if(tags == 0)
 				interface.media_images_recommendations_list.innerHTML = "";
 
 			// interface HTML: media, images, recommendations, tag
 			var tag_element = document.createElement("label");
-			if(player_active() && player.images.index > 0 && data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
-				tag_element.innerHTML += "<u>" + tag_name + "</u><br/>";
-			else
-				tag_element.innerHTML += tag_name + "<br/>";
 			tag_element.setAttribute("title", "Click to apply this tag");
 			tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
 			tag_element.setAttribute("onclick", "interface_update_recommendations_images_set(\"" + tag_name + "\")");
 			interface.media_images_recommendations_list.appendChild(tag_element);
+
+			// tags that are present on this item will be underlined
+			// tags that match the keyword in use will be bold
+			tag_element.innerHTML = tag_name;
+			if(player_active() && player.images.index > 0 && data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
+				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
+			if(tag_name == current_tag)
+				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
+			tag_element.innerHTML += "<br/>";
 
 			// stop here if we've reached the display limit
 			++tags;
@@ -438,24 +438,24 @@ function interface_update_recommendations_music() {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
 			const tag_name = recommendations_sorted[tag];
-
-			// remove the current keyword from the list as showing it is useless
-			// tags that are present on this item will be underlined
-			if(tag_name == current_tag)
-				continue;
-			else if(tags == 0)
+			if(tags == 0)
 				interface.media_music_recommendations_list.innerHTML = "";
 
 			// interface HTML: media, music, recommendations, tag
 			var tag_element = document.createElement("label");
-			if(player_active() && player.music.index > 0 && data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
-				tag_element.innerHTML += "<u>" + tag_name + "</u><br/>";
-			else
-				tag_element.innerHTML += tag_name + "<br/>";
 			tag_element.setAttribute("title", "Click to apply this tag");
 			tag_element.setAttribute("style", "pointer-events: all; cursor: pointer");
 			tag_element.setAttribute("onclick", "interface_update_recommendations_music_set(\"" + tag_name + "\")");
 			interface.media_music_recommendations_list.appendChild(tag_element);
+
+			// tags that are present on this item will be underlined
+			// tags that match the keyword in use will be bold
+			tag_element.innerHTML = tag_name;
+			if(player_active() && player.music.index > 0 && data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
+				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
+			if(tag_name == current_tag)
+				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
+			tag_element.innerHTML += "<br/>";
 
 			// stop here if we've reached the display limit
 			++tags;
