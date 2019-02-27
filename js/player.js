@@ -88,7 +88,10 @@ function recommendations_timer() {
 			recommendations.music[tag_name] += 1;
 	}
 
-	interface_update_media(false, true, false);
+	if(!player_busy_images())
+		interface_update_media(false, true, false);
+	if(!player_busy_music())
+		interface_update_media(false, false, true);
 }
 
 // player, images, timer function for fullscreen
