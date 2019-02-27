@@ -204,7 +204,7 @@ function player_images_fade() {
 		// schedule the next image
 		// the latency calculated based on the loading time of previous images is deducted from the duration of this image
 		if(!player.images.stopped) {
-			const duration = Math.max(settings.images.duration - player_images_latency.time_average, 5);
+			const duration = Math.max(settings.images.duration - (settings.images.duration * TRANSITION) - player_images_latency.time_average, 5);
 			player.images.timer_next = setTimeout(player_images_next, duration * 1000);
 		}
 

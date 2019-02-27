@@ -468,7 +468,7 @@ function interface_update_recommendations_music() {
 // interface, update HTML, media controls
 function interface_update_media_controls() {
 	const busy = plugins_busy();
-	const total_seconds = data_images.length * (settings.images.duration + (settings.images.duration * TRANSITION));
+	const total_seconds = data_images.length * settings.images.duration;
 	var total_time = "+1 day";
 	if(total_seconds <= 86400) {
 		var total_date = new Date(null);
