@@ -50,7 +50,7 @@ function music_hearthis() {
 	for(var page = 1; page <= page_count_hearthis; page++) {
 		var script = document.createElement("script");
 		script.type = "text/javascript";
-		script.src = url_prefix + encodeURIComponent("http://api-v2.hearthis.at/categories/" + keywords + "/?page=" + page + "&count=" + page_limit_hearthis) + url_sufix;
+		script.src = url_prefix + encodeURIComponent("https://api-v2.hearthis.at/categories/" + keywords + "/?page=" + page + "&count=" + page_limit_hearthis) + url_sufix;
 		document.body.appendChild(script);
 	}
 
