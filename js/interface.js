@@ -58,11 +58,8 @@ function interface_preload(name, type) {
 		clearInterval(interface_refresh.interval);
 		interface_refresh.interval = setInterval(interface_autorefresh, 1000);
 		interface_refresh.timer = AUTOREFRESH;
-		interface_update_media(true, false, false);
 	}
-	else {
-		interface_load(false);
-	}
+	interface_load(false);
 }
 
 // interface, functions, plugin loader
@@ -105,7 +102,7 @@ function interface_load(pull) {
 	settings.music.volume = Math.max(Math.min(settings.music.volume, 1), 0);
 
 	// update the settings cookie
-	settings_cookie_set();
+	settings_url_set();
 
 	// update the images and songs if a setting affecting the list changed
 	if(settings.images.count !== old_images_count || settings.images.shuffle !== old_images_shuffle)
@@ -128,10 +125,7 @@ function interface_load(pull) {
 		if(settings.sites.length > 0) {
 			for(var site in settings.sites) {
 				const name_site = settings.sites[site];
-				if(interface_refresh.images && name_site.substring(0, TYPE_IMAGES.length) === TYPE_IMAGES)
-					plugins_load(name_site);
-				if(interface_refresh.music && name_site.substring(0, TYPE_MUSIC.length) === TYPE_MUSIC)
-					plugins_load(name_site);
+				plugins_load(name_site);
 			}
 		} else {
 			player_detach();
@@ -211,7 +205,7 @@ function interface_update_controls_sites() {
 		// interface HTML: controls, images, sites, list, label
 		const id_label = "controls_images_list_sites_" + item + "_label";
 		interface[id_label] = document.createElement("label");
-		interface[id_label].innerHTML = item + "<br/>";
+		interface[id_label].innerHTML = plugins[item].type + " " + item + "<br/>";
 		interface.controls_sites_list.appendChild(interface[id_label]);
 	}
 }

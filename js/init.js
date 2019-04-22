@@ -31,24 +31,74 @@ Object.defineProperty(navigator, "userAgent", {
 	}
 });
 
-// settings, cookie, set
-function settings_cookie_set() {
-	const expire = 365 * 24 * 60 * 60; // year, hour, minute, second
-	const string = JSON.stringify(settings);
-	var time = new Date();
-	time.setTime(time.getTime() + 1 * expire * 1000);
-	document.cookie = "slideshowplayer" + "=" + string + "; expires=" + time.toUTCString();
+// settings, url, set
+function settings_url_set() {
+	var params = "";
+
+	// images
+	for(var entry in settings.images) {
+		const setting_name = "images_" + entry;
+		const setting_value = settings.images[entry];
+		const setting_value_default = settings_default.images[entry];
+		if(setting_value !== setting_value_default)
+			params += setting_name + "=" + setting_value + "&";
+	}
+	// music
+	for(var entry in settings.music) {
+		const setting_name = "music_" + entry;
+		const setting_value = settings.music[entry];
+		const setting_value_default = settings_default.music[entry];
+		if(setting_value !== setting_value_default)
+			params += setting_name + "=" + setting_value + "&";
+	}
+	// sites
+	if(settings.sites.length > 0 && settings.sites.length < Object.keys(plugins).length)
+	{
+		const setting_name = "sites";
+		const setting_value = settings.sites.toString();
+		const setting_value_default = settings_default.sites.toString();
+		if(setting_value !== setting_value_default)
+			params += setting_name + "=" + setting_value + "&";
+	}
+
+	if(params.length > 0) {
+		params = params.substring(0, params.length - 1); // remove the last "&"
+		window.location.hash = params;
+	}
 }
 
-// settings, cookie, get
-function settings_cookie_get() {
-	const table = document.cookie.match(new RegExp("slideshowplayer" + "=([^;]+)"));
-	if(table)
-		settings = JSON.parse(table[1]);
+// settings, url, get
+function settings_url_get() {
+	const url = window.location.hash;
+	const params = url.substring(1).split("&");
+	for(var entry in params) {
+		const param = params[entry];
+		const param_namevalue = param.split("="); // [0] = param type + name, [1] = param value
+		const param_typename = param_namevalue[0].split("_"); // [0] = param type, [1] = param name
+
+		const param_type = param_typename[0];
+		const param_name = param_typename.length > 1 ? param_typename[1] : param_typename[0];
+		var param_value = param_namevalue[1];
+
+		// convert the value to the proper type
+		if(!isNaN(param_value))
+			param_value = Number(param_value);
+		else if(param_value === "true" || param_value === "false")
+			param_value = param_value === "true";
+
+		if(param_value !== null && param_value !== undefined && param_value !== "") {
+			if(param_type == "images")
+				settings.images[param_name] = param_value;
+			else if(param_type == "music")
+				settings.music[param_name] = param_value;
+			else if(param_type == "sites")
+				settings[param_name] = param_value.split(",");
+		}
+	}
 }
 
 // settings, global object
-var settings = {
+const settings_default = {
 	sites: [],
 	images: {
 		keywords: "anthro",
@@ -66,7 +116,12 @@ var settings = {
 		volume: 1
 	}
 };
-settings_cookie_get();
+var settings = {
+	sites: settings_default.sites.slice(),
+	images: Object.assign({}, settings_default.images),
+	music: Object.assign({}, settings_default.music)
+};
+settings_url_get();
 
 // plugins, global object
 var plugins = {};
@@ -74,9 +129,9 @@ var plugins_settings = [];
 
 // plugins, functions, register
 function plugins_register(name, type, func) {
-	const name_plugin = type + " " + name;
-	plugins[name_plugin] = {
+	plugins[name] = {
 		func: func,
+		type: type,
 		busy: false,
 		busy_timeout: null
 	};
@@ -143,7 +198,7 @@ function plugins_busy() {
 // plugins, busy set
 function plugins_busy_set(name, type, timeout) {
 	const busy = timeout > 0;
-	const name_plugin = type + " " + name;
+	const name_plugin = name;
 	plugins[name_plugin].busy = busy;
 
 	// automatically mark the plugin as no longer busy after the given timeout
