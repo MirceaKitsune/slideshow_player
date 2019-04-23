@@ -45,7 +45,7 @@ function interface_autorefresh() {
 }
 
 // interface, functions, preload
-function interface_preload(name, type) {	
+function interface_preload(name, type) {
 	// if this setting was used by any plugins, we will want to pull new contents from the server
 	// when the name or type variables are set to true rather than a setting name, force a refresh regardless
 	// if sites don't need to be refreshed, automatically load the new settings instead of starting the timer
@@ -59,6 +59,7 @@ function interface_preload(name, type) {
 		interface_refresh.interval = setInterval(interface_autorefresh, 1000);
 		interface_refresh.timer = AUTOREFRESH;
 	}
+
 	interface_load(false);
 }
 
@@ -101,7 +102,7 @@ function interface_load(pull) {
 	settings.music.count = Math.max(Math.min(settings.music.count, 1000000), 0);
 	settings.music.volume = Math.max(Math.min(settings.music.volume, 1), 0);
 
-	// update the settings cookie
+	// update the settings url
 	settings_url_set();
 
 	// update the images and songs if a setting affecting the list changed

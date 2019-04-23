@@ -64,6 +64,9 @@ function settings_url_set() {
 	if(params.length > 0) {
 		params = params.substring(0, params.length - 1); // remove the last "&"
 		window.location.hash = params;
+
+		// as we don't want a manual update to reload the page, block onhashchange for the next detection
+		onhashchange_block = true;
 	}
 }
 
@@ -443,6 +446,16 @@ document.onkeydown = function(event) {
 window.onbeforeunload = function() {
 	if(player_active())
 		return "Closing this page will end the current slideshow. Are you sure?";
+}
+
+// refresh the page if settings have been updated in the hash URL
+// this behavior can be blocked for a turn by setting the blocker to true
+var onhashchange_block = false;
+window.onhashchange = function() {
+	if(onhashchange_block)
+		onhashchange_block = false;
+	else
+		window.location.reload();
 }
 
 // initialize the interface
