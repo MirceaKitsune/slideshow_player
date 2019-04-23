@@ -228,7 +228,7 @@ function interface_update_media(update_controls, update_images, update_music) {
 
 // interface, update HTML, media images
 function interface_update_media_images() {
-	const active = (player_active() && data_images.length > 0);
+	const active = player_available_images() && player_active_images();
 	const ready = !player_busy_images();
 
 	// configure previous / play / next elements
@@ -292,7 +292,7 @@ function interface_update_media_images() {
 
 // interface, update HTML, media music
 function interface_update_media_music() {
-	const active = (player_active() && data_music.length > 0);
+	const active = player_available_music() && player_active_music();
 	const ready = !player_busy_music();
 
 	// configure previous / play / next elements
@@ -393,7 +393,7 @@ function interface_update_recommendations_images() {
 			// tags that are present on this item will be underlined
 			// tags that match the keyword in use will be bold
 			tag_element.innerHTML = tag_name;
-			if(player_active() && player.images.index > 0 && data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
+			if(player_available_images() && player_active_images() && player.images.index > 0 && data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
 			if(tag_name == current_tag)
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
@@ -446,7 +446,7 @@ function interface_update_recommendations_music() {
 			// tags that are present on this item will be underlined
 			// tags that match the keyword in use will be bold
 			tag_element.innerHTML = tag_name;
-			if(player_active() && player.music.index > 0 && data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
+			if(player_available_music() && player_active_music() && player.music.index > 0 && data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
 			if(tag_name == current_tag)
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";

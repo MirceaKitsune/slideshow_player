@@ -199,16 +199,15 @@ function plugins_busy() {
 }
 
 // plugins, busy set
-function plugins_busy_set(name, type, timeout) {
-	const busy = timeout > 0;
-	const name_plugin = name;
-	plugins[name_plugin].busy = busy;
+function plugins_busy_set(name, timeout) {
+	const busy = timeout !== null && timeout !== undefined;
+	plugins[name].busy = busy;
 
 	// automatically mark the plugin as no longer busy after the given timeout
-	clearTimeout(plugins[name_plugin].busy_timeout);
+	clearTimeout(plugins[name].busy_timeout);
 	if(busy) {
-		plugins[name_plugin].busy_timeout = setTimeout(function() {
-			plugins_busy_set(name, type, 0);
+		plugins[name].busy_timeout = setTimeout(function() {
+			plugins_busy_set(name, null);
 		}, timeout * 1000);
 	} else if(plugins_busy() == 0) {
 		// call the ready function if this was the last plugin that finished working
@@ -278,12 +277,12 @@ function images_pick() {
 	data_images.sort(function(a, b) { return b.score - a.score });
 	data_images.splice(settings.images.count);
 
-	if(data_images.length == 0) {
+	if(!player_available_images()) {
 		// stop the player if there are neither images or songs left to play
 		// otherwise if the player is active and no images are left, clear the image player
-		if(data_music.length == 0)
+		if(!player_available_music())
 			player_detach();
-		else if(player_active())
+		else if(player_active_images())
 			player_images_clear();
 	} else {
 		// suffle the images again
@@ -292,7 +291,7 @@ function images_pick() {
 
 		// refresh the image player if there are changes to apply
 		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index].src !== current_image.src) {
-			if(player_active() && (player.images.index <= 0 || player.images.index >= data_images.length))
+			if(player_active_images() && (player.images.index <= 0 || player.images.index >= data_images.length))
 				player.images.index = 1;
 			player_images_skip(player.images.index);
 		}
@@ -367,12 +366,12 @@ function music_pick() {
 	data_music.sort(function(a, b) { return b.score - a.score });
 	data_music.splice(settings.music.count);
 
-	if(data_music.length == 0) {
+	if(!player_available_music()) {
 		// stop the player if there are neither images or songs left to play
 		// otherwise if the player is active and no songs are left, clear the music player
-		if(data_images.length == 0)
+		if(!player_available_images())
 			player_detach();
-		else if(player_active())
+		else if(player_active_music())
 			player_music_clear();
 	} else {
 		// suffle the songs again
@@ -381,7 +380,7 @@ function music_pick() {
 
 		// refresh the music player if there are changes to apply
 		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index].src !== current_song.src) {
-			if(player_active() && (player.music.index <= 0 || player.music.index >= data_music.length))
+			if(player_active_music() && (player.music.index <= 0 || player.music.index >= data_music.length))
 				player.music.index = 1;
 			player_music_skip(player.music.index);
 		}

@@ -41,7 +41,7 @@ function parse_derpibooru(data) {
 
 	--pages_left_derpibooru;
 	if(pages_left_derpibooru <= 0)
-		plugins_busy_set(name_derpibooru, TYPE_IMAGES, 0);
+		plugins_busy_set(name_derpibooru, null);
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -62,7 +62,7 @@ function images_derpibooru() {
 	}
 
 	pages_left_derpibooru = page_count_derpibooru;
-	plugins_busy_set(name_derpibooru, TYPE_IMAGES, 10);
+	plugins_busy_set(name_derpibooru, 10);
 }
 
 // register the plugin

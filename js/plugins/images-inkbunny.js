@@ -18,7 +18,7 @@ var pages_left_inkbunny = 0;
 
 // indicate that the plugin has finished working
 function parse_inkbunny_ready(data) {
-	plugins_busy_set(name_inkbunny, TYPE_IMAGES, 0);
+	plugins_busy_set(name_inkbunny, null);
 }
 
 // close the temporary guest session
@@ -81,7 +81,7 @@ function images_inkbunny() {
 	document.body.appendChild(script);
 
 	pages_left_inkbunny = page_count_inkbunny;
-	plugins_busy_set(name_inkbunny, TYPE_IMAGES, 10);
+	plugins_busy_set(name_inkbunny, 10);
 }
 
 // register the plugin

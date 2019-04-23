@@ -35,7 +35,7 @@ function parse_ccmixter(data) {
 
 	--pages_left_ccmixter;
 	if(pages_left_ccmixter <= 0)
-		plugins_busy_set(name_ccmixter, TYPE_MUSIC, 0);
+		plugins_busy_set(name_ccmixter, null);
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -55,7 +55,7 @@ function music_ccmixter() {
 	}
 
 	pages_left_ccmixter = page_count_ccmixter;
-	plugins_busy_set(name_ccmixter, TYPE_MUSIC, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
+	plugins_busy_set(name_ccmixter, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
 }
 
 // register the plugin

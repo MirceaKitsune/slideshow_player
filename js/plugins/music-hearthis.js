@@ -35,7 +35,7 @@ function parse_hearthis(data) {
 
 	--pages_left_hearthis;
 	if(pages_left_hearthis <= 0)
-		plugins_busy_set(name_hearthis, TYPE_MUSIC, 0);
+		plugins_busy_set(name_hearthis, null);
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -55,7 +55,7 @@ function music_hearthis() {
 	}
 
 	pages_left_hearthis = page_count_hearthis;
-	plugins_busy_set(name_hearthis, TYPE_MUSIC, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
+	plugins_busy_set(name_hearthis, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
 }
 
 // register the plugin

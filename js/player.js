@@ -67,25 +67,29 @@ function recommendations_timer() {
 	// this operates on the assumption that the more you like something, the more you keep looking at or listening to it
 	// oppositely, the less you like an item, the faster it's assumed you're going to switch away from it
 	// if the player is busy, don't increment the rating of a tag, since that doesn't count as deliberately selecting an item
-	for(var tag in data_images[player.images.index - 1].tags) {
-		const tag_name = data_images[player.images.index - 1].tags[tag].toLowerCase();
-		if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
-			continue;
+	if(player_available_images() && player_active_images() && player.images.index > 0) {
+		for(var tag in data_images[player.images.index - 1].tags) {
+			const tag_name = data_images[player.images.index - 1].tags[tag].toLowerCase();
+			if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
+				continue;
 
-		if(recommendations.images[tag_name] === null || recommendations.images[tag_name] === undefined)
-			recommendations.images[tag_name] = 0;
-		else if(!player_busy_images() && recommendations.images[tag_name] < 1000000)
-			recommendations.images[tag_name] += 1;
+			if(recommendations.images[tag_name] === null || recommendations.images[tag_name] === undefined)
+				recommendations.images[tag_name] = 0;
+			else if(!player_busy_images() && recommendations.images[tag_name] < 1000000)
+				recommendations.images[tag_name] += 1;
+		}
 	}
-	for(var tag in data_music[player.music.index - 1].tags) {
-		const tag_name = data_music[player.music.index - 1].tags[tag].toLowerCase();
-		if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
-			continue;
+	if(player_available_music() && player_active_music() && player.music.index > 0) {
+		for(var tag in data_music[player.music.index - 1].tags) {
+			const tag_name = data_music[player.music.index - 1].tags[tag].toLowerCase();
+			if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
+				continue;
 
-		if(recommendations.music[tag_name] === null || recommendations.music[tag_name] === undefined)
-			recommendations.music[tag_name] = 0;
-		else if(!player_busy_music() && recommendations.music[tag_name] < 1000000)
-			recommendations.music[tag_name] += 1;
+			if(recommendations.music[tag_name] === null || recommendations.music[tag_name] === undefined)
+				recommendations.music[tag_name] = 0;
+			else if(!player_busy_music() && recommendations.music[tag_name] < 1000000)
+				recommendations.music[tag_name] += 1;
+		}
 	}
 
 	if(!player_busy_images())
@@ -193,6 +197,8 @@ function player_images_latency_stop() {
 
 // player, images, transition
 function player_images_fade() {
+	if(!player_available_images() || !player_active_images())
+		return;
 	if(player.images.preloading)
 		return;
 
@@ -222,7 +228,7 @@ function player_images_fade() {
 
 // player, images, switching
 function player_images_next() {
-	if(!player_active() || data_images.length == 0)
+	if(!player_available_images() || !player_active_images())
 		return;
 
 	// start recording the latency
@@ -273,7 +279,7 @@ function player_images_next() {
 
 // player, images, skip
 function player_images_skip(index) {
-	if(!player_active() || data_images.length == 0)
+	if(!player_available_images() || !player_active_images())
 		return;
 
 	const overflow_start = index <= 0;
@@ -297,6 +303,9 @@ function player_images_skip(index) {
 
 // player, images, play
 function player_images_play() {
+	if(!player_available_images() || !player_active_images())
+		return;
+
 	clearTimeout(player.images.timer_next);
 	if(player.images.stopped) {
 		player.images.timer_next = setTimeout(player_images_next, 0);
@@ -311,7 +320,7 @@ function player_images_play() {
 
 // player, images, clear
 function player_images_clear() {
-	if(!player_active())
+	if(!player_active_images())
 		return;
 
 	player.images.index = 1;
@@ -326,6 +335,9 @@ function player_images_clear() {
 
 // player, music, switching, canplay
 function player_music_next_canplay() {
+	if(!player_available_music() || !player_active_music())
+		return;
+
 	if(!player.music.preloading)
 		return;
 	player.music.preloading = false;
@@ -348,7 +360,7 @@ function player_music_next_canplay() {
 
 // player, music, switching
 function player_music_next() {
-	if(!player_active() || data_music.length == 0)
+	if(!player_available_music() || !player_active_music())
 		return;
 
 	// stop or restart the slideshow if this is the final song
@@ -383,7 +395,7 @@ function player_music_next() {
 
 // player, music, skip
 function player_music_skip(index) {
-	if(!player_active() || data_music.length == 0)
+	if(!player_available_music() || !player_active_music())
 		return;
 
 	const overflow_start = index <= 0;
@@ -407,6 +419,9 @@ function player_music_skip(index) {
 
 // player, music, play
 function player_music_play() {
+	if(!player_available_music() || !player_active_music())
+		return;
+
 	clearTimeout(player.music.timer_next);
 	if(player.music.stopped) {
 		// we need to know the duration of the current song in order to reschedule, don't unpause if preloading
@@ -430,7 +445,7 @@ function player_music_play() {
 
 // player, music, clear
 function player_music_clear() {
-	if(!player_active())
+	if(!player_active_music())
 		return;
 
 	player.music.index = 1;
@@ -447,9 +462,29 @@ function player_available() {
 	return data_images.length > 0 || data_music.length > 0;
 }
 
+// player, is available, images
+function player_available_images() {
+	return data_images.length > 0;
+}
+
+// player, is available, music
+function player_available_music() {
+	return data_music.length > 0;
+}
+
 // player, is active
 function player_active() {
 	return document.body.contains(player.element);
+}
+
+// player, is active, images
+function player_active_images() {
+	return document.body.contains(player.images.element_1) && document.body.contains(player.images.element_2);
+}
+
+// player, is active, music
+function player_active_music() {
+	return document.body.contains(player.music.element);
 }
 
 // player, is busy, images
@@ -468,7 +503,7 @@ function player_attach() {
 		return;
 
 	// don't spawn the player if there is no content to play
-	if(data_images.length == 0 && data_music.length == 0)
+	if(!player_available_images() && !player_available_music())
 		return;
 
 	// create the player element

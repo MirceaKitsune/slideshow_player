@@ -35,7 +35,7 @@ function parse_e621(data) {
 
 	--pages_left_e621;
 	if(pages_left_e621 <= 0)
-		plugins_busy_set(name_e621, TYPE_IMAGES, 0);
+		plugins_busy_set(name_e621, null);
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -51,7 +51,7 @@ function images_e621() {
 	}
 
 	pages_left_e621 = page_count_e621;
-	plugins_busy_set(name_e621, TYPE_IMAGES, 10);
+	plugins_busy_set(name_e621, 10);
 }
 
 // register the plugin
