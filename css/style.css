@@ -133,15 +133,26 @@
 	background-color: #aa00aa;
 }
 
-.player {
+.controls {
 	position: absolute;
-	background-color: #000000;
-	overflow: hidden;
+	overflow: auto;
+	line-height: 20px;
+	font-size: 14px;
+	font-family: sans-serif;
 }
 
 .media {
 	position: absolute;
 	overflow: hidden;
+	line-height: 20px;
+	font-size: 14px;
+	font-family: sans-serif;
+}
+
+.player {
+	position: absolute;
+	overflow: hidden;
+	background-color: #000000;
 }
 
 .thumbnail {

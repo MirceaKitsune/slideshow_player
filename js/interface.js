@@ -489,20 +489,16 @@ function interface_update_media_controls() {
 
 	// label text for player status
 	var label_player =
-		"<font class=text_size_large>" +
 		"<b>Images:</b> " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + total_time + "<b>)</b><br/>" +
-		"<b>Music:</b> " + data_music.length + " <b>/</b> " + data_music_all.length +
-		"</font>";
+		"<b>Music:</b> " + data_music.length + " <b>/</b> " + data_music_all.length;
 
 	// label text for plugin status
-	var label_plugin = 
-		"<font class=text_size_large>" +
-		"<b>Update needed:</b> ";
+	var label_plugin = "<b>Update needed:</b> ";
 	if(interface_refresh.images)
 		label_plugin += TYPE_IMAGES + " ";
 	if(interface_refresh.music)
 		label_plugin += TYPE_MUSIC + " ";
-	label_plugin += "<br/>Refreshing in " + interface_refresh.timer + " sec</font>";
+	label_plugin += "<br/>Refreshing in " + interface_refresh.timer + " sec";
 
 	// first configuration, based on player status
 	// configure play / label elements, window title
@@ -510,14 +506,14 @@ function interface_update_media_controls() {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_green");
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "■";
-		interface.media_controls_label.innerHTML = label_player;
+		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_player + "</font>";
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ▶";
 	}
 	else if(player_available()) {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_yellow");
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "▶";
-		interface.media_controls_label.innerHTML = label_player;
+		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_player + "</font>";
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ■";
 	}
 	else {
@@ -536,7 +532,7 @@ function interface_update_media_controls() {
 		document.title += " ⧗";
 	}
 	else if(interface_refresh.timer > 0) {
-		interface.media_controls_label.innerHTML = label_plugin;
+		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_plugin + "</font>";
 		interface.media_controls_play.innerHTML += " ⟳";
 		document.title += " ⟳";
 	}
@@ -567,7 +563,8 @@ function interface_init() {
 
 	// interface HTML: controls
 	interface.controls = document.createElement("div");
-	interface.controls.setAttribute("style", "position: absolute; overflow: auto; " + STYLE_CONTROLS_POSITION);
+	interface.controls.setAttribute("class", "controls");
+	interface.controls.setAttribute("style", STYLE_CONTROLS_POSITION);
 	document.body.appendChild(interface.controls);
 	{
 		// interface HTML: controls, banner
