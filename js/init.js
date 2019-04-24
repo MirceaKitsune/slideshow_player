@@ -61,13 +61,13 @@ function settings_url_set() {
 			params += setting_name + "=" + setting_value + "&";
 	}
 
-	if(params.length > 0) {
-		params = params.substring(0, params.length - 1); // remove the last "&"
-		window.location.hash = params;
+	if(params.length > 0)
+		window.location.hash = params.substring(0, params.length - 1); // remove the last &
+	else
+		window.location.hash = "default";
 
-		// as we don't want a manual update to reload the page, block onhashchange for the next detection
-		onhashchange_block = true;
-	}
+	// as we don't want a manual update to reload the page, block onhashchange for the next detection
+	onhashchange_block = true;
 }
 
 // settings, url, get

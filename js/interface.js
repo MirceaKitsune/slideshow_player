@@ -1023,4 +1023,5 @@ function interface_init() {
 	interface_refresh.interval = setInterval(interface_autorefresh, 1000);
 	interface_refresh.timer = 1;
 	interface_update_media(true, true, true);
+	settings_url_set();
 }
