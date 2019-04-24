@@ -9,8 +9,8 @@ const STYLE_PLAYER_POSITION_ATTACHED = "top: 0%; left: 0%; width: 100%; height: 
 const STYLE_PLAYER_POSITION_DETACHED = "top: 0%; left: 0%; width: 85%; height: 80%";
 const STYLE_MEDIA_POSITION_ATTACHED = "top: 80%; left: 0%; width: 100%; height: 20%";
 const STYLE_MEDIA_POSITION_DETACHED = "top: 80%; left: 0%; width: 85%; height: 20%";
-const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000c0)";
-const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bottom, #00000005, #00000000)";
+const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000aa)";
+const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bottom, #00000011, #00000000)";
 
 // seconds after which to pull data from websites after settings that require refreshing are changed
 // this needs to be big enough to give users enough time to finish typing and to protect sites against spamming
@@ -151,24 +151,24 @@ function interface_play() {
 function interface_update_attached(attached) {
 	if(attached) {
 		interface.media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
-		interface.media_images_label.setAttribute("class", "text_black");
-		interface.media_images_info.setAttribute("class", "text_black");
-		interface.media_controls_label.setAttribute("class", "text_black");
-		interface.media_images_recommendations_label.setAttribute("class", "text_black");
-		interface.media_images_recommendations_list.setAttribute("class", "text_black");
-		interface.media_music_recommendations_label.setAttribute("class", "text_black");
-		interface.media_music_recommendations_list.setAttribute("class", "text_black");
+		interface.media_images_label.setAttribute("class", "text_color_black");
+		interface.media_images_info.setAttribute("class", "text_color_black");
+		interface.media_controls_label.setAttribute("class", "text_color_black");
+		interface.media_images_recommendations_label.setAttribute("class", "text_color_black");
+		interface.media_images_recommendations_list.setAttribute("class", "text_color_black");
+		interface.media_music_recommendations_label.setAttribute("class", "text_color_black");
+		interface.media_music_recommendations_list.setAttribute("class", "text_color_black");
 		interface.player.removeChild(interface.media);
 		document.body.appendChild(interface.media);
 	} else {
 		interface.media.setAttribute("style", STYLE_MEDIA_POSITION_ATTACHED + "; " + STYLE_MEDIA_BACKGROUND_ATTACHED);
-		interface.media_images_label.setAttribute("class", "text_white");
-		interface.media_images_info.setAttribute("class", "text_white");
-		interface.media_controls_label.setAttribute("class", "text_white");
-		interface.media_images_recommendations_label.setAttribute("class", "text_white");
-		interface.media_images_recommendations_list.setAttribute("class", "text_white");
-		interface.media_music_recommendations_label.setAttribute("class", "text_white");
-		interface.media_music_recommendations_list.setAttribute("class", "text_white");
+		interface.media_images_label.setAttribute("class", "text_color_white");
+		interface.media_images_info.setAttribute("class", "text_color_white");
+		interface.media_controls_label.setAttribute("class", "text_color_white");
+		interface.media_images_recommendations_label.setAttribute("class", "text_color_white");
+		interface.media_images_recommendations_list.setAttribute("class", "text_color_white");
+		interface.media_music_recommendations_label.setAttribute("class", "text_color_white");
+		interface.media_music_recommendations_list.setAttribute("class", "text_color_white");
 		document.body.removeChild(interface.media);
 		interface.player.appendChild(interface.media);
 	}
@@ -233,24 +233,32 @@ function interface_update_media_images() {
 
 	// configure previous / play / next elements
 	if(active && ready) {
-		interface.media_images_previous.setAttribute("class", "button_size_small button_color_cyan");
-		interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
-		interface.media_images_previous.innerHTML = "|◀";
-
 		if(player.images.stopped) {
+			interface.media_images_previous.setAttribute("class", "button_size_small button_color_yellow");
+			interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
+			interface.media_images_previous.innerHTML = "|◀";
+
 			interface.media_images_play.setAttribute("class", "button_size_medium button_color_yellow");
 			interface.media_images_play.setAttribute("onclick", "player_images_play()");
 			interface.media_images_play.innerHTML = "▶";
+
+			interface.media_images_next.setAttribute("class", "button_size_small button_color_yellow");
+			interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
+			interface.media_images_next.innerHTML = "▶|";
 		}
 		else {
+			interface.media_images_previous.setAttribute("class", "button_size_small button_color_green");
+			interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
+			interface.media_images_previous.innerHTML = "|◀";
+
 			interface.media_images_play.setAttribute("class", "button_size_medium button_color_green");
 			interface.media_images_play.setAttribute("onclick", "player_images_play()");
 			interface.media_images_play.innerHTML = "||";
-		}
 
-		interface.media_images_next.setAttribute("class", "button_size_small button_color_cyan");
-		interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
-		interface.media_images_next.innerHTML = "▶|";
+			interface.media_images_next.setAttribute("class", "button_size_small button_color_green");
+			interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
+			interface.media_images_next.innerHTML = "▶|";
+		}
 	}
 	else {
 		interface.media_images_previous.setAttribute("class", "button_size_small button_color_red");
@@ -268,21 +276,21 @@ function interface_update_media_images() {
 
 	// configure label / thumb / info / player_icon elements
 	if(active && !ready) {
-		interface.media_images_label.innerHTML = "<font size=\"2\"><b>? / " + data_images.length + "</b></font>";
+		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>? / " + data_images.length + "</b></font>";
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
-		interface.media_images_info.innerHTML = "<font size=\"1\"><b>Loading image</b></font>";
-		interface.player_icon_images.innerHTML = "⧗<br/><font size=\"2\"><b>Latency:</b> " + player_images_latency.time_average.toFixed(2) + " sec</font>";
+		interface.media_images_info.innerHTML = "<font class=text_size_small><b>Loading image</b></font>";
+		interface.player_icon_images.innerHTML = "⧗<br/><font class=text_size_medium><b>Latency:</b> " + player_images_latency.time_average.toFixed(2) + " sec</font>";
 	}
 	else if(active) {
-		interface.media_images_label.innerHTML = "<font size=\"2\"><b>" + player.images.index + " / " + data_images.length + "</b></font>";
+		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>" + player.images.index + " / " + data_images.length + "</b></font>";
 		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
-		interface.media_images_info.innerHTML = "<font size=\"1\"><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
+		interface.media_images_info.innerHTML = "<font class=text_size_small><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
 		interface.player_icon_images.innerHTML = "";
 	}
 	else {
-		interface.media_images_label.innerHTML = "<font size=\"2\"><b>No images loaded</b></font>";
+		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>No images loaded</b></font>";
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 		interface.media_images_info.innerHTML = "";
@@ -297,24 +305,32 @@ function interface_update_media_music() {
 
 	// configure previous / play / next elements
 	if(active && ready) {
-		interface.media_music_previous.setAttribute("class", "button_size_small button_color_cyan");
-		interface.media_music_previous.setAttribute("onclick", "player_music_skip(player.music.index - 1)");
-		interface.media_music_previous.innerHTML = "|◀";
-
 		if(player.music.stopped) {
+			interface.media_music_previous.setAttribute("class", "button_size_small button_color_yellow");
+			interface.media_music_previous.setAttribute("onclick", "player_music_skip(player.music.index - 1)");
+			interface.media_music_previous.innerHTML = "|◀";
+
 			interface.media_music_play.setAttribute("class", "button_size_medium button_color_yellow");
 			interface.media_music_play.setAttribute("onclick", "player_music_play()");
 			interface.media_music_play.innerHTML = "▶";
+
+			interface.media_music_next.setAttribute("class", "button_size_small button_color_yellow");
+			interface.media_music_next.setAttribute("onclick", "player_music_skip(player.music.index + 1)");
+			interface.media_music_next.innerHTML = "▶|";
 		}
 		else {
+			interface.media_music_previous.setAttribute("class", "button_size_small button_color_green");
+			interface.media_music_previous.setAttribute("onclick", "player_music_skip(player.music.index - 1)");
+			interface.media_music_previous.innerHTML = "|◀";
+
 			interface.media_music_play.setAttribute("class", "button_size_medium button_color_green");
 			interface.media_music_play.setAttribute("onclick", "player_music_play()");
 			interface.media_music_play.innerHTML = "||";
-		}
 
-		interface.media_music_next.setAttribute("class", "button_size_small button_color_cyan");
-		interface.media_music_next.setAttribute("onclick", "player_music_skip(player.music.index + 1)");
-		interface.media_music_next.innerHTML = "▶|";
+			interface.media_music_next.setAttribute("class", "button_size_small button_color_green");
+			interface.media_music_next.setAttribute("onclick", "player_music_skip(player.music.index + 1)");
+			interface.media_music_next.innerHTML = "▶|";
+		}
 	}
 	else {
 		interface.media_music_previous.setAttribute("class", "button_size_small button_color_red");
@@ -332,21 +348,21 @@ function interface_update_media_music() {
 
 	// configure label / thumb / info / player_icon elements
 	if(active && !ready) {
-		interface.media_music_label.innerHTML = "<font size=\"2\"><b>? / " + data_music.length + "</b></font>";
+		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>? / " + data_music.length + "</b></font>";
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
-		interface.media_music_info.innerHTML = "<font size=\"1\"><b>Loading song</b></font>";
+		interface.media_music_info.innerHTML = "<font class=text_size_small><b>Loading song</b></font>";
 		interface.player_icon_music.innerHTML = "⧖";
 	}
 	else if(active) {
-		interface.media_music_label.innerHTML = "<font size=\"2\"><b>" + player.music.index + " / " + data_music.length + "</b></font>";
+		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>" + player.music.index + " / " + data_music.length + "</b></font>";
 		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
-		interface.media_music_info.innerHTML = "<font size=\"1\"><b>" + data_music[player.music.index - 1].title + "</b> by <b>" + data_music[player.music.index - 1].author + "</b></font>";
+		interface.media_music_info.innerHTML = "<font class=text_size_small><b>" + data_music[player.music.index - 1].title + "</b> by <b>" + data_music[player.music.index - 1].author + "</b></font>";
 		interface.player_icon_music.innerHTML = "";
 	}
 	else {
-		interface.media_music_label.innerHTML = "<font size=\"2\"><b>No music loaded</b></font>";
+		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>No music loaded</b></font>";
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 		interface.media_music_info.innerHTML = "";
@@ -375,7 +391,7 @@ function interface_update_recommendations_images() {
 	const recommendations_sorted = Object.keys(recommendations.images).sort(function(a, b) { return recommendations.images[b] - recommendations.images[a] });
 	const current_tag = interface.controls_images_search_keywords_input.getAttribute("value") || interface.controls_images_search_keywords_input.value;
 
-	interface.media_images_recommendations_list.innerHTML = "No recommended tags available";
+	interface.media_images_recommendations_list.innerHTML = "<font class=text_size_medium>No recommended tags available</font>";
 	if(recommendations_sorted.length > 0) {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
@@ -392,12 +408,12 @@ function interface_update_recommendations_images() {
 
 			// tags that are present on this item will be underlined
 			// tags that match the keyword in use will be bold
-			tag_element.innerHTML = tag_name;
+			tag_element.innerHTML = "<font class=text_size_medium>" + tag_name;
 			if(player_available_images() && player_active_images() && player.images.index > 0 && data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
 			if(tag_name == current_tag)
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
-			tag_element.innerHTML += "<br/>";
+			tag_element.innerHTML += "</font><br/>";
 
 			// stop here if we've reached the display limit
 			++tags;
@@ -428,7 +444,7 @@ function interface_update_recommendations_music() {
 	const recommendations_sorted = Object.keys(recommendations.music).sort(function(a, b) { return recommendations.music[b] - recommendations.music[a] });
 	const current_tag = interface.controls_music_search_keywords_input.getAttribute("value") || interface.controls_music_search_keywords_input.value;
 
-	interface.media_music_recommendations_list.innerHTML = "No recommended tags available";
+	interface.media_music_recommendations_list.innerHTML = "<font class=text_size_medium>No recommended tags available</font>";
 	if(recommendations_sorted.length > 0) {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
@@ -445,12 +461,12 @@ function interface_update_recommendations_music() {
 
 			// tags that are present on this item will be underlined
 			// tags that match the keyword in use will be bold
-			tag_element.innerHTML = tag_name;
+			tag_element.innerHTML = "<font class=text_size_medium>" + tag_name;
 			if(player_available_music() && player_active_music() && player.music.index > 0 && data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
 			if(tag_name == current_tag)
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
-			tag_element.innerHTML += "<br/>";
+			tag_element.innerHTML += "</font><br/>";
 
 			// stop here if we've reached the display limit
 			++tags;
@@ -473,16 +489,20 @@ function interface_update_media_controls() {
 
 	// label text for player status
 	var label_player =
+		"<font class=text_size_large>" +
 		"<b>Images:</b> " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + total_time + "<b>)</b><br/>" +
-		"<b>Music:</b> " + data_music.length + " <b>/</b> " + data_music_all.length;
+		"<b>Music:</b> " + data_music.length + " <b>/</b> " + data_music_all.length +
+		"</font>";
 
 	// label text for plugin status
-	var label_plugin = "<b>Update needed:</b> ";
+	var label_plugin = 
+		"<font class=text_size_large>" +
+		"<b>Update needed:</b> ";
 	if(interface_refresh.images)
 		label_plugin += TYPE_IMAGES + " ";
 	if(interface_refresh.music)
 		label_plugin += TYPE_MUSIC + " ";
-	label_plugin += "<br/>Refreshing in " + interface_refresh.timer + " sec";
+	label_plugin += "<br/>Refreshing in " + interface_refresh.timer + " sec</font>";
 
 	// first configuration, based on player status
 	// configure play / label elements, window title
@@ -504,14 +524,14 @@ function interface_update_media_controls() {
 		interface.media_controls_play.setAttribute("class", "button_size_large button_color_red");
 		interface.media_controls_play.removeAttribute("onclick");
 		interface.media_controls_play.innerHTML = "∅";
-		interface.media_controls_label.innerHTML = "<b>No content to play</b>";
+		interface.media_controls_label.innerHTML = "<font class=text_size_large><b>No content to play</b></font>";
 		document.title = "Slideshow Player ∅";
 	}
 
 	// second configuration, based on plugin status
 	// configure play / label elements, window title
 	if(busy > 0) {
-		interface.media_controls_label.innerHTML = "<b>Fetching content:</b> " + busy + " left";
+		interface.media_controls_label.innerHTML = "<font class=text_size_large><b>Fetching content:</b> " + busy + " left</font>";
 		interface.media_controls_play.innerHTML += " ⧗";
 		document.title += " ⧗";
 	}
@@ -534,13 +554,13 @@ function interface_init() {
 	{
 		// interface HTML: player, icon, images
 		interface.player_icon_images = document.createElement("div");
-		interface.player_icon_images.setAttribute("class", "text_white");
+		interface.player_icon_images.setAttribute("class", "text_color_white");
 		interface.player_icon_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 128px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
 		interface.player.appendChild(interface.player_icon_images);
 
 		// interface HTML: player, icon, music
 		interface.player_icon_music = document.createElement("div");
-		interface.player_icon_music.setAttribute("class", "text_white");
+		interface.player_icon_music.setAttribute("class", "text_color_white");
 		interface.player_icon_music.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 128px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
 		interface.player.appendChild(interface.player_icon_music);
 	}
@@ -572,8 +592,8 @@ function interface_init() {
 				interface.controls_banner_url_text = document.createElement("div");
 				interface.controls_banner_url_text.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 100%");
 				interface.controls_banner_url_text.innerHTML =
-					"<font size=\"4\"><b>Slideshow Player</b></font><br/>" +
-					"<font size=\"1\"><b>by MirceaKitsune</b></font>";
+					"<font size=4><b>Slideshow Player</b></font><br/>" +
+					"<font size=2><b>by MirceaKitsune</b></font>";
 				interface.controls_banner_url.appendChild(interface.controls_banner_url_text);
 			}
 		}
@@ -586,7 +606,7 @@ function interface_init() {
 			// interface HTML: media, images, title
 			interface.controls_images_title = document.createElement("p");
 			interface.controls_images_title.setAttribute("style", "text-align: center");
-			interface.controls_images_title.innerHTML = "<font size=\"4\"><b>" + TYPE_IMAGES + " Image settings</b></font>";
+			interface.controls_images_title.innerHTML = "<font size=4><b>" + TYPE_IMAGES + " Image settings</b></font>";
 			interface.controls_images.appendChild(interface.controls_images_title);
 
 			// interface HTML: controls, images, search
@@ -712,7 +732,7 @@ function interface_init() {
 			// interface HTML: media, music, title
 			interface.controls_music_title = document.createElement("p");
 			interface.controls_music_title.setAttribute("style", "text-align: center");
-			interface.controls_music_title.innerHTML = "<font size=\"4\"><b>" + TYPE_MUSIC + " Music settings</b></font>";
+			interface.controls_music_title.innerHTML = "<font size=4><b>" + TYPE_MUSIC + " Music settings</b></font>";
 			interface.controls_music.appendChild(interface.controls_music_title);
 
 			// interface HTML: controls, music, search
@@ -824,7 +844,7 @@ function interface_init() {
 			// interface HTML: controls, sites, title
 			interface.controls_sites_title = document.createElement("p");
 			interface.controls_sites_title.setAttribute("style", "text-align: center");
-			interface.controls_sites_title.innerHTML = "<font size=\"4\"><b>" + TYPE_SOURCES + " Sources</b></font>";
+			interface.controls_sites_title.innerHTML = "<font size=4><b>" + TYPE_SOURCES + " Sources</b></font>";
 			interface.controls_sites.appendChild(interface.controls_sites_title);
 
 			// interface HTML: controls, sites, list
@@ -846,14 +866,14 @@ function interface_init() {
 		{
 			// interface HTML: controls, images, recommendations, label
 			interface.media_images_recommendations_label = document.createElement("p");
-			interface.media_images_recommendations_label.setAttribute("class", "text_black");
+			interface.media_images_recommendations_label.setAttribute("class", "text_color_black");
 			interface.media_images_recommendations_label.setAttribute("style", "text-align: center");
-			interface.media_images_recommendations_label.innerHTML = "<b>" + TYPE_IMAGES + " Recommendations<b/>";
+			interface.media_images_recommendations_label.innerHTML = "<font class=text_size_large><b>" + TYPE_IMAGES + " Recommendations<b/></font>";
 			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_label);
 
 			// interface HTML: controls, images, recommendations, list
 			interface.media_images_recommendations_list = document.createElement("div");
-			interface.media_images_recommendations_list.setAttribute("class", "text_black");
+			interface.media_images_recommendations_list.setAttribute("class", "text_color_black");
 			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_list);
 		}
 
@@ -865,7 +885,7 @@ function interface_init() {
 			// interface HTML: media, images, previous
 			interface.media_images_previous = document.createElement("div");
 			interface.media_images_previous.setAttribute("title", "Previous image (" + KEY_IMAGES_PREVIOUS + ")");
-			interface.media_images_previous.setAttribute("class", "button_size_small button_color_pink");
+			interface.media_images_previous.setAttribute("class", "button_size_small button_color_black");
 			interface.media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
 			interface.media_images_previous.innerHTML = "✖";
 			interface.media_images.appendChild(interface.media_images_previous);
@@ -873,7 +893,7 @@ function interface_init() {
 			// interface HTML: media, images, play
 			interface.media_images_play = document.createElement("div");
 			interface.media_images_play.setAttribute("title", "Play / Pause image (" + KEY_IMAGES_PLAY + ")");
-			interface.media_images_play.setAttribute("class", "button_size_medium button_color_pink");
+			interface.media_images_play.setAttribute("class", "button_size_medium button_color_black");
 			interface.media_images_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
 			interface.media_images_play.innerHTML = "✖";
 			interface.media_images.appendChild(interface.media_images_play);
@@ -881,14 +901,14 @@ function interface_init() {
 			// interface HTML: media, images, next
 			interface.media_images_next = document.createElement("div");
 			interface.media_images_next.setAttribute("title", "Next image (" + KEY_IMAGES_NEXT + ")");
-			interface.media_images_next.setAttribute("class", "button_size_small button_color_pink");
+			interface.media_images_next.setAttribute("class", "button_size_small button_color_black");
 			interface.media_images_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
 			interface.media_images_next.innerHTML = "✖";
 			interface.media_images.appendChild(interface.media_images_next);
 
 			// interface HTML: media, images, label
 			interface.media_images_label = document.createElement("p");
-			interface.media_images_label.setAttribute("class", "text_black");
+			interface.media_images_label.setAttribute("class", "text_color_black");
 			interface.media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%");
 			interface.media_images.appendChild(interface.media_images_label);
 
@@ -908,7 +928,7 @@ function interface_init() {
 
 			// interface HTML: media, images, info
 			interface.media_images_info = document.createElement("p");
-			interface.media_images_info.setAttribute("class", "text_black");
+			interface.media_images_info.setAttribute("class", "text_color_black");
 			interface.media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%");
 			interface.media_images.appendChild(interface.media_images_info);
 		}
@@ -921,21 +941,21 @@ function interface_init() {
 			// interface HTML: media, controls, play
 			interface.media_controls_play = document.createElement("div");
 			interface.media_controls_play.setAttribute("title", "Toggle player / Refresh settings (" + KEY_PLAY + ")");
-			interface.media_controls_play.setAttribute("class", "button_size_large button_color_pink");
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_black");
 			interface.media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
 			interface.media_controls_play.innerHTML = "✖";
 			interface.media_controls.appendChild(interface.media_controls_play);
 
 			// interface HTML: media, controls, label
 			interface.media_controls_label = document.createElement("p");
-			interface.media_controls_label.setAttribute("class", "text_black");
+			interface.media_controls_label.setAttribute("class", "text_color_black");
 			interface.media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%");
 			interface.media_controls.appendChild(interface.media_controls_label);
 
 			// interface HTML: media, controls, fullscreen
 			interface.media_controls_fullscreen = document.createElement("div");
 			interface.media_controls_fullscreen.setAttribute("title", "Fullscreen");
-			interface.media_controls_fullscreen.setAttribute("class", "button_size_small button_color_black");
+			interface.media_controls_fullscreen.setAttribute("class", "button_size_small button_color_white");
 			interface.media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 128px");
 			interface.media_controls_fullscreen.setAttribute("onclick", "player_images_fullscreen_toggle()");
 			interface.media_controls_fullscreen.innerHTML = "▭";
@@ -950,7 +970,7 @@ function interface_init() {
 			// interface HTML: media, music, previous
 			interface.media_music_previous = document.createElement("div");
 			interface.media_music_previous.setAttribute("title", "Previous song (" + KEY_MUSIC_PREVIOUS + ")");
-			interface.media_music_previous.setAttribute("class", "button_size_small button_color_pink");
+			interface.media_music_previous.setAttribute("class", "button_size_small button_color_black");
 			interface.media_music_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
 			interface.media_music_previous.innerHTML = "✖";
 			interface.media_music.appendChild(interface.media_music_previous);
@@ -958,7 +978,7 @@ function interface_init() {
 			// interface HTML: media, music, play
 			interface.media_music_play = document.createElement("div");
 			interface.media_music_play.setAttribute("title", "Play / Pause song (" + KEY_MUSIC_PLAY + ")");
-			interface.media_music_play.setAttribute("class", "button_size_medium button_color_pink");
+			interface.media_music_play.setAttribute("class", "button_size_medium button_color_black");
 			interface.media_music_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
 			interface.media_music_play.innerHTML = "✖";
 			interface.media_music.appendChild(interface.media_music_play);
@@ -966,14 +986,14 @@ function interface_init() {
 			// interface HTML: media, music, next
 			interface.media_music_next = document.createElement("div");
 			interface.media_music_next.setAttribute("title", "Next song (" + KEY_MUSIC_NEXT + ")");
-			interface.media_music_next.setAttribute("class", "button_size_small button_color_pink");
+			interface.media_music_next.setAttribute("class", "button_size_small button_color_black");
 			interface.media_music_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
 			interface.media_music_next.innerHTML = "✖";
 			interface.media_music.appendChild(interface.media_music_next);
 
 			// interface HTML: media, music, label
 			interface.media_music_label = document.createElement("p");
-			interface.media_music_label.setAttribute("class", "text_black");
+			interface.media_music_label.setAttribute("class", "text_color_black");
 			interface.media_music_label.setAttribute("style", "position: absolute; top: 40px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_label);
 
@@ -993,7 +1013,7 @@ function interface_init() {
 
 			// interface HTML: media, music, info
 			interface.media_music_info = document.createElement("p");
-			interface.media_music_info.setAttribute("class", "text_black");
+			interface.media_music_info.setAttribute("class", "text_color_black");
 			interface.media_music_info.setAttribute("style", "position: absolute; top: 144px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_info);
 		}
@@ -1005,14 +1025,14 @@ function interface_init() {
 		{
 			// interface HTML: controls, music, recommendations, label
 			interface.media_music_recommendations_label = document.createElement("p");
-			interface.media_music_recommendations_label.setAttribute("class", "text_black");
+			interface.media_music_recommendations_label.setAttribute("class", "text_color_black");
 			interface.media_music_recommendations_label.setAttribute("style", "text-align: center");
-			interface.media_music_recommendations_label.innerHTML = "<b>" + TYPE_MUSIC + " Recommendations<b/>";
+			interface.media_music_recommendations_label.innerHTML = "<font class=text_size_large><b>" + TYPE_MUSIC + " Recommendations<b/></font>";
 			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_label);
 
 			// interface HTML: controls, music, recommendations, list
 			interface.media_music_recommendations_list = document.createElement("div");
-			interface.media_music_recommendations_list.setAttribute("class", "text_black");
+			interface.media_music_recommendations_list.setAttribute("class", "text_color_black");
 			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_list);
 		}
 	}
