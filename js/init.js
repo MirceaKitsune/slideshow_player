@@ -62,12 +62,14 @@ function settings_url_set() {
 	}
 
 	if(params.length > 0)
-		window.location.hash = params.substring(0, params.length - 1); // remove the last &
+		params = params.substring(0, params.length - 1); // remove the last &
 	else
-		window.location.hash = "default";
+		params = "default";
 
-	// as we don't want a manual update to reload the page, block onhashchange for the next detection
-	onhashchange_block = true;
+	if("#" + params !== window.location.hash) {
+		window.location.hash = params;
+		onhashchange_block = true; // we don't want a manual update to reload the page, block onhashchange for the next detection
+	}
 }
 
 // settings, url, get
