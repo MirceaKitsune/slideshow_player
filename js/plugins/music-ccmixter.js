@@ -16,6 +16,9 @@ const page_limit_ccmixter = 15;
 // this counter reaches 0 once all pages finished loading
 var pages_left_ccmixter = 0;
 
+// the script elements for this plugin
+var elements_ccmixter = [];
+
 // convert each entry into a music object for the player
 function parse_ccmixter(data) {
 	for(var entry in data) {
@@ -34,12 +37,20 @@ function parse_ccmixter(data) {
 	}
 
 	--pages_left_ccmixter;
-	if(pages_left_ccmixter <= 0)
-		plugins_busy_set(name_ccmixter, null);
+	if(pages_left_ccmixter <= 0) {
+		for(var page = 1; page <= page_count_ccmixter; page++) {
+			document.body.removeChild(elements_ccmixter[page]);
+			elements_ccmixter[page] = null;
+		}
+
+		plugins_busy_set(name_ccmixter, null);	
+	}
 }
 
 // fetch the json object containing the data and execute it as a script
 function music_ccmixter() {
+	plugins_busy_set(name_ccmixter, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
+
 	// since this site doesn't offer builtin JSONP support, use a JSON to JSONP converter from: json2jsonp.com
 	const url_prefix = "https://json2jsonp.com/?url=";
 	const url_sufix = "&callback=parse_ccmixter";
@@ -48,14 +59,13 @@ function music_ccmixter() {
 	keywords = keywords.replace(" ", ","); // json2jsonp.com returns an error when spaces are included in the URL, convert spaces to commas
 
 	for(var page = 1; page <= page_count_ccmixter; page++) {
-		var script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = url_prefix + encodeURIComponent("http://ccmixter.org/api/query?f=json&tags=" + keywords + "&offset=" + page + "&limit=" + page_limit_ccmixter) + url_sufix;
-		document.body.appendChild(script);
+		elements_ccmixter[page] = document.createElement("script");
+		elements_ccmixter[page].type = "text/javascript";
+		elements_ccmixter[page].src = url_prefix + encodeURIComponent("http://ccmixter.org/api/query?f=json&tags=" + keywords + "&offset=" + page + "&limit=" + page_limit_ccmixter) + url_sufix;
+		document.body.appendChild(elements_ccmixter[page]);
 	}
 
 	pages_left_ccmixter = page_count_ccmixter;
-	plugins_busy_set(name_ccmixter, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
 }
 
 // register the plugin

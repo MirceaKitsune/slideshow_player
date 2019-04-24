@@ -16,6 +16,9 @@ const page_limit_derpibooru = 50;
 // this counter reaches 0 once all pages finished loading
 var pages_left_derpibooru = 0;
 
+// the script elements for this plugin
+var elements_derpibooru = [];
+
 // convert each entry into an image object for the player
 function parse_derpibooru(data) {
 	for(var entry in data.search) {
@@ -40,12 +43,20 @@ function parse_derpibooru(data) {
 	}
 
 	--pages_left_derpibooru;
-	if(pages_left_derpibooru <= 0)
+	if(pages_left_derpibooru <= 0) {
+		for(var page = 1; page <= page_count_derpibooru; page++) {
+			document.body.removeChild(elements_derpibooru[page]);
+			elements_derpibooru[page] = null;
+		}
+
 		plugins_busy_set(name_derpibooru, null);
+	}
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_derpibooru() {
+	plugins_busy_set(name_derpibooru, 10);
+
 	// since this site doesn't offer builtin JSONP support, use a JSON to JSONP converter from: json2jsonp.com
 	const url_prefix = "https://json2jsonp.com/?url=";
 	const url_sufix = "&callback=parse_derpibooru";
@@ -55,14 +66,13 @@ function images_derpibooru() {
 	const filter_id = plugins_settings_read("nsfw", TYPE_IMAGES) ? "56027" : "100073"; // pick the appropriate filter from: https://www.derpibooru.org/filters
 
 	for(var page = 1; page <= page_count_derpibooru; page++) {
-		var script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = url_prefix + encodeURIComponent("https://derpibooru.org/search.json?q=" + keywords + "&page=" + page + "&perpage=" + page_limit_derpibooru + "&filter_id=" + filter_id) + url_sufix;
-		document.body.appendChild(script);
+		elements_derpibooru[page] = document.createElement("script");
+		elements_derpibooru[page].type = "text/javascript";
+		elements_derpibooru[page].src = url_prefix + encodeURIComponent("https://derpibooru.org/search.json?q=" + keywords + "&page=" + page + "&perpage=" + page_limit_derpibooru + "&filter_id=" + filter_id) + url_sufix;
+		document.body.appendChild(elements_derpibooru[page]);
 	}
 
 	pages_left_derpibooru = page_count_derpibooru;
-	plugins_busy_set(name_derpibooru, 10);
 }
 
 // register the plugin

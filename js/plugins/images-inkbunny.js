@@ -16,17 +16,26 @@ const page_limit_inkbunny = 100;
 // this counter reaches 0 once all pages finished loading
 var pages_left_inkbunny = 0;
 
+// the script elements for this plugin
+var element_login_inkbunny = null;
+var element_logout_inkbunny = null;
+var element_rating_inkbunny = null;
+var elements_inkbunny = [];
+
 // indicate that the plugin has finished working
 function parse_inkbunny_ready(data) {
+	document.body.removeChild(element_logout_inkbunny);
+	element_logout_inkbunny = null;
+
 	plugins_busy_set(name_inkbunny, null);
 }
 
 // close the temporary guest session
 function parse_inkbunny_logout(data) {
-	var script = document.createElement("script");
-	script.type = "text/javascript";
-	script.src = "https://inkbunny.net/api_logout.php?output_mode=json&sid=" + data.sid + "&callback=parse_inkbunny_ready";
-	document.body.appendChild(script);
+	element_logout_inkbunny = document.createElement("script");
+	element_logout_inkbunny.type = "text/javascript";
+	element_logout_inkbunny.src = "https://inkbunny.net/api_logout.php?output_mode=json&sid=" + data.sid + "&callback=parse_inkbunny_ready";
+	document.body.appendChild(element_logout_inkbunny);
 }
 
 // convert each entry into an image object for the player
@@ -47,8 +56,14 @@ function parse_inkbunny(data) {
 	}
 
 	--pages_left_inkbunny;
-	if(pages_left_inkbunny <= 0)
+	if(pages_left_inkbunny <= 0) {
 		parse_inkbunny_logout(data);
+
+		for(var page = 1; page <= page_count_inkbunny; page++) {
+			document.body.removeChild(elements_inkbunny[page]);
+			elements_inkbunny[page] = null;
+		}
+	}
 }
 
 // change the rating, then call the image parser with the session id
@@ -56,11 +71,14 @@ function parse_inkbunny_rating(data) {
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 
 	for(var page = 1; page <= page_count_inkbunny; page++) {
-		var script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + keywords + "&page=" + page + "&submissions_per_page=" + page_limit_inkbunny + "&callback=parse_inkbunny";
-		document.body.appendChild(script);
+		elements_inkbunny[page] = document.createElement("script");
+		elements_inkbunny[page].type = "text/javascript";
+		elements_inkbunny[page].src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + keywords + "&page=" + page + "&submissions_per_page=" + page_limit_inkbunny + "&callback=parse_inkbunny";
+		document.body.appendChild(elements_inkbunny[page]);
 	}
+
+	document.body.removeChild(element_rating_inkbunny);
+	element_rating_inkbunny = null;
 }
 
 // create a new session as guest, then call the rating api with its session id
@@ -68,20 +86,24 @@ function parse_inkbunny_login(data) {
 	// whether or not to enable the NSFW tags
 	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "yes" : "no";
 
-	var script = document.createElement("script");
-	script.type = "text/javascript";
-	script.src = "https://inkbunny.net/api_userrating.php?output_mode=json&sid=" + data.sid + "&tag[2]=" + nsfw + "&tag[3]=" + nsfw + "&tag[4]=" + nsfw + "&tag[5]=" + nsfw + "&callback=parse_inkbunny_rating";
-	document.body.appendChild(script);
+	element_rating_inkbunny = document.createElement("script");
+	element_rating_inkbunny.type = "text/javascript";
+	element_rating_inkbunny.src = "https://inkbunny.net/api_userrating.php?output_mode=json&sid=" + data.sid + "&tag[2]=" + nsfw + "&tag[3]=" + nsfw + "&tag[4]=" + nsfw + "&tag[5]=" + nsfw + "&callback=parse_inkbunny_rating";
+	document.body.appendChild(element_rating_inkbunny);
+
+	document.body.removeChild(element_login_inkbunny);
+	element_login_inkbunny = null;
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_inkbunny() {
-	var script = document.createElement("script");
-	script.src = "https://inkbunny.net/api_login.php?output_mode=json&username=guest&callback=parse_inkbunny_login";
-	document.body.appendChild(script);
+	plugins_busy_set(name_inkbunny, 10);
+
+	element_login_inkbunny = document.createElement("script");
+	element_login_inkbunny.src = "https://inkbunny.net/api_login.php?output_mode=json&username=guest&callback=parse_inkbunny_login";
+	document.body.appendChild(element_login_inkbunny);
 
 	pages_left_inkbunny = page_count_inkbunny;
-	plugins_busy_set(name_inkbunny, 10);
 }
 
 // register the plugin

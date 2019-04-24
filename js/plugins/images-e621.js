@@ -16,6 +16,9 @@ const page_limit_e621 = 320;
 // this counter reaches 0 once all pages finished loading
 var pages_left_e621 = 0;
 
+// the script elements for this plugin
+var elements_e621 = [];
+
 // convert each entry into an image object for the player
 function parse_e621(data) {
 	for(var entry in data) {
@@ -34,24 +37,31 @@ function parse_e621(data) {
 	}
 
 	--pages_left_e621;
-	if(pages_left_e621 <= 0)
+	if(pages_left_e621 <= 0) {
+		for(var page = 1; page <= page_count_e621; page++) {
+			document.body.removeChild(elements_e621[page]);
+			elements_e621[page] = null;
+		}
+
 		plugins_busy_set(name_e621, null);
+	}
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
+	plugins_busy_set(name_e621, 10);
+
 	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) ? "e621" : "e926"; // e926 is the SFW version of e621
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 
 	for(var page = 1; page <= page_count_e621; page++) {
-		var script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = "https://" + domain + ".net/post/index.json?tags=" + keywords + "&page=" + page + "&limit=" + page_limit_e621 + "&callback=parse_e621";
-		document.body.appendChild(script);
+		elements_e621[page] = document.createElement("script");
+		elements_e621[page].type = "text/javascript";
+		elements_e621[page].src = "https://" + domain + ".net/post/index.json?tags=" + keywords + "&page=" + page + "&limit=" + page_limit_e621 + "&callback=parse_e621";
+		document.body.appendChild(elements_e621[page]);
 	}
 
 	pages_left_e621 = page_count_e621;
-	plugins_busy_set(name_e621, 10);
 }
 
 // register the plugin
