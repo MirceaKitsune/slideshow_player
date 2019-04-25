@@ -33,7 +33,6 @@
 }
 
 .button_size_small {
-	border-radius: 100%;
 	text-align: center;
 	line-height: 28px;
 	font-size: 8px;
@@ -44,11 +43,11 @@
 	left: -16px;
 	cursor: pointer;
 	z-index: 1;
+	transition: 0.5s;
 	pointer-events: all;
 }
 
 .button_size_medium {
-	border-radius: 100%;
 	text-align: center;
 	line-height: 40px;
 	font-size: 16px;
@@ -59,11 +58,11 @@
 	left: -24px;
 	cursor: pointer;
 	z-index: 1;
+	transition: 0.5s;
 	pointer-events: all;
 }
 
 .button_size_large {
-	border-radius: 100%;
 	text-align: center;
 	line-height: 56px;
 	font-size: 24px;
@@ -74,7 +73,16 @@
 	left: -32px;
 	cursor: pointer;
 	z-index: 1;
+	transition: 0.5s;
 	pointer-events: all;
+}
+
+.button_shape_square {
+	border-radius: 10%;
+}
+
+.button_shape_round {
+	border-radius: 100%;
 }
 
 .button_color_black {

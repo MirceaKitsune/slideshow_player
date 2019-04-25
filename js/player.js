@@ -114,7 +114,6 @@ function player_images_fullscreen_has() {
 function player_images_fullscreen_mouse(event) {
 	const opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
 	interface.media.setAttribute("style", "z-index: 1; opacity: " + opacity);
-	interface.media.setAttribute("class", "item_media item_media_position_attached item_media_background_attached");
 }
 
 // player, images, toggle fullscreen
@@ -161,6 +160,10 @@ function player_images_fullscreen_toggle(force_to) {
 		// start the periodic fullscreen check
 		fullscreen_timer = setInterval(player_images_fullscreen_timer, 100);
 	}
+
+	// as the fullscreen button moves outside of the mouse cursor when toggling fullscreen, reset its hover effects
+	interface_style_button_shape(interface.media_controls_fullscreen, false);
+	interface_style_button_color(interface.media_controls_fullscreen, "white");
 }
 
 // player, images, latency, settings
