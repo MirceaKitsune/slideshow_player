@@ -408,12 +408,12 @@ function interface_update_recommendations_images() {
 
 			// tags that are present on this item will be underlined
 			// tags that match the keyword in use will be bold
-			tag_element.innerHTML = "<font class=text_size_medium>" + tag_name;
+			tag_element.innerHTML = tag_name;
 			if(player_available_images() && player_active_images() && player.images.index > 0 && data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
-			if(tag_name == current_tag)
+			if(current_tag.toLowerCase().includes(tag_name))
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
-			tag_element.innerHTML += "</font><br/>";
+			tag_element.innerHTML = "<font class=text_size_medium>" + tag_element.innerHTML + "</font><br/>";
 
 			// stop here if we've reached the display limit
 			++tags;
@@ -461,12 +461,12 @@ function interface_update_recommendations_music() {
 
 			// tags that are present on this item will be underlined
 			// tags that match the keyword in use will be bold
-			tag_element.innerHTML = "<font class=text_size_medium>" + tag_name;
+			tag_element.innerHTML = tag_name;
 			if(player_available_music() && player_active_music() && player.music.index > 0 && data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
-			if(tag_name == current_tag)
+			if(current_tag.toLowerCase().includes(tag_name))
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
-			tag_element.innerHTML += "</font><br/>";
+			tag_element.innerHTML = "<font class=text_size_medium>" + tag_element.innerHTML + "</font><br/>";
 
 			// stop here if we've reached the display limit
 			++tags;
