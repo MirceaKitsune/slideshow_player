@@ -1,6 +1,10 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
+// style constants
+const STYLE_MEDIA_RING_COLOR_EMPTY = "#ffffff";
+const STYLE_MEDIA_RING_COLOR_FULL = "#00aacc";
+
 // seconds after which to pull data from websites after settings that require refreshing are changed
 // this needs to be big enough to give users enough time to finish typing and to protect sites against spamming
 const AUTOREFRESH = 5;
@@ -18,6 +22,94 @@ var interface_refresh = {
 
 // object containing all of the interface elements
 var interface = {};
+
+// properties for the ring indicators
+var interface_ring = {
+	images: {
+		timer: null,
+		seconds: 0,
+		duration: 0
+	},
+	music: {
+		timer: null,
+		seconds: 0,
+		duration: 0
+	}
+}
+
+// interface, functions, ring, images, timer
+function interface_ring_images_timer() {
+	interface_ring.images.seconds += RATE;
+
+	if(interface_ring.images.seconds >= interface_ring.images.duration) {
+		interface_ring.images.seconds = interface_ring.images.duration;
+		clearInterval(interface_ring.images.timer);
+	}
+
+	const progress = interface_ring.images.duration > 0 ? interface_ring.images.seconds / interface_ring.images.duration : 0;
+	interface_style_ring_gradient(interface.media_images_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
+}
+
+// interface, functions, ring, images, set
+function interface_ring_images_set(duration) {
+	clearInterval(interface_ring.images.timer);
+
+	// if the duration is a number, set the ring to this goal in seconds
+	// if the duration is a boolean, pause or unpause it
+	if(duration === true) {
+		// pause
+	} else if(duration === false) {
+		// unpause
+		interface_ring.images.timer = setInterval(interface_ring_images_timer, RATE);
+	} else if(duration > 0) {
+		// set
+		interface_ring.images.seconds = 0;
+		interface_ring.images.duration = duration;
+		interface_ring.images.timer = setInterval(interface_ring_images_timer, RATE);
+	} else {
+		// clear
+		interface_ring.images.seconds = 0;
+		interface_ring.images.duration = 0;
+		interface_ring_images_timer();
+	}
+}
+
+// interface, functions, ring, music, timer
+function interface_ring_music_timer() {
+	interface_ring.music.seconds += RATE;
+
+	if(interface_ring.music.seconds >= interface_ring.music.duration) {
+		interface_ring.music.seconds = interface_ring.music.duration;
+		clearInterval(interface_ring.music.timer);
+	}
+
+	const progress = interface_ring.music.duration > 0 ? interface_ring.music.seconds / interface_ring.music.duration : 0;
+	interface_style_ring_gradient(interface.media_music_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
+}
+
+// interface, functions, ring, music, set
+function interface_ring_music_set(duration) {
+	clearInterval(interface_ring.music.timer);
+
+	// if the duration is a number, set the ring to this goal in seconds
+	// if the duration is a boolean, pause or unpause it
+	if(duration === true) {
+		// pause
+	} else if(duration === false) {
+		// unpause
+		interface_ring.music.timer = setInterval(interface_ring_music_timer, RATE);
+	} else if(duration > 0) {
+		// set
+		interface_ring.music.seconds = 0;
+		interface_ring.music.duration = duration;
+		interface_ring.music.timer = setInterval(interface_ring_music_timer, RATE);
+	} else {
+		// clear
+		interface_ring.music.seconds = 0;
+		interface_ring.music.duration = 0;
+		interface_ring_music_timer();
+	}
+}
 
 // interface, functions, autorefresh
 function interface_autorefresh() {
@@ -200,7 +292,7 @@ function interface_style_button_color(element, color) {
 	element.classList.add("button_color_" + color);
 }
 
-// interface, update style, button, transition
+// interface, update style, button, shape
 function interface_style_button_shape(element, square) {
 	element.classList.remove("button_shape_round");
 	element.classList.remove("button_shape_square");
@@ -209,6 +301,17 @@ function interface_style_button_shape(element, square) {
 		element.classList.add("button_shape_square");
 	else
 		element.classList.add("button_shape_round");
+}
+
+// interface, update style, ring, gradient
+// TODO: use conic-gradient instead of the linear-gradient hack, once the specification is supported by all major web browsers
+function interface_style_ring_gradient(element, progress, color_empty, color_full) {
+	progress = Math.min(Math.max(progress, 0), 1);
+	const gradient_progress_angle = (progress > 0.5 ? 90 : 270) + (progress * 360);
+	const gradient_progress_color = (progress > 0.5 ? color_full : color_empty);
+	const gradient_progress = "linear-gradient(" + gradient_progress_angle + "deg, " + gradient_progress_color + " 0%," + gradient_progress_color + " 50%, #00000000 50%, #00000000 100%)";
+	const gradient_background = "linear-gradient(90deg, " + color_empty + " 0%," + color_empty + " 50%, " + color_full + " 50%, " + color_full + " 100%)";
+	element.style["background-image"] = gradient_progress + ", " + gradient_background;
 }
 
 // interface, update HTML, controls, images
@@ -268,7 +371,6 @@ function interface_update_media(update_controls, update_images, update_music) {
 		interface_update_recommendations_music();
 	}
 }
-
 
 // interface, update HTML, media images
 function interface_update_media_images() {
@@ -340,6 +442,10 @@ function interface_update_media_images() {
 		interface.media_images_info.innerHTML = "";
 		interface.player_icon_images.innerHTML = "";
 	}
+
+	// update the ring element
+	if(!active || !ready || player.images.stopped)
+		interface_ring_images_set(0);
 }
 
 // interface, update HTML, media music
@@ -412,6 +518,12 @@ function interface_update_media_music() {
 		interface.media_music_info.innerHTML = "";
 		interface.player_icon_music.innerHTML = "";
 	}
+
+	// update the ring element
+	if(!active || !ready)
+		interface_ring_music_set(0);
+	else
+		interface_ring_music_set(player.music.stopped);
 }
 
 // interface, update HTML, recommendation images, clear
@@ -962,18 +1074,24 @@ function interface_init() {
 			interface.media_images_thumb.setAttribute("target", "_blank");
 			interface.media_images.appendChild(interface.media_images_thumb);
 			{
+				// interface HTML: media, images, thumb, ring
+				interface.media_images_thumb_ring = document.createElement("div");
+				interface.media_images_thumb_ring.setAttribute("class", "item_ring");
+				interface.media_images_thumb_ring.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
+				interface.media_images_thumb.appendChild(interface.media_images_thumb_ring);
+
 				// interface HTML: media, images, thumb, image
 				interface.media_images_thumb_image = document.createElement("img");
 				interface.media_images_thumb_image.setAttribute("class", "item_thumbnail");
 				interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
-				interface.media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
+				interface.media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
 				interface.media_images_thumb.appendChild(interface.media_images_thumb_image);
 			}
 
 			// interface HTML: media, images, info
 			interface.media_images_info = document.createElement("p");
 			interface.media_images_info.setAttribute("class", "text_color_black");
-			interface.media_images_info.setAttribute("style", "position: absolute; top: 144px; width: 100%");
+			interface.media_images_info.setAttribute("style", "position: absolute; top: 160px; width: 100%");
 			interface.media_images.appendChild(interface.media_images_info);
 		}
 
@@ -1057,18 +1175,24 @@ function interface_init() {
 			interface.media_music_thumb.setAttribute("target", "_blank");
 			interface.media_music.appendChild(interface.media_music_thumb);
 			{
+				// interface HTML: media, music, thumb, ring
+				interface.media_music_thumb_ring = document.createElement("div");
+				interface.media_music_thumb_ring.setAttribute("class", "item_ring");
+				interface.media_music_thumb_ring.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
+				interface.media_music_thumb.appendChild(interface.media_music_thumb_ring);
+
 				// interface HTML: media, music, thumb, song
 				interface.media_music_thumb_song = document.createElement("img");
 				interface.media_music_thumb_song.setAttribute("class", "item_thumbnail");
 				interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
-				interface.media_music_thumb_song.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
+				interface.media_music_thumb_song.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
 				interface.media_music_thumb.appendChild(interface.media_music_thumb_song);
 			}
 
 			// interface HTML: media, music, info
 			interface.media_music_info = document.createElement("p");
 			interface.media_music_info.setAttribute("class", "text_color_black");
-			interface.media_music_info.setAttribute("style", "position: absolute; top: 144px; width: 100%");
+			interface.media_music_info.setAttribute("style", "position: absolute; top: 160px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_info);
 		}
 
