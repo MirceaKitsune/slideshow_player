@@ -131,6 +131,8 @@ settings_url_get();
 // plugins, global object
 var plugins = {};
 var plugins_settings = [];
+plugins_settings[TYPE_IMAGES] = [];
+plugins_settings[TYPE_MUSIC] = [];
 
 // plugins, functions, register
 function plugins_register(name, type, func) {
@@ -146,23 +148,6 @@ function plugins_register(name, type, func) {
 // plugins, functions, load
 function plugins_load(name) {
 	plugins[name].func();
-}
-
-// plugins, functions, settings, read
-function plugins_settings_read(name, type) {
-	// take note that this setting was used by a plugin
-	const name_settings = type + "_" + name;
-	if(plugins_settings.indexOf(name_settings) < 0)
-		plugins_settings.push(name_settings);
-
-	switch(type) {
-		case TYPE_IMAGES:
-			return settings.images[name];
-		case TYPE_MUSIC:
-			return settings.music[name];
-		default:
-			return null;
-	}
 }
 
 // plugins, functions, ready
@@ -181,12 +166,6 @@ function plugins_ready() {
 		interface_refresh.images = false;
 		interface_refresh.music = false;
 	}
-}
-
-// plugins, functions, settings, used
-function plugins_settings_used(name, type) {
-	const name_settings = type + "_" + name;
-	return plugins_settings.indexOf(name_settings) >= 0;
 }
 
 // plugins, busy check
@@ -217,6 +196,27 @@ function plugins_busy_set(name, timeout) {
 	}
 
 	interface_update_media(true, false, false);
+}
+
+// plugins, functions, settings, read
+function plugins_settings_read(name, type) {
+	// take note that this setting was used by a plugin
+	if(plugins_settings[type].indexOf(name) < 0)
+		plugins_settings[type].push(name);
+
+	switch(type) {
+		case TYPE_IMAGES:
+			return settings.images[name];
+		case TYPE_MUSIC:
+			return settings.music[name];
+		default:
+			return null;
+	}
+}
+
+// plugins, functions, settings, used
+function plugins_settings_used(name, type) {
+	return plugins_settings[type].indexOf(name) >= 0;
 }
 
 // data, images, global list
@@ -280,11 +280,8 @@ function images_pick() {
 	data_images.splice(settings.images.count);
 
 	if(!player_available_images()) {
-		// stop the player if there are neither images or songs left to play
-		// otherwise if the player is active and no images are left, clear the image player
-		if(!player_available_music())
-			player_detach();
-		else if(player_active_images())
+		// if the player is active and no images are left, clear the image player
+		if(player_active_images())
 			player_images_clear();
 	} else {
 		// suffle the images again
@@ -369,11 +366,8 @@ function music_pick() {
 	data_music.splice(settings.music.count);
 
 	if(!player_available_music()) {
-		// stop the player if there are neither images or songs left to play
-		// otherwise if the player is active and no songs are left, clear the music player
-		if(!player_available_images())
-			player_detach();
-		else if(player_active_music())
+		// if the player is active and no songs are left, clear the music player
+		if(player_active_music())
 			player_music_clear();
 	} else {
 		// suffle the songs again

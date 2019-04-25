@@ -113,7 +113,8 @@ function player_images_fullscreen_has() {
 // player, images, fullscreen mouse movement
 function player_images_fullscreen_mouse(event) {
 	const opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
-	interface.media.setAttribute("style", "z-index: 1; opacity: " + opacity + "; " + STYLE_MEDIA_POSITION_ATTACHED + "; " + STYLE_MEDIA_BACKGROUND_ATTACHED);
+	interface.media.setAttribute("style", "z-index: 1; opacity: " + opacity);
+	interface.media.setAttribute("class", "item_media item_media_position_attached item_media_background_attached");
 }
 
 // player, images, toggle fullscreen
@@ -127,7 +128,7 @@ function player_images_fullscreen_toggle(force_to) {
 			// return;
 
 		// configure player / media / media_images_label / media_images_info / media_controls_label elements
-		interface.player.setAttribute("style", STYLE_PLAYER_POSITION_DETACHED);
+		interface.player.setAttribute("class", "item_player item_player_position_detached");
 		interface.player.removeAttribute("onmousemove");
 		if(document.body && interface.player && interface.player.contains(interface.media))
 			interface_update_attached(true);
@@ -148,7 +149,7 @@ function player_images_fullscreen_toggle(force_to) {
 			return;
 
 		// configure player / media / media_images_label / media_images_info / media_controls_label elements
-		interface.player.setAttribute("style", STYLE_PLAYER_POSITION_ATTACHED);
+		interface.player.setAttribute("class", "item_player item_player_position_attached");
 		interface.player.setAttribute("onmousemove", "player_images_fullscreen_mouse(event)");
 		if(interface.player && document.body && document.body.contains(interface.media))
 			interface_update_attached(false);

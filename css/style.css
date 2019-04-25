@@ -95,14 +95,14 @@
 	color: #ffffff;
 	box-shadow: 0 0 2px #00000044;
 	text-shadow: 0 0 2px #00000066;
-	background-color: #aa0000;
+	background-color: #aa2200;
 }
 
 .button_color_yellow {
 	color: #ffffff;
 	box-shadow: 0 0 2px #00000044;
 	text-shadow: 0 0 2px #00000066;
-	background-color: #aaaa00;
+	background-color: #aa8800;
 }
 
 .button_color_green {
@@ -116,24 +116,24 @@
 	color: #ffffff;
 	box-shadow: 0 0 2px #00000044;
 	text-shadow: 0 0 2px #00000066;
-	background-color: #00aaaa;
+	background-color: #0088aa;
 }
 
 .button_color_blue {
 	color: #ffffff;
 	box-shadow: 0 0 2px #00000044;
 	text-shadow: 0 0 2px #00000066;
-	background-color: #0000aa;
+	background-color: #0022aa;
 }
 
 .button_color_pink {
 	color: #ffffff;
 	box-shadow: 0 0 2px #00000044;
 	text-shadow: 0 0 2px #00000066;
-	background-color: #aa00aa;
+	background-color: #aa0088;
 }
 
-.controls {
+.item_controls {
 	position: absolute;
 	overflow: auto;
 	line-height: 20px;
@@ -141,7 +141,14 @@
 	font-family: sans-serif;
 }
 
-.media {
+.item_controls_position {
+	top: 0%;
+	left: 85%;
+	width: 15%;
+	height: 100%;
+}
+
+.item_media {
 	position: absolute;
 	overflow: hidden;
 	line-height: 20px;
@@ -149,13 +156,49 @@
 	font-family: sans-serif;
 }
 
-.player {
+.item_media_position_attached {
+	top: 80%;
+	left: 0%;
+	width: 100%;
+	height: 20%;
+}
+
+.item_media_position_detached {
+	top: 80%;
+	left: 0%;
+	width: 85%;
+	height: 20%;
+}
+
+.item_media_background_attached {
+	background-image: linear-gradient(to bottom, #00000000, #000000aa);
+}
+
+.item_media_background_detached {
+	background-image: linear-gradient(to bottom, #00000011, #00000000);
+}
+
+.item_player {
 	position: absolute;
 	overflow: hidden;
 	background-color: #000000;
 }
 
-.thumbnail {
+.item_player_position_attached {
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+}
+
+.item_player_position_detached {
+	top: 0%;
+	left: 0%;
+	width: 85%;
+	height: 80%;
+}
+
+.item_thumbnail {
 	border-radius: 100%;
 	text-align: center;
 	width: 80px;

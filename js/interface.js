@@ -1,17 +1,6 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
-// attached and detached element positions and styles
-// player: always relative to the document body
-// media: relative to the document body when detached, relative to the player window when attached
-const STYLE_CONTROLS_POSITION = "top: 0%; left: 85%; width: 15%; height: 100%";
-const STYLE_PLAYER_POSITION_ATTACHED = "top: 0%; left: 0%; width: 100%; height: 100%";
-const STYLE_PLAYER_POSITION_DETACHED = "top: 0%; left: 0%; width: 85%; height: 80%";
-const STYLE_MEDIA_POSITION_ATTACHED = "top: 80%; left: 0%; width: 100%; height: 20%";
-const STYLE_MEDIA_POSITION_DETACHED = "top: 80%; left: 0%; width: 85%; height: 20%";
-const STYLE_MEDIA_BACKGROUND_ATTACHED = "background-image: linear-gradient(to bottom, #00000000, #000000aa)";
-const STYLE_MEDIA_BACKGROUND_DETACHED = "background-image: linear-gradient(to bottom, #00000011, #00000000)";
-
 // seconds after which to pull data from websites after settings that require refreshing are changed
 // this needs to be big enough to give users enough time to finish typing and to protect sites against spamming
 const AUTOREFRESH = 5;
@@ -49,15 +38,17 @@ function interface_preload(name, type) {
 	// if this setting was used by any plugins, we will want to pull new contents from the server
 	// when the name or type variables are set to true rather than a setting name, force a refresh regardless
 	// if sites don't need to be refreshed, automatically load the new settings instead of starting the timer
-	const force = (name === true || type === true);
-	if(force || plugins_settings_used(name, type)) {
-		if(force || type === TYPE_IMAGES)
-			interface_refresh.images = true;
-		if(force || type === TYPE_MUSIC)
-			interface_refresh.music = true;
-		clearInterval(interface_refresh.interval);
-		interface_refresh.interval = setInterval(interface_autorefresh, 1000);
-		interface_refresh.timer = AUTOREFRESH;
+	if(name === true || plugins_settings_used(name, type)) {
+		if(type === TYPE_IMAGES || type === TYPE_MUSIC) {
+			if(type === TYPE_IMAGES)
+				interface_refresh.images = true;
+			if(type === TYPE_MUSIC)
+				interface_refresh.music = true;
+
+			clearInterval(interface_refresh.interval);
+			interface_refresh.interval = setInterval(interface_autorefresh, 1000);
+			interface_refresh.timer = AUTOREFRESH;
+		}
 	}
 
 	interface_load(false);
@@ -115,23 +106,45 @@ function interface_load(pull) {
 	interface_update_controls_images();
 	interface_update_controls_music();
 
-	// if sites need to be refreshed, load every selected plugin
+	// load the plugins if we have any sources enabled
 	if(pull) {
 		if(interface_refresh.images)
 			images_clear();
 		if(interface_refresh.music)
 			music_clear();
 
-		// load the plugins if we have any sources enabled, clear everything if not
 		if(settings.sites.length > 0) {
+			var has_images = has_music = false;
 			for(var site in settings.sites) {
-				const name_site = settings.sites[site];
-				plugins_load(name_site);
+				const name = settings.sites[site];
+				if(interface_refresh.images && plugins[name].type === TYPE_IMAGES) {
+					plugins_load(name);
+					has_images = true;
+				}
+				if(interface_refresh.music && plugins[name].type === TYPE_MUSIC) {
+					plugins_load(name);
+					has_music = true;
+				}
+			}
+
+			// if there are no items of the given type, clear that category
+			if(interface_refresh.images && !has_images) {
+				data_images = [];
+				images_pick();
+				interface_update_recommendations_images_clear();
+			}
+			if(interface_refresh.music && !has_music) {
+				data_music = [];
+				music_pick();
+				interface_update_recommendations_music_clear();
 			}
 		} else {
+			// if there are no items available, clear everything
 			player_detach();
 			data_images = [];
 			data_music = [];
+			interface_update_recommendations_images_clear();
+			interface_update_recommendations_music_clear();
 		}
 	}
 
@@ -150,7 +163,7 @@ function interface_play() {
 // interface, update, attached
 function interface_update_attached(attached) {
 	if(attached) {
-		interface.media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
+		interface.media.setAttribute("class", "item_media item_media_position_detached item_media_background_detached");
 		interface.media_images_label.setAttribute("class", "text_color_black");
 		interface.media_images_info.setAttribute("class", "text_color_black");
 		interface.media_controls_label.setAttribute("class", "text_color_black");
@@ -161,7 +174,7 @@ function interface_update_attached(attached) {
 		interface.player.removeChild(interface.media);
 		document.body.appendChild(interface.media);
 	} else {
-		interface.media.setAttribute("style", STYLE_MEDIA_POSITION_ATTACHED + "; " + STYLE_MEDIA_BACKGROUND_ATTACHED);
+		interface.media.setAttribute("class", "item_media item_media_position_attached item_media_background_attached");
 		interface.media_images_label.setAttribute("class", "text_color_white");
 		interface.media_images_info.setAttribute("class", "text_color_white");
 		interface.media_controls_label.setAttribute("class", "text_color_white");
@@ -191,6 +204,12 @@ function interface_update_controls_music() {
 function interface_update_controls_sites() {
 	interface.controls_sites_list.innerHTML = "";
 	for(var item in plugins) {
+		var type = "";
+		if(plugins[item].type === TYPE_IMAGES)
+			type = "TYPE_IMAGES";
+		if(plugins[item].type === TYPE_MUSIC)
+			type = "TYPE_MUSIC";
+
 		// interface HTML: controls, images, sites, list, checkbox
 		const id_checkbox = "controls_images_list_sites_" + item + "_checkbox";
 		interface[id_checkbox] = document.createElement("input");
@@ -200,7 +219,7 @@ function interface_update_controls_sites() {
 		interface[id_checkbox].setAttribute("name", item);
 		if(settings.sites.length == 0 || settings.sites.indexOf(item) >= 0)
 			interface[id_checkbox].setAttribute("checked", true);
-		interface[id_checkbox].setAttribute("onclick", "interface_preload(true, true)");
+		interface[id_checkbox].setAttribute("onclick", "interface_preload(true, " + type + ")");
 		interface.controls_sites_list.appendChild(interface[id_checkbox]);
 
 		// interface HTML: controls, images, sites, list, label
@@ -389,7 +408,7 @@ function interface_update_recommendations_images_set(tag) {
 function interface_update_recommendations_images() {
 	// sort the recommended tags into an array
 	const recommendations_sorted = Object.keys(recommendations.images).sort(function(a, b) { return recommendations.images[b] - recommendations.images[a] });
-	const current_tag = interface.controls_images_search_keywords_input.getAttribute("value") || interface.controls_images_search_keywords_input.value;
+	const current_tag = interface.controls_images_search_keywords_input.value || interface.controls_images_search_keywords_input.getAttribute("value");
 
 	interface.media_images_recommendations_list.innerHTML = "<font class=text_size_medium>No recommended tags available</font>";
 	if(recommendations_sorted.length > 0) {
@@ -442,7 +461,7 @@ function interface_update_recommendations_music_set(tag) {
 function interface_update_recommendations_music() {
 	// sort the recommended tags into an array
 	const recommendations_sorted = Object.keys(recommendations.music).sort(function(a, b) { return recommendations.music[b] - recommendations.music[a] });
-	const current_tag = interface.controls_music_search_keywords_input.getAttribute("value") || interface.controls_music_search_keywords_input.value;
+	const current_tag = interface.controls_music_search_keywords_input.value || interface.controls_music_search_keywords_input.getAttribute("value");
 
 	interface.media_music_recommendations_list.innerHTML = "<font class=text_size_medium>No recommended tags available</font>";
 	if(recommendations_sorted.length > 0) {
@@ -544,8 +563,7 @@ function interface_init() {
 
 	// interface HTML: player
 	interface.player = document.createElement("div");
-	interface.player.setAttribute("class", "player");
-	interface.player.setAttribute("style", STYLE_PLAYER_POSITION_DETACHED);
+	interface.player.setAttribute("class", "item_player item_player_position_detached");
 	document.body.appendChild(interface.player);
 	{
 		// interface HTML: player, icon, images
@@ -563,8 +581,7 @@ function interface_init() {
 
 	// interface HTML: controls
 	interface.controls = document.createElement("div");
-	interface.controls.setAttribute("class", "controls");
-	interface.controls.setAttribute("style", STYLE_CONTROLS_POSITION);
+	interface.controls.setAttribute("class", "item_controls item_controls_position");
 	document.body.appendChild(interface.controls);
 	{
 		// interface HTML: controls, banner
@@ -852,8 +869,7 @@ function interface_init() {
 
 	// interface HTML: media
 	interface.media = document.createElement("div");
-	interface.media.setAttribute("class", "media");
-	interface.media.setAttribute("style", STYLE_MEDIA_POSITION_DETACHED + "; " + STYLE_MEDIA_BACKGROUND_DETACHED);
+	interface.media.setAttribute("class", "item_media item_media_position_detached item_media_background_detached");
 	document.body.appendChild(interface.media);
 	{
 		// interface HTML: media, images, recommendations
@@ -917,7 +933,7 @@ function interface_init() {
 			{
 				// interface HTML: media, images, thumb, image
 				interface.media_images_thumb_image = document.createElement("img");
-				interface.media_images_thumb_image.setAttribute("class", "thumbnail");
+				interface.media_images_thumb_image.setAttribute("class", "item_thumbnail");
 				interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 				interface.media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
 				interface.media_images_thumb.appendChild(interface.media_images_thumb_image);
@@ -1002,7 +1018,7 @@ function interface_init() {
 			{
 				// interface HTML: media, music, thumb, song
 				interface.media_music_thumb_song = document.createElement("img");
-				interface.media_music_thumb_song.setAttribute("class", "thumbnail");
+				interface.media_music_thumb_song.setAttribute("class", "item_thumbnail");
 				interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 				interface.media_music_thumb_song.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
 				interface.media_music_thumb.appendChild(interface.media_music_thumb_song);
