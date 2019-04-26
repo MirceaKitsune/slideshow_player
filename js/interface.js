@@ -47,7 +47,7 @@ function interface_ring_images_timer() {
 	}
 
 	const progress = interface_ring.images.duration > 0 ? interface_ring.images.seconds / interface_ring.images.duration : 0;
-	interface_style_ring_gradient(interface.media_images_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
+	interface_style_css_gradient(interface.media_images_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
 }
 
 // interface, functions, ring, images, set
@@ -84,7 +84,7 @@ function interface_ring_music_timer() {
 	}
 
 	const progress = interface_ring.music.duration > 0 ? interface_ring.music.seconds / interface_ring.music.duration : 0;
-	interface_style_ring_gradient(interface.media_music_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
+	interface_style_css_gradient(interface.media_music_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
 }
 
 // interface, functions, ring, music, set
@@ -252,6 +252,41 @@ function interface_play() {
 		player_detach();
 }
 
+// interface, update style, ring, gradient
+// TODO: use conic-gradient instead of the linear-gradient hack, once the specification is supported by all major web browsers
+function interface_style_css_gradient(element, progress, color_empty, color_full) {
+	progress = Math.min(Math.max(progress, 0), 1);
+	const gradient_progress_angle = (progress > 0.5 ? 90 : 270) + (progress * 360);
+	const gradient_progress_color = (progress > 0.5 ? color_full : color_empty);
+	const gradient_progress = "linear-gradient(" + gradient_progress_angle + "deg, " + gradient_progress_color + " 0%," + gradient_progress_color + " 50%, #00000000 50%, #00000000 100%)";
+	const gradient_background = "linear-gradient(90deg, " + color_empty + " 0%," + color_empty + " 50%, " + color_full + " 50%, " + color_full + " 100%)";
+	element.style["background-image"] = gradient_progress + ", " + gradient_background;
+}
+
+// interface, update style, effect, shape
+function interface_style_effect_shape(element, square) {
+	element.classList.remove("effect_shape_round");
+	element.classList.remove("effect_shape_square");
+
+	if(square)
+		element.classList.add("effect_shape_square");
+	else
+		element.classList.add("effect_shape_round");
+}
+
+// interface, update style, button, color
+function interface_style_button_color(element, color) {
+	element.classList.remove("button_color_black");
+	element.classList.remove("button_color_white");
+	element.classList.remove("button_color_red");
+	element.classList.remove("button_color_yellow");
+	element.classList.remove("button_color_green");
+	element.classList.remove("button_color_cyan");
+	element.classList.remove("button_color_blue");
+	element.classList.remove("button_color_pink");
+	element.classList.add("button_color_" + color);
+}
+
 // interface, update, attached
 function interface_update_attached(attached) {
 	if(attached) {
@@ -279,41 +314,6 @@ function interface_update_attached(attached) {
 		document.body.removeChild(interface.media);
 		interface.player.appendChild(interface.media);
 	}
-}
-
-// interface, update style, button, color
-function interface_style_button_color(element, color) {
-	element.classList.remove("button_color_black");
-	element.classList.remove("button_color_white");
-	element.classList.remove("button_color_red");
-	element.classList.remove("button_color_yellow");
-	element.classList.remove("button_color_green");
-	element.classList.remove("button_color_cyan");
-	element.classList.remove("button_color_blue");
-	element.classList.remove("button_color_pink");
-	element.classList.add("button_color_" + color);
-}
-
-// interface, update style, button, shape
-function interface_style_button_shape(element, square) {
-	element.classList.remove("button_shape_round");
-	element.classList.remove("button_shape_square");
-
-	if(square)
-		element.classList.add("button_shape_square");
-	else
-		element.classList.add("button_shape_round");
-}
-
-// interface, update style, ring, gradient
-// TODO: use conic-gradient instead of the linear-gradient hack, once the specification is supported by all major web browsers
-function interface_style_ring_gradient(element, progress, color_empty, color_full) {
-	progress = Math.min(Math.max(progress, 0), 1);
-	const gradient_progress_angle = (progress > 0.5 ? 90 : 270) + (progress * 360);
-	const gradient_progress_color = (progress > 0.5 ? color_full : color_empty);
-	const gradient_progress = "linear-gradient(" + gradient_progress_angle + "deg, " + gradient_progress_color + " 0%," + gradient_progress_color + " 50%, #00000000 50%, #00000000 100%)";
-	const gradient_background = "linear-gradient(90deg, " + color_empty + " 0%," + color_empty + " 50%, " + color_full + " 50%, " + color_full + " 100%)";
-	element.style["background-image"] = gradient_progress + ", " + gradient_background;
 }
 
 // interface, update HTML, controls, images
@@ -1059,30 +1059,30 @@ function interface_init() {
 			// interface HTML: media, images, previous
 			interface.media_images_previous = document.createElement("div");
 			interface.media_images_previous.setAttribute("title", "Previous image (" + KEY_IMAGES_PREVIOUS + ")");
-			interface.media_images_previous.setAttribute("class", "button_size_small button_color_black button_shape_round");
+			interface.media_images_previous.setAttribute("class", "button_size_small button_color_black effect_shape_round");
 			interface.media_images_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
-			interface.media_images_previous.setAttribute("onmouseover", "interface_style_button_shape(this, true)");
-			interface.media_images_previous.setAttribute("onmouseout", "interface_style_button_shape(this, false)");
+			interface.media_images_previous.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
+			interface.media_images_previous.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_images_previous.innerHTML = "✖";
 			interface.media_images.appendChild(interface.media_images_previous);
 
 			// interface HTML: media, images, play
 			interface.media_images_play = document.createElement("div");
 			interface.media_images_play.setAttribute("title", "Play / Pause image (" + KEY_IMAGES_PLAY + ")");
-			interface.media_images_play.setAttribute("class", "button_size_medium button_color_black button_shape_round");
+			interface.media_images_play.setAttribute("class", "button_size_medium button_color_black effect_shape_round");
 			interface.media_images_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
-			interface.media_images_play.setAttribute("onmouseover", "interface_style_button_shape(this, true)");
-			interface.media_images_play.setAttribute("onmouseout", "interface_style_button_shape(this, false)");
+			interface.media_images_play.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
+			interface.media_images_play.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_images_play.innerHTML = "✖";
 			interface.media_images.appendChild(interface.media_images_play);
 
 			// interface HTML: media, images, next
 			interface.media_images_next = document.createElement("div");
 			interface.media_images_next.setAttribute("title", "Next image (" + KEY_IMAGES_NEXT + ")");
-			interface.media_images_next.setAttribute("class", "button_size_small button_color_black button_shape_round");
+			interface.media_images_next.setAttribute("class", "button_size_small button_color_black effect_shape_round");
 			interface.media_images_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
-			interface.media_images_next.setAttribute("onmouseover", "interface_style_button_shape(this, true)");
-			interface.media_images_next.setAttribute("onmouseout", "interface_style_button_shape(this, false)");
+			interface.media_images_next.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
+			interface.media_images_next.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_images_next.innerHTML = "✖";
 			interface.media_images.appendChild(interface.media_images_next);
 
@@ -1095,18 +1095,25 @@ function interface_init() {
 			// interface HTML: media, images, thumb
 			interface.media_images_thumb = document.createElement("a");
 			interface.media_images_thumb.setAttribute("title", "Open image (" + KEY_IMAGES_OPEN + ")");
+			interface.media_images_thumb.setAttribute("style", "pointer-events: all");
 			interface.media_images_thumb.setAttribute("target", "_blank");
+			interface.media_images_thumb.setAttribute("onmouseover",
+				"interface_style_effect_shape(interface.media_images_thumb_ring, true);" +
+				"interface_style_effect_shape(interface.media_images_thumb_image, true)");
+			interface.media_images_thumb.setAttribute("onmouseout",
+				"interface_style_effect_shape(interface.media_images_thumb_ring, false);" +
+				"interface_style_effect_shape(interface.media_images_thumb_image, false)");
 			interface.media_images.appendChild(interface.media_images_thumb);
 			{
 				// interface HTML: media, images, thumb, ring
 				interface.media_images_thumb_ring = document.createElement("div");
-				interface.media_images_thumb_ring.setAttribute("class", "item_ring");
+				interface.media_images_thumb_ring.setAttribute("class", "item_thumbnail_ring effect_shape_round");
 				interface.media_images_thumb_ring.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
 				interface.media_images_thumb.appendChild(interface.media_images_thumb_ring);
 
 				// interface HTML: media, images, thumb, image
 				interface.media_images_thumb_image = document.createElement("img");
-				interface.media_images_thumb_image.setAttribute("class", "item_thumbnail");
+				interface.media_images_thumb_image.setAttribute("class", "item_thumbnail_image effect_shape_round");
 				interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 				interface.media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
 				interface.media_images_thumb.appendChild(interface.media_images_thumb_image);
@@ -1127,10 +1134,10 @@ function interface_init() {
 			// interface HTML: media, controls, play
 			interface.media_controls_play = document.createElement("div");
 			interface.media_controls_play.setAttribute("title", "Toggle player / Refresh settings (" + KEY_PLAY + ")");
-			interface.media_controls_play.setAttribute("class", "button_size_large button_color_black button_shape_round");
+			interface.media_controls_play.setAttribute("class", "button_size_large button_color_black effect_shape_round");
 			interface.media_controls_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 8px");
-			interface.media_controls_play.setAttribute("onmouseover", "interface_style_button_shape(this, true)");
-			interface.media_controls_play.setAttribute("onmouseout", "interface_style_button_shape(this, false)");
+			interface.media_controls_play.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
+			interface.media_controls_play.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_controls_play.innerHTML = "✖";
 			interface.media_controls.appendChild(interface.media_controls_play);
 
@@ -1143,11 +1150,11 @@ function interface_init() {
 			// interface HTML: media, controls, fullscreen
 			interface.media_controls_fullscreen = document.createElement("div");
 			interface.media_controls_fullscreen.setAttribute("title", "Fullscreen");
-			interface.media_controls_fullscreen.setAttribute("class", "button_size_small button_color_white button_shape_round");
+			interface.media_controls_fullscreen.setAttribute("class", "button_size_small button_color_white effect_shape_round");
 			interface.media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 128px");
 			interface.media_controls_fullscreen.setAttribute("onclick", "player_images_fullscreen_toggle()");
-			interface.media_controls_fullscreen.setAttribute("onmouseover", "interface_style_button_shape(this, true)");
-			interface.media_controls_fullscreen.setAttribute("onmouseout", "interface_style_button_shape(this, false)");
+			interface.media_controls_fullscreen.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
+			interface.media_controls_fullscreen.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_controls_fullscreen.innerHTML = "▭";
 			interface.media_controls.appendChild(interface.media_controls_fullscreen);
 		}
@@ -1160,30 +1167,30 @@ function interface_init() {
 			// interface HTML: media, music, previous
 			interface.media_music_previous = document.createElement("div");
 			interface.media_music_previous.setAttribute("title", "Previous song (" + KEY_MUSIC_PREVIOUS + ")");
-			interface.media_music_previous.setAttribute("class", "button_size_small button_color_black button_shape_round");
+			interface.media_music_previous.setAttribute("class", "button_size_small button_color_black effect_shape_round");
 			interface.media_music_previous.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: -64px");
-			interface.media_music_previous.setAttribute("onmouseover", "interface_style_button_shape(this, true)");
-			interface.media_music_previous.setAttribute("onmouseout", "interface_style_button_shape(this, false)");
+			interface.media_music_previous.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
+			interface.media_music_previous.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_music_previous.innerHTML = "✖";
 			interface.media_music.appendChild(interface.media_music_previous);
 
 			// interface HTML: media, music, play
 			interface.media_music_play = document.createElement("div");
 			interface.media_music_play.setAttribute("title", "Play / Pause song (" + KEY_MUSIC_PLAY + ")");
-			interface.media_music_play.setAttribute("class", "button_size_medium button_color_black button_shape_round");
+			interface.media_music_play.setAttribute("class", "button_size_medium button_color_black effect_shape_round");
 			interface.media_music_play.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 4px");
-			interface.media_music_play.setAttribute("onmouseover", "interface_style_button_shape(this, true)");
-			interface.media_music_play.setAttribute("onmouseout", "interface_style_button_shape(this, false)");
+			interface.media_music_play.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
+			interface.media_music_play.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_music_play.innerHTML = "✖";
 			interface.media_music.appendChild(interface.media_music_play);
 
 			// interface HTML: media, music, next
 			interface.media_music_next = document.createElement("div");
 			interface.media_music_next.setAttribute("title", "Next song (" + KEY_MUSIC_NEXT + ")");
-			interface.media_music_next.setAttribute("class", "button_size_small button_color_black button_shape_round");
+			interface.media_music_next.setAttribute("class", "button_size_small button_color_black effect_shape_round");
 			interface.media_music_next.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 12px; left: 32px");
-			interface.media_music_next.setAttribute("onmouseover", "interface_style_button_shape(this, true)");
-			interface.media_music_next.setAttribute("onmouseout", "interface_style_button_shape(this, false)");
+			interface.media_music_next.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
+			interface.media_music_next.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_music_next.innerHTML = "✖";
 			interface.media_music.appendChild(interface.media_music_next);
 
@@ -1196,18 +1203,25 @@ function interface_init() {
 			// interface HTML: media, music, thumb
 			interface.media_music_thumb = document.createElement("a");
 			interface.media_music_thumb.setAttribute("title", "Open song (" + KEY_MUSIC_OPEN + ")");
+			interface.media_music_thumb.setAttribute("style", "pointer-events: all");
 			interface.media_music_thumb.setAttribute("target", "_blank");
+			interface.media_music_thumb.setAttribute("onmouseover",
+				"interface_style_effect_shape(interface.media_music_thumb_ring, true);" +
+				"interface_style_effect_shape(interface.media_music_thumb_song, true)");
+			interface.media_music_thumb.setAttribute("onmouseout",
+				"interface_style_effect_shape(interface.media_music_thumb_ring, false);" +
+				"interface_style_effect_shape(interface.media_music_thumb_song, false)");
 			interface.media_music.appendChild(interface.media_music_thumb);
 			{
 				// interface HTML: media, music, thumb, ring
 				interface.media_music_thumb_ring = document.createElement("div");
-				interface.media_music_thumb_ring.setAttribute("class", "item_ring");
+				interface.media_music_thumb_ring.setAttribute("class", "item_thumbnail_ring effect_shape_round");
 				interface.media_music_thumb_ring.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
 				interface.media_music_thumb.appendChild(interface.media_music_thumb_ring);
 
 				// interface HTML: media, music, thumb, song
 				interface.media_music_thumb_song = document.createElement("img");
-				interface.media_music_thumb_song.setAttribute("class", "item_thumbnail");
+				interface.media_music_thumb_song.setAttribute("class", "item_thumbnail_image effect_shape_round");
 				interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 				interface.media_music_thumb_song.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
 				interface.media_music_thumb.appendChild(interface.media_music_thumb_song);

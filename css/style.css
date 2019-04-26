@@ -43,7 +43,6 @@
 	left: -16px;
 	cursor: pointer;
 	z-index: 1;
-	transition: 0.5s;
 	pointer-events: all;
 }
 
@@ -58,7 +57,6 @@
 	left: -24px;
 	cursor: pointer;
 	z-index: 1;
-	transition: 0.5s;
 	pointer-events: all;
 }
 
@@ -73,16 +71,7 @@
 	left: -32px;
 	cursor: pointer;
 	z-index: 1;
-	transition: 0.5s;
 	pointer-events: all;
-}
-
-.button_shape_square {
-	border-radius: 10%;
-}
-
-.button_shape_round {
-	border-radius: 100%;
 }
 
 .button_color_black {
@@ -206,8 +195,7 @@
 	height: 80%;
 }
 
-.item_thumbnail {
-	border-radius: 100%;
+.item_thumbnail_image {
 	text-align: center;
 	width: 88px;
 	height: 88px;
@@ -217,8 +205,7 @@
 	pointer-events: all;
 }
 
-.item_ring {
-	border-radius: 100%;
+.item_thumbnail_ring {
 	text-align: center;
 	width: 96px;
 	height: 96px;
@@ -226,4 +213,14 @@
 	background-color: #ffffff;
 	z-index: 1;
 	pointer-events: all;
+}
+
+.effect_shape_square {
+	border-radius: 10%;
+	transition: border-radius 0.5s, background-color 0.25s;
+}
+
+.effect_shape_round {
+	border-radius: 100%;
+	transition: border-radius 0.5s, background-color 0.25s;
 }

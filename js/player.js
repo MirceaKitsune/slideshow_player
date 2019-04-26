@@ -162,7 +162,7 @@ function player_images_fullscreen_toggle(force_to) {
 	}
 
 	// as the fullscreen button moves outside of the mouse cursor when toggling fullscreen, reset its hover effects
-	interface_style_button_shape(interface.media_controls_fullscreen, false);
+	interface_style_effect_shape(interface.media_controls_fullscreen, false);
 	interface_style_button_color(interface.media_controls_fullscreen, "white");
 }
 
