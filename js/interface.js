@@ -429,10 +429,18 @@ function interface_update_media_images() {
 		interface.player_icon_images.innerHTML = "⧗<br/><font class=text_size_medium><b>Latency:</b> " + player_images_latency.time_average.toFixed(2) + " sec</font>";
 	}
 	else if(active) {
+		var label_title = data_images[player.images.index - 1].title;
+		if(label_title.length > 32)
+			label_title = label_title.substring(0, 32) + "...";
+
+		var label_author = data_images[player.images.index - 1].author;
+		if(label_author.length > 16)
+			label_author = label_author.substring(0, 16) + "...";
+
 		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>" + player.images.index + " / " + data_images.length + "</b></font>";
 		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
-		interface.media_images_info.innerHTML = "<font class=text_size_small><b>" + data_images[player.images.index - 1].title + "</b> by <b>" + data_images[player.images.index - 1].author + "</b></font>";
+		interface.media_images_info.innerHTML = "<font class=text_size_small><b>" + label_title + "</b> by <b>" + label_author + "</b></font>";
 		interface.player_icon_images.innerHTML = "";
 	}
 	else {
@@ -505,10 +513,18 @@ function interface_update_media_music() {
 		interface.player_icon_music.innerHTML = "⧖";
 	}
 	else if(active) {
+		var label_title = data_music[player.music.index - 1].title;
+		if(label_title.length > 32)
+			label_title = label_title.substring(0, 32) + "...";
+
+		var label_author = data_music[player.music.index - 1].author;
+		if(label_author.length > 16)
+			label_author = label_author.substring(0, 16) + "...";
+
 		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>" + player.music.index + " / " + data_music.length + "</b></font>";
 		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
-		interface.media_music_info.innerHTML = "<font class=text_size_small><b>" + data_music[player.music.index - 1].title + "</b> by <b>" + data_music[player.music.index - 1].author + "</b></font>";
+		interface.media_music_info.innerHTML = "<font class=text_size_small><b>" + label_title + "</b> by <b>" + label_author + "</b></font>";
 		interface.player_icon_music.innerHTML = "";
 	}
 	else {
@@ -551,7 +567,10 @@ function interface_update_recommendations_images() {
 	if(recommendations_sorted.length > 0) {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
-			const tag_name = recommendations_sorted[tag];
+			var tag_name = recommendations_sorted[tag];
+			if(tag_name.length > 32)
+				tag_name = tag_name.substring(0, 32) + "...";
+	
 			if(tags == 0)
 				interface.media_images_recommendations_list.innerHTML = "";
 
@@ -604,7 +623,10 @@ function interface_update_recommendations_music() {
 	if(recommendations_sorted.length > 0) {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
-			const tag_name = recommendations_sorted[tag];
+			var tag_name = recommendations_sorted[tag];
+			if(tag_name.length > 32)
+				tag_name = tag_name.substring(0, 32) + "...";
+
 			if(tags == 0)
 				interface.media_music_recommendations_list.innerHTML = "";
 
