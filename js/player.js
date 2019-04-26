@@ -216,7 +216,7 @@ function player_images_fade() {
 		if(!player.images.stopped) {
 			const duration = Math.max(settings.images.duration - (settings.images.duration * TRANSITION) - player_images_latency.time_average, 5);
 			player.images.timer_next = setTimeout(player_images_next, duration * 1000);
-			interface_ring_images_set(duration * 1000);
+			interface_ring_images_set(duration);
 		}
 
 		// deactivate the fading function
@@ -357,11 +357,10 @@ function player_music_next_canplay() {
 	player.music.timer_next = setTimeout(player_music_next, duration * 1000);
 
 	// start playing the song
-	if(!player.music.stopped) {
+	if(!player.music.stopped)
 		player.music.element.play();
-		interface_ring_music_set(duration * 1000);
-	}
 
+	interface_ring_music_set(player.music.element);
 	interface_update_media(false, false, true);
 }
 

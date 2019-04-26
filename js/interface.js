@@ -1,6 +1,10 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
+// update rate for rings in miliseconds (1000 = 1 second)
+// lower values are smoother but use more browser resources
+const RING_RATE = 10;
+
 // style constants
 const STYLE_MEDIA_RING_COLOR_EMPTY = "#ffffff";
 const STYLE_MEDIA_RING_COLOR_FULL = "#00aacc";
@@ -27,26 +31,33 @@ var interface = {};
 var interface_ring = {
 	images: {
 		timer: null,
-		seconds: 0,
+		date: null,
 		duration: 0
 	},
 	music: {
 		timer: null,
-		seconds: 0,
-		duration: 0
+		element: null
 	}
 }
 
 // interface, functions, ring, images, timer
 function interface_ring_images_timer() {
-	interface_ring.images.seconds += RATE;
+	const duration = interface_ring.images.duration * 1000;
+	const current_date = new Date();
+	const current_ms = current_date.getTime();
+	const target_ms = interface_ring.images.date ? interface_ring.images.date.getTime() + duration : null;
 
-	if(interface_ring.images.seconds >= interface_ring.images.duration) {
-		interface_ring.images.seconds = interface_ring.images.duration;
+	var progress = 0;
+	if(isNaN(current_ms) || isNaN(target_ms) || duration <= 0) {
+		progress = 0;
 		clearInterval(interface_ring.images.timer);
+	} else if(current_ms >= target_ms) {
+		progress = 1;
+		clearInterval(interface_ring.images.timer);
+	} else {
+		progress = 1 - ((target_ms - current_ms) / duration);
 	}
 
-	const progress = interface_ring.images.duration > 0 ? interface_ring.images.seconds / interface_ring.images.duration : 0;
 	interface_style_css_gradient(interface.media_images_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
 }
 
@@ -54,59 +65,54 @@ function interface_ring_images_timer() {
 function interface_ring_images_set(duration) {
 	clearInterval(interface_ring.images.timer);
 
-	// if the duration is a number, set the ring to this goal in seconds
-	// if the duration is a boolean, pause or unpause it
-	if(duration === true) {
-		// pause
-	} else if(duration === false) {
-		// unpause
-		interface_ring.images.timer = setInterval(interface_ring_images_timer, RATE);
-	} else if(duration > 0) {
-		// set
-		interface_ring.images.seconds = 0;
-		interface_ring.images.duration = duration;
-		interface_ring.images.timer = setInterval(interface_ring_images_timer, RATE);
-	} else {
+	if(duration === null || duration === undefined) {
 		// clear
-		interface_ring.images.seconds = 0;
+		interface_ring.images.date = null;
 		interface_ring.images.duration = 0;
 		interface_ring_images_timer();
+	} else {
+		// set
+		interface_ring.images.date = new Date();
+		interface_ring.images.duration = duration;
+		interface_ring.images.timer = setInterval(interface_ring_images_timer, RING_RATE);
 	}
 }
 
 // interface, functions, ring, music, timer
 function interface_ring_music_timer() {
-	interface_ring.music.seconds += RATE;
+	const current_s = document.body.contains(interface_ring.music.element) ? interface_ring.music.element.currentTime : 0;
+	const target_s = document.body.contains(interface_ring.music.element) ? interface_ring.music.element.duration : 0;
 
-	if(interface_ring.music.seconds >= interface_ring.music.duration) {
-		interface_ring.music.seconds = interface_ring.music.duration;
+	var progress = 0;
+	if(isNaN(current_s) || isNaN(target_s) || target_s <= 0) {
+		progress = 0;
 		clearInterval(interface_ring.music.timer);
+	} else if(current_s >= target_s) {
+		progress = 1;
+		clearInterval(interface_ring.music.timer);
+	} else {
+		progress = current_s / target_s;
 	}
 
-	const progress = interface_ring.music.duration > 0 ? interface_ring.music.seconds / interface_ring.music.duration : 0;
 	interface_style_css_gradient(interface.media_music_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
 }
 
 // interface, functions, ring, music, set
-function interface_ring_music_set(duration) {
+function interface_ring_music_set(element) {
 	clearInterval(interface_ring.music.timer);
 
-	// if the duration is a number, set the ring to this goal in seconds
-	// if the duration is a boolean, pause or unpause it
-	if(duration === true) {
+	if(element === true) {
 		// pause
-	} else if(duration === false) {
-		// unpause
-		interface_ring.music.timer = setInterval(interface_ring_music_timer, RATE);
-	} else if(duration > 0) {
+	} else if(element === false) {
+		// resume
+		interface_ring.music.timer = setInterval(interface_ring_music_timer, RING_RATE);
+	} else if(element !== null && element !== undefined) {
 		// set
-		interface_ring.music.seconds = 0;
-		interface_ring.music.duration = duration;
-		interface_ring.music.timer = setInterval(interface_ring_music_timer, RATE);
+		interface_ring.music.element = element;
+		interface_ring.music.timer = setInterval(interface_ring_music_timer, RING_RATE);
 	} else {
 		// clear
-		interface_ring.music.seconds = 0;
-		interface_ring.music.duration = 0;
+		interface_ring.music.element = null;
 		interface_ring_music_timer();
 	}
 }
@@ -455,7 +461,7 @@ function interface_update_media_images() {
 
 	// update the ring element
 	if(!active || !ready || player.images.stopped)
-		interface_ring_images_set(0);
+		interface_ring_images_set(null);
 }
 
 // interface, update HTML, media music
@@ -539,7 +545,7 @@ function interface_update_media_music() {
 
 	// update the ring element
 	if(!active || !ready)
-		interface_ring_music_set(0);
+		interface_ring_music_set(null);
 	else
 		interface_ring_music_set(player.music.stopped);
 }
