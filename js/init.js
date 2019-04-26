@@ -285,8 +285,7 @@ function images_pick() {
 			player_images_clear();
 	} else {
 		// suffle the images again
-		if(settings.images.shuffle)
-			images_shuffle();
+		images_shuffle();
 
 		// refresh the image player if there are changes to apply
 		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index].src !== current_image.src) {
@@ -299,6 +298,9 @@ function images_pick() {
 
 // data, images, functions, shuffle
 function images_shuffle() {
+	if(!settings.images.shuffle)
+		return;
+
 	for(var i = data_images.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[data_images[i], data_images[j]] = [data_images[j], data_images[i]];
@@ -371,8 +373,7 @@ function music_pick() {
 			player_music_clear();
 	} else {
 		// suffle the songs again
-		if(settings.music.shuffle)
-			music_shuffle();
+		music_shuffle();
 
 		// refresh the music player if there are changes to apply
 		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index].src !== current_song.src) {
@@ -385,6 +386,9 @@ function music_pick() {
 
 // data, music, functions, shuffle
 function music_shuffle() {
+	if(!settings.music.shuffle)
+		return;
+
 	for(var i = data_music.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[data_music[i], data_music[j]] = [data_music[j], data_music[i]];

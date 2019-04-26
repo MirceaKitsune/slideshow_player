@@ -245,10 +245,7 @@ function player_images_next() {
 			player.images.index = 0;
 			player.images.element_1.setAttribute("src", player.images.element_2.getAttribute("src"));
 			player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
-
-			// also shuffle the images again
-			if(settings.images.shuffle)
-				images_shuffle();
+			images_shuffle();
 		}
 		else {
 			player_detach();
@@ -292,12 +289,15 @@ function player_images_skip(index) {
 	if((overflow_start || overflow_end) && !settings.images.loop)
 		return;
 
-	if(overflow_start)
+	if(overflow_start) {
 		player.images.index = data_images.length - 1;
-	else if(overflow_end)
+		images_shuffle();
+	} else if(overflow_end) {
 		player.images.index = 0;
-	else
+		images_shuffle();
+	} else {
 		player.images.index = index - 1;
+	}
 	player.images.transition = -1;
 
 	clearTimeout(player.images.timer_next);
@@ -373,10 +373,7 @@ function player_music_next() {
 	if(player.music.index >= data_music.length) {
 		if(settings.music.loop) {
 			player.music.index = 0;
-
-			// also shuffle the music again
-			if(settings.music.shuffle)
-				music_shuffle();
+			music_shuffle();
 		}
 		else {
 			player_detach();
@@ -409,12 +406,15 @@ function player_music_skip(index) {
 	if((overflow_start || overflow_end) && !settings.music.loop)
 		return;
 
-	if(overflow_start)
+	if(overflow_start) {
 		player.music.index = data_music.length - 1;
-	else if(overflow_end)
+		music_shuffle();
+	} else if(overflow_end) {
 		player.music.index = 0;
-	else
+		music_shuffle();
+	} else {
 		player.music.index = index - 1;
+	}
 	player.music.preloading = true;
 
 	clearTimeout(player.music.timer_next);
