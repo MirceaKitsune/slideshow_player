@@ -121,7 +121,7 @@ function player_images_fullscreen_toggle(force_to) {
 	if(typeof force_to === "boolean" ? !force_to : player_images_fullscreen_has()) {
 		// cancel fullscreen mode
 		const method_cancel = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msCancelFullScreen;
-		if(method_cancel)
+		if(method_cancel && player_images_fullscreen_has())
 			method_cancel.call(document);
 		// else
 			// return;

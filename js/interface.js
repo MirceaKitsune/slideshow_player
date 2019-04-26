@@ -256,6 +256,7 @@ function interface_play() {
 function interface_update_attached(attached) {
 	if(attached) {
 		interface.media.setAttribute("class", "item_media item_media_position_detached item_media_background_detached");
+		interface.media.setAttribute("style", "z-index: 1; opacity: 1");
 		interface.media_images_label.setAttribute("class", "text_color_black");
 		interface.media_images_info.setAttribute("class", "text_color_black");
 		interface.media_controls_label.setAttribute("class", "text_color_black");
@@ -267,6 +268,7 @@ function interface_update_attached(attached) {
 		document.body.appendChild(interface.media);
 	} else {
 		interface.media.setAttribute("class", "item_media item_media_position_attached item_media_background_attached");
+		// interface.media.setAttribute("style", "z-index: 1; opacity: 1");
 		interface.media_images_label.setAttribute("class", "text_color_white");
 		interface.media_images_info.setAttribute("class", "text_color_white");
 		interface.media_controls_label.setAttribute("class", "text_color_white");

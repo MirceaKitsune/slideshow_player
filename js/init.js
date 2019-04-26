@@ -107,7 +107,7 @@ const settings_default = {
 	sites: [],
 	images: {
 		keywords: "anthro",
-		count: 100,
+		count: 1000,
 		duration: 10,
 		nsfw: false,
 		loop: true,
@@ -115,7 +115,7 @@ const settings_default = {
 	},
 	music: {
 		keywords: "trance",
-		count: 10,
+		count: 100,
 		loop: true,
 		shuffle: true,
 		volume: 1
