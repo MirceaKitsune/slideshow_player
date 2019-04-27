@@ -16,9 +16,6 @@ const TRANSITION = 0.1;
 // smaller values offer more accuracy but use more processing power
 const RECOMMENDATIONS_RATE = 1;
 
-// default image style
-const STYLE_IMG = "position: absolute; width: auto; height: 100%; max-width: 100%; max-height: 100%";
-
 // recommendations, global object
 var recommendations = {
 	timer: null,
@@ -185,9 +182,9 @@ function player_images_fade() {
 		// preloading: element_2 is used to preload the next image in the background, which sets the preload flag back to false when ready
 		player.images.preloading = true;
 		player.images.element_1.setAttribute("src", data_images[index_current].src);
-		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+		player.images.element_1.setAttribute("style", "opacity: 1");
 		player.images.element_2.setAttribute("src", data_images[index_next].src);
-		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+		player.images.element_2.setAttribute("style", "opacity: 0");
 		player.images.element_2.setAttribute("onload", "player.images.preloading = false");
 		player.images.element_2.setAttribute("onerror", "player_detach()");
 	} else if(player.images.transition <= 0) {
@@ -196,19 +193,19 @@ function player_images_fade() {
 		// element_2: represents the current image, opacity is set to 0
 		// shuffling: since the indexes of images change when shuffling, do so only after storing the previous element
 		player.images.element_1.setAttribute("src", data_images[index_previous].src);
-		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+		player.images.element_1.setAttribute("style", "opacity: 1");
 		if(index_current <= 0)
 			images_shuffle();
 		player.images.element_2.setAttribute("src", data_images[index_current].src);
-		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+		player.images.element_2.setAttribute("style", "opacity: 0");
 		player.images.element_2.removeAttribute("onload");
 		player.images.element_2.removeAttribute("onerror");
 	} else {
 		// preform transition operations
 		// element_1: opacity translates from 1 to 0
 		// element_2: opacity translates from 0 to 1
-		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
-		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
+		player.images.element_1.setAttribute("style", "opacity: " + (1 - player.images.transition));
+		player.images.element_2.setAttribute("style", "opacity: " + (0 + player.images.transition));
 	}
 
 	// advance or stop the transition
@@ -313,9 +310,9 @@ function player_images_clear() {
 
 	player.images.index = 1;
 	player.images.stopped = false;
-	player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+	player.images.element_1.setAttribute("style", "opacity: 1");
 	player.images.element_1.setAttribute("src", SRC_BLANK);
-	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+	player.images.element_2.setAttribute("style", "opacity: 0");
 	player.images.element_2.setAttribute("src", SRC_BLANK);
 
 	interface_update_media(false, true, false);
@@ -502,13 +499,15 @@ function player_attach() {
 
 	// configure the 1st image element
 	player.images.element_1 = document.createElement("img");
-	player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+	player.images.element_1.setAttribute("class", "player_image");
+	player.images.element_1.setAttribute("style", "opacity: 1");
 	player.images.element_1.setAttribute("src", SRC_BLANK);
 	player.element.appendChild(player.images.element_1);
 
 	// configure the 2nd image element
 	player.images.element_2 = document.createElement("img");
-	player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+	player.images.element_2.setAttribute("class", "player_image");
+	player.images.element_2.setAttribute("style", "opacity: 0");
 	player.images.element_2.setAttribute("src", SRC_BLANK);
 	player.element.appendChild(player.images.element_2);
 
