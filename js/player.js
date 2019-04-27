@@ -35,9 +35,9 @@ var recommendations = {
 var player = {
 	element: null,
 	images: {
+		index: 0,
 		preloading: false,
 		stopped: false,
-		index: 0,
 		transition: 0,
 		timer_fade: null,
 		timer_next: null,
@@ -45,9 +45,9 @@ var player = {
 		element_2: null
 	},
 	music: {
+		index: 0,
 		preloading: false,
 		stopped: false,
-		index: 0,
 		timer_next: null,
 		element: null
 	}
@@ -209,25 +209,68 @@ function player_images_fade() {
 	// stop recording the latency
 	player_images_latency_stop();
 
-	// check if the transition has finished
+	// image indexes to be used below
+	var index_previous = player.images.index - 2;
+	var index_current = player.images.index - 1;
+	var index_next = player.images.index - 0;
+	if(index_previous < 0)
+		index_previous = settings.images.loop ? data_images.length - 1 : 0;
+	if(index_next >= data_images.length)
+		index_next = settings.images.loop ? 0 : data_images.length - 1;
+
+	// apply the current image
 	if(player.images.transition >= 1) {
+		interface_update_media(false, true, false);
+
+		// preform end operations
+		// element_1: represents the current image, opacity is set to 1
+		// element_2: represents the next image, opacity is set to 0
+		// preloading: element_2 is used to preload the next image in the background, which sets the preload flag back to false when ready
+		player.images.preloading = true;
+		player.images.element_1.setAttribute("src", data_images[index_current].src);
+		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+		player.images.element_2.setAttribute("src", data_images[index_next].src);
+		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+		player.images.element_2.setAttribute("onload", "player.images.preloading = false");
+		player.images.element_2.setAttribute("onerror", "player_detach()");
+	} else if(player.images.transition <= 0) {
+		// preform start operations
+		// element_1: represents the previous image, opacity is set to 1
+		// element_2: represents the current image, opacity is set to 0
+		// shuffling: since the indexes of images change when shuffling, do so only after storing the previous element
+		player.images.element_1.setAttribute("src", data_images[index_previous].src);
+		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
+		if(index_current <= 0)
+			images_shuffle();
+		player.images.element_2.setAttribute("src", data_images[index_current].src);
+		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: 0");
+		player.images.element_2.removeAttribute("onload");
+		player.images.element_2.removeAttribute("onerror");
+	} else {
+		// preform transition operations
+		// element_1: opacity translates from 1 to 0
+		// element_2: opacity translates from 0 to 1
+		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
+		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
+	}
+
+	// advance or stop the transition
+	if(player.images.transition < 1) {
+		player.images.transition = Math.min(player.images.transition + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
+	} else {
+		player.images.transition = 0;
+
+		// deactivate the fading function
+		clearInterval(player.images.timer_fade);
+
 		// schedule the next image
 		// the latency calculated based on the loading time of previous images is deducted from the duration of this image
 		if(!player.images.stopped) {
 			const duration = Math.max(settings.images.duration - (settings.images.duration * TRANSITION) - player_images_latency.time_average, 5);
+			const duration_ring = duration + (settings.images.duration * TRANSITION);
 			player.images.timer_next = setTimeout(player_images_next, duration * 1000);
-			interface_ring_images_set(duration);
+			interface_ring_images_set(duration_ring);
 		}
-
-		// deactivate the fading function
-		clearInterval(player.images.timer_fade);
-		interface_update_media(false, true, false);
-	}
-	else {
-		// advance the transition and apply the new transparency to the image elements
-		player.images.transition = Math.min(Math.abs(player.images.transition) + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
-		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (1 - player.images.transition));
-		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (0 + player.images.transition));
 	}
 }
 
@@ -240,12 +283,11 @@ function player_images_next() {
 	player_images_latency_start();
 
 	// stop or restart the slideshow if this is the final image
+	// for images, shuffling is handled by fade function for technical reasons
 	if(player.images.index >= data_images.length) {
 		if(settings.images.loop) {
 			player.images.index = 0;
-			player.images.element_1.setAttribute("src", player.images.element_2.getAttribute("src"));
-			player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: 1");
-			images_shuffle();
+			// images_shuffle();
 		}
 		else {
 			player_detach();
@@ -253,27 +295,12 @@ function player_images_next() {
 		}
 	}
 
+	// bump the index to the next image
+	++player.images.index;
+
 	// activate the fading function
 	clearInterval(player.images.timer_fade);
 	player.images.timer_fade = setInterval(player_images_fade, RATE);
-
-	// bump the index to the next image
-	// a negative transition value can be used to disable the transition effect for this turn
-	++player.images.index;
-	player.images.transition = player.images.transition < 0 ? -1 : 0;
-	player.images.preloading = true;
-
-	// apply the current and next image
-	if(player.images.index > 1) {
-		player.images.element_1.setAttribute("src", data_images[player.images.index - 2].src);
-		player.images.element_1.setAttribute("style", STYLE_IMG + "; opacity: " + (player.images.transition < 0 ? 0 : 1));
-	}
-	if(player.images.index > 0) {
-		player.images.element_2.setAttribute("src", data_images[player.images.index - 1].src);
-		player.images.element_2.setAttribute("style", STYLE_IMG + "; opacity: " + (player.images.transition < 0 ? 1 : 0));
-		player.images.element_2.setAttribute("onload", "player.images.preloading = false");
-		player.images.element_2.setAttribute("onerror", "player_detach()");
-	}
 
 	// refresh recommended tags
 	recommendations_timer();
@@ -298,7 +325,9 @@ function player_images_skip(index) {
 	} else {
 		player.images.index = index - 1;
 	}
-	player.images.transition = -1;
+
+	// as the image we're switching to is unpredictable and can't be preloaded ahead of time, disable the transition
+	player.images.transition = 1;
 
 	clearTimeout(player.images.timer_next);
 	player.images.timer_next = setTimeout(player_images_next, 0);
@@ -495,7 +524,7 @@ function player_active_music() {
 
 // player, is busy, images
 function player_busy_images() {
-	return player.images.index <= 0 || player.images.transition < 1 || player.images.preloading;
+	return player.images.index <= 0 || player.images.preloading;
 }
 
 // player, is busy, music
@@ -534,15 +563,14 @@ function player_attach() {
 	player.element.appendChild(player.music.element);
 
 	// set the image interval and timeout functions
-	// player.images.timer_fade = setInterval(player_images_fade, RATE);
+	// as this is the first image and there's nothing to fade from, disable the transition
 	player.images.timer_next = setTimeout(player_images_next, 0);
 	player.images.index = 0;
-	player.images.stopped = false;
+	player.images.transition = 1;
 
 	// set the music interval and timeout functions
 	player.music.timer_next = setTimeout(player_music_next, 0);
 	player.music.index = 0;
-	player.music.stopped = false;
 
 	// set the recommendations interval
 	recommendations.timer = setInterval(recommendations_timer, RECOMMENDATIONS_RATE * 1000);
@@ -571,10 +599,13 @@ function player_detach() {
 	clearInterval(recommendations.timer);
 	player.element = null;
 	player.images.index = 0;
+	player.images.preloading = false;
 	player.images.stopped = false;
+	player.images.transition = 0;
 	player.images.element_1 = null;
 	player.images.element_2 = null;
 	player.music.index = 0;
+	player.music.preloading = false;
 	player.music.stopped = false;
 	player.music.element = null;
 
