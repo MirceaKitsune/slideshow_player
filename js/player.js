@@ -16,11 +16,6 @@ const TRANSITION = 0.1;
 // smaller values offer more accuracy but use more processing power
 const RECOMMENDATIONS_RATE = 1;
 
-// latency strength: 0.5 = half, 1.0 = full, 2.0 = double
-// latency step: resolution of the latency check in seconds, lower is more accurate but also more expensive
-const IMAGES_LATENCY_STRENGTH = 1;
-const IMAGES_LATENCY_STEP = 0.1;
-
 // default image style
 const STYLE_IMG = "position: absolute; width: auto; height: 100%; max-width: 100%; max-height: 100%";
 
@@ -166,48 +161,10 @@ function player_images_fullscreen_toggle(force_to) {
 	interface_style_button_color(interface.media_controls_fullscreen, "white");
 }
 
-// player, images, latency, settings
-var player_images_latency = {
-	time_average: 0,
-	time_this: 0,
-	recording: false,
-	timer: null
-};
-
-// player, images, latency, start recording
-function player_images_latency_start() {
-	if(player_images_latency.recording)
-		return;
-
-	player_images_latency.recording = true;
-	player_images_latency.time_this = 0;
-	player_images_latency.timer = setInterval(function() {
-		player_images_latency.time_this += IMAGES_LATENCY_STEP;
-	}, IMAGES_LATENCY_STEP * 1000);
-}
-
-// player, images, latency, stop recording
-function player_images_latency_stop() {
-	if(player_images_latency.recording === false)
-		return;
-
-	// update the average latency based on the current latency
-	player_images_latency.time_average = (player_images_latency.time_average + (player_images_latency.time_this * IMAGES_LATENCY_STRENGTH)) / 2;
-
-	player_images_latency.recording = false;
-	player_images_latency.time_this = 0;
-	clearInterval(player_images_latency.timer);
-}
-
 // player, images, transition
 function player_images_fade() {
 	if(!player_available_images() || !player_active_images())
 		return;
-	if(player.images.preloading)
-		return;
-
-	// stop recording the latency
-	player_images_latency_stop();
 
 	// image indexes to be used below
 	var index_previous = player.images.index - 2;
@@ -259,18 +216,7 @@ function player_images_fade() {
 		player.images.transition = Math.min(player.images.transition + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
 	} else {
 		player.images.transition = 0;
-
-		// deactivate the fading function
 		clearInterval(player.images.timer_fade);
-
-		// schedule the next image
-		// the latency calculated based on the loading time of previous images is deducted from the duration of this image
-		if(!player.images.stopped) {
-			const duration = Math.max(settings.images.duration - (settings.images.duration * TRANSITION) - player_images_latency.time_average, 5);
-			const duration_ring = duration + (settings.images.duration * TRANSITION);
-			player.images.timer_next = setTimeout(player_images_next, duration * 1000);
-			interface_ring_images_set(duration_ring);
-		}
 	}
 }
 
@@ -279,8 +225,16 @@ function player_images_next() {
 	if(!player_available_images() || !player_active_images())
 		return;
 
-	// start recording the latency
-	player_images_latency_start();
+	// if the player is still preloading the previous image, wait and retry every second
+	// otherwise schedule the next image
+	if(player.images.preloading) {
+		player.images.timer_next = setTimeout(player_images_next, 1000);
+		interface_update_media(false, true, false);
+		return;
+	} else if(!player.images.stopped) {
+		player.images.timer_next = setTimeout(player_images_next, settings.images.duration * 1000);
+		interface_ring_images_set(settings.images.duration);
+	}
 
 	// stop or restart the slideshow if this is the final image
 	// for images, shuffling is handled by fade function for technical reasons
@@ -592,7 +546,6 @@ function player_detach() {
 	player.element.innerHTML = "";
 
 	// unset the interval and timeout functions
-	player_images_latency_stop();
 	clearInterval(player.images.timer_fade);
 	clearTimeout(player.images.timer_next);
 	clearTimeout(player.music.timer_next);

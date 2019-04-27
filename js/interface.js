@@ -434,7 +434,7 @@ function interface_update_media_images() {
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 		interface.media_images_info.innerHTML = "<font class=text_size_small><b>Loading image</b></font>";
-		interface.player_icon_images.innerHTML = "⧗<br/><font class=text_size_medium><b>Latency:</b> " + player_images_latency.time_average.toFixed(2) + " sec</font>";
+		interface.player_icon_images.innerHTML = "⧗";
 	}
 	else if(active) {
 		var label_title = data_images[player.images.index - 1].title;
