@@ -292,6 +292,9 @@ function images_pick() {
 			if(player_active_images() && (player.images.index <= 0 || player.images.index >= data_images.length))
 				player.images.index = 1;
 			player_images_skip(player.images.index);
+
+			// as shuffling changes the indexes of items, disable the transition effect for this turn
+			player.images.transition = 1;
 		}
 	}
 }

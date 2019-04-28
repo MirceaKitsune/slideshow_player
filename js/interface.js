@@ -383,7 +383,7 @@ function interface_update_media(update_controls, update_images, update_music) {
 // interface, update HTML, media images
 function interface_update_media_images() {
 	const active = player_available_images() && player_active_images();
-	const ready = !player_busy_images();
+	const ready = !player_busy_images() && player.images.index > 0;
 
 	// configure previous / play / next elements
 	if(active && ready) {
@@ -467,7 +467,7 @@ function interface_update_media_images() {
 // interface, update HTML, media music
 function interface_update_media_music() {
 	const active = player_available_music() && player_active_music();
-	const ready = !player_busy_music();
+	const ready = !player_busy_music() && player.music.index > 0;
 
 	// configure previous / play / next elements
 	if(active && ready) {
