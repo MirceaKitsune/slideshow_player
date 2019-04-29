@@ -288,8 +288,7 @@ function images_pick() {
 		images_shuffle();
 
 		// the order and availability of images has changed, disable the transition effect
-		if(player_active_images())
-			player.images.transition = 1;
+		player.images.transition = 1;
 
 		// refresh the image player if there are changes to apply
 		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index].src !== current_image.src) {
@@ -298,10 +297,8 @@ function images_pick() {
 			player_images_skip(player.images.index);
 
 			// immediately mark images as preloading
-			if(player.images.reverse)
-				player.images.preloading_previous = true;
-			else
-				player.images.preloading_next = true;
+			player.images.preloading_previous = true;
+			player.images.preloading_next = true;
 		}
 	}
 }

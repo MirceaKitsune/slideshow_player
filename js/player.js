@@ -166,54 +166,23 @@ function player_images_fade() {
 	if(!player_available_images() || !player_active_images())
 		return;
 
-	// set the image indexes
-	var index_previous = player.images.index - 2;
-	var index_current = player.images.index - 1;
-	var index_next = player.images.index - 0;
-	if(index_previous < 0)
-		index_previous = settings.images.loop ? data_images.length - 1 : 0;
-	if(index_next >= data_images.length)
-		index_next = settings.images.loop ? 0 : data_images.length - 1;
-
-	// set the image element sources
-	// since the indexes of images change when shuffling, shuffle after storing the previous and next elements
-	if(player.images.transition <= 0 || player.images.transition >= 1) {
-		player.images.element_previous.setAttribute("src", data_images[index_previous].src);
-		player.images.element_next.setAttribute("src", data_images[index_next].src);
-		if(player.images.transition <= 0 && ((!player.images.reverse && index_current <= 0) || (player.images.reverse && index_current >= data_images.length)))
-			images_shuffle();
-		player.images.element_current.setAttribute("src", data_images[index_current].src);
-	}
-
 	// set the image element opacities
 	if(player.images.transition >= 1) {
 		// preform end operations
 		// element_previous: opacity is set to 0
 		// element_current: opacity is set to 1
 		// element_next: opacity is set to 0
-		player.images.preloading_previous = true;
-		player.images.preloading_next = true;
 		player.images.element_previous.setAttribute("style", "opacity: 0");
-		player.images.element_previous.setAttribute("onload", "player.images.preloading_previous = false");
-		player.images.element_previous.setAttribute("onerror", "player_detach()");
 		player.images.element_current.setAttribute("style", "opacity: 1");
 		player.images.element_next.setAttribute("style", "opacity: 0");
-		player.images.element_next.setAttribute("onload", "player.images.preloading_next = false");	
-		player.images.element_next.setAttribute("onerror", "player_detach()");
 	} else if(player.images.transition <= 0) {
 		// preform start operations
 		// element_previous: opacity is set to 1, or 0 if in reverse
 		// element_current: opacity is set to 0
 		// element_next: opacity is set to 0, or 1 if in reverse
-		player.images.preloading_previous = false;
-		player.images.preloading_next = false;
 		player.images.element_previous.setAttribute("style", "opacity: " + (player.images.reverse ? 0 : 1));
-		player.images.element_previous.removeAttribute("onload");
-		player.images.element_previous.removeAttribute("onerror");
 		player.images.element_current.setAttribute("style", "opacity: 0");
 		player.images.element_next.setAttribute("style", "opacity: " + (player.images.reverse ? 1 : 0));
-		player.images.element_next.removeAttribute("onload");
-		player.images.element_next.removeAttribute("onerror");
 	} else {
 		// preform transition operations
 		// element_previous: opacity translates from 1 to 0, or is set to 0 if in reverse
@@ -259,7 +228,7 @@ function player_images_next() {
 	if(player.images.index >= data_images.length) {
 		if(settings.images.loop) {
 			player.images.index = 0;
-			// images_shuffle(); // for images, shuffling is handled by the fade function to support transitions
+			// images_shuffle(); // for images, shuffling is handled by the switch function to support transitions
 		}
 		else {
 			player_detach();
@@ -267,21 +236,46 @@ function player_images_next() {
 		}
 	}
 
+	// bump the index to the next image
+	++player.images.index;
+	interface_update_media(false, true, false);
+
+	// apply the current image
+	// since the indexes of images change when shuffling, shuffle after storing the previous and next elements
+	if(player.images.index > 0) {
+		var index_previous = player.images.index - 2;
+		var index_current = player.images.index - 1;
+		var index_next = player.images.index - 0;
+		if(index_previous < 0)
+			index_previous = settings.images.loop ? data_images.length - 1 : 0;
+		if(index_next >= data_images.length)
+			index_next = settings.images.loop ? 0 : data_images.length - 1;
+
+		player.images.element_previous.setAttribute("src", data_images[index_previous].src);
+		player.images.element_next.setAttribute("src", data_images[index_next].src);
+		if((!player.images.reverse && index_current <= 0) || (player.images.reverse && index_current >= data_images.length))
+			images_shuffle();
+		player.images.element_current.setAttribute("src", data_images[index_current].src);
+
+		player.images.preloading_previous = true;
+		player.images.preloading_next = true;
+		player.images.element_previous.setAttribute("onload", "player.images.preloading_previous = false");
+		player.images.element_previous.setAttribute("onerror", "player_detach()");
+		player.images.element_next.setAttribute("onload", "player.images.preloading_next = false");	
+		player.images.element_next.setAttribute("onerror", "player_detach()");
+	}
+
 	// if we're interrupting an existing transition, reset the effect
 	if(player.images.transition > 0 && player.images.transition < 1)
 		player.images.transition = 0;
 
-	// bump the index to the next image
-	++player.images.index;
-
-	// activate the fading function
+	// activate the fading function, also run it to instantly apply initial opacities
 	clearInterval(player.images.timer_fade);
 	player.images.timer_fade = setInterval(player_images_fade, RATE);
+	player_images_fade();
 
 	// refresh recommended tags
 	recommendations_timer();
-
-	interface_update_media(false, true, false);
 }
 
 // player, images, skip
@@ -298,10 +292,10 @@ function player_images_skip(index) {
 
 	if(overflow_start) {
 		player.images.index = data_images.length - 1;
-		// images_shuffle(); // for images, shuffling is handled by the fade function to support transitions
+		// images_shuffle(); // for images, shuffling is handled by the switch function to support transitions
 	} else if(overflow_end) {
 		player.images.index = 0;
-		// images_shuffle(); // for images, shuffling is handled by the fade function to support transitions
+		// images_shuffle(); // for images, shuffling is handled by the switch function to support transitions
 	} else {
 		player.images.index = index - 1;
 	}
@@ -322,9 +316,8 @@ function player_images_play() {
 	}
 	else {
 		player.images.stopped = true;
+		interface_update_media(false, true, false);
 	}
-
-	interface_update_media(false, true, false);
 }
 
 // player, images, clear
@@ -389,6 +382,7 @@ function player_music_next() {
 
 	// bump the index to the next song
 	++player.music.index;
+	interface_update_media(false, false, true);
 
 	// apply the current song
 	if(player.music.index > 0) {
@@ -400,8 +394,6 @@ function player_music_next() {
 
 	// refresh recommended tags
 	recommendations_timer();
-
-	interface_update_media(false, false, true);
 }
 
 // player, music, skip
@@ -547,22 +539,18 @@ function player_attach() {
 	player.music.element = document.createElement("audio");
 	player.element.appendChild(player.music.element);
 
-	// set the image interval and timeout functions
+	// start the image player, images_pick will take care executing player_images_next
 	// as this is the first image and there's nothing to fade from, disable the transition
-	player.images.index = 0;
 	player.images.transition = 1;
-	player_images_next();
+	player.images.index = 0;
+	images_pick();
 
-	// set the music interval and timeout functions
+	// start the music player, music_pick will take care executing player_music_next
 	player.music.index = 0;
-	player_music_next();
+	music_pick();
 
 	// set the recommendations interval
 	recommendations.timer = setInterval(recommendations_timer, RECOMMENDATIONS_RATE * 1000);
-
-	// refresh the images and songs in use
-	images_pick();
-	music_pick();
 
 	interface_update_media(true, true, true);
 }
