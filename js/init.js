@@ -298,6 +298,7 @@ function images_pick() {
 
 			// immediately mark images as preloading
 			player.images.preloading_previous = true;
+			player.images.preloading_current = true;
 			player.images.preloading_next = true;
 		}
 	}

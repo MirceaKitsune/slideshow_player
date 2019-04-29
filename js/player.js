@@ -491,7 +491,7 @@ function player_active_music() {
 
 // player, is busy, images
 function player_busy_images() {
-	return player.images.preloading_current || (!player.images.reverse && player.images.preloading_next) || (player.images.reverse && player.images.preloading_previous);
+	return player.images.preloading_previous || player.images.preloading_current || player.images.preloading_next;
 }
 
 // player, is busy, music
