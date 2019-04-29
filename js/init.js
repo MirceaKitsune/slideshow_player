@@ -283,18 +283,25 @@ function images_pick() {
 		// if the player is active and no images are left, clear the image player
 		if(player_active_images())
 			player_images_clear();
-	} else {
+	} else if(player_active_images()) {
 		// suffle the images again
 		images_shuffle();
 
+		// the order and availability of images has changed, disable the transition effect
+		if(player_active_images())
+			player.images.transition = 1;
+
 		// refresh the image player if there are changes to apply
 		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index].src !== current_image.src) {
-			if(player_active_images() && (player.images.index <= 0 || player.images.index >= data_images.length))
+			if(player.images.index <= 0 || player.images.index >= data_images.length)
 				player.images.index = 1;
 			player_images_skip(player.images.index);
 
-			// as shuffling changes the indexes of items, disable the transition effect for this turn
-			player.images.transition = 1;
+			// immediately mark images as preloading
+			if(player.images.reverse)
+				player.images.preloading_previous = true;
+			else
+				player.images.preloading_next = true;
 		}
 	}
 }
@@ -374,15 +381,18 @@ function music_pick() {
 		// if the player is active and no songs are left, clear the music player
 		if(player_active_music())
 			player_music_clear();
-	} else {
+	} else if(player_active_music()) {
 		// suffle the songs again
 		music_shuffle();
 
 		// refresh the music player if there are changes to apply
 		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index].src !== current_song.src) {
-			if(player_active_music() && (player.music.index <= 0 || player.music.index >= data_music.length))
+			if(player.music.index <= 0 || player.music.index >= data_music.length)
 				player.music.index = 1;
 			player_music_skip(player.music.index);
+
+			// immediately mark songs as preloading
+			player.music.preloading = true;
 		}
 	}
 }

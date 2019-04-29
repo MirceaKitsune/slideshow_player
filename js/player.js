@@ -289,12 +289,12 @@ function player_images_skip(index) {
 	if(!player_available_images() || !player_active_images())
 		return;
 
+	player.images.reverse = index < player.images.index;
+
 	const overflow_start = index <= 0;
 	const overflow_end = index > data_images.length;
 	if((overflow_start || overflow_end) && !settings.images.loop)
 		return;
-
-	player.images.reverse = index < player.images.index;
 
 	if(overflow_start) {
 		player.images.index = data_images.length - 1;
@@ -423,7 +423,6 @@ function player_music_skip(index) {
 	} else {
 		player.music.index = index - 1;
 	}
-	player.music.preloading = true;
 
 	clearTimeout(player.music.timer_next);
 	player_music_next();

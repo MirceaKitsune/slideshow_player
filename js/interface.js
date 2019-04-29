@@ -460,7 +460,7 @@ function interface_update_media_images() {
 	}
 
 	// update the ring element
-	if(!active || !ready || player.images.stopped)
+	if(!active || player.images.stopped)
 		interface_ring_images_set(null);
 }
 
@@ -544,7 +544,7 @@ function interface_update_media_music() {
 	}
 
 	// update the ring element
-	if(!active || !ready)
+	if(!active)
 		interface_ring_music_set(null);
 	else
 		interface_ring_music_set(player.music.stopped);
