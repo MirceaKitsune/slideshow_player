@@ -390,8 +390,7 @@ function interface_update_media_images() {
 		interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
 		interface.media_images_play.setAttribute("onclick", "player_images_play()");
 		interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
-	}
-	else {
+	} else {
 		interface.media_images_previous.removeAttribute("onclick");
 		interface.media_images_play.removeAttribute("onclick");
 		interface.media_images_next.removeAttribute("onclick");
@@ -401,13 +400,11 @@ function interface_update_media_images() {
 		interface.media_images_previous.innerHTML = "|◀";
 		interface.media_images_play.innerHTML = "||" + (active && !ready ? "⧗" : "");
 		interface.media_images_next.innerHTML = "▶|";
-	}
-	else if(active) {
+	} else if(active) {
 		interface.media_images_previous.innerHTML = "|◀";
 		interface.media_images_play.innerHTML = "▶" + (active && !ready ? "⧗" : "");
 		interface.media_images_next.innerHTML = "▶|";
-	}
-	else {
+	} else {
 		interface.media_images_previous.innerHTML = "|◀";
 		interface.media_images_play.innerHTML = "∅" + (active && !ready ? "⧗" : "");
 		interface.media_images_next.innerHTML = "▶|";
@@ -417,13 +414,11 @@ function interface_update_media_images() {
 		interface_style_button_color(interface.media_images_previous, "green");
 		interface_style_button_color(interface.media_images_play, "green");
 		interface_style_button_color(interface.media_images_next, "green");
-	}
-	else if(active && ready) {
+	} else if(active && ready) {
 		interface_style_button_color(interface.media_images_previous, "yellow");
 		interface_style_button_color(interface.media_images_play, "yellow");
 		interface_style_button_color(interface.media_images_next, "yellow");
-	}
-	else {
+	} else {
 		interface_style_button_color(interface.media_images_previous, "red");
 		interface_style_button_color(interface.media_images_play, "red");
 		interface_style_button_color(interface.media_images_next, "red");
@@ -444,8 +439,7 @@ function interface_update_media_images() {
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
 		interface.media_images_info.innerHTML = "<font class=text_size_small><b>" + label_title + "</b> by <b>" + label_author + "</b></font>";
 		interface.player_icon_images.innerHTML = ready ? "" : "⧗";
-	}
-	else {
+	} else {
 		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>No images loaded</b></font>";
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
@@ -468,8 +462,7 @@ function interface_update_media_music() {
 		interface.media_music_previous.setAttribute("onclick", "player_music_skip(player.music.index - 1)");
 		interface.media_music_play.setAttribute("onclick", "player_music_play()");
 		interface.media_music_next.setAttribute("onclick", "player_music_skip(player.music.index + 1)");
-	}
-	else {
+	} else {
 		interface.media_music_previous.removeAttribute("onclick");
 		interface.media_music_play.removeAttribute("onclick");
 		interface.media_music_next.removeAttribute("onclick");
@@ -479,13 +472,11 @@ function interface_update_media_music() {
 		interface.media_music_previous.innerHTML = "|◀";
 		interface.media_music_play.innerHTML = "||" + (active && !ready ? "⧗" : "");
 		interface.media_music_next.innerHTML = "▶|";
-	}
-	else if(active) {
+	} else if(active) {
 		interface.media_music_previous.innerHTML = "|◀";
 		interface.media_music_play.innerHTML = "▶" + (active && !ready ? "⧗" : "");
 		interface.media_music_next.innerHTML = "▶|";
-	}
-	else {
+	} else {
 		interface.media_music_previous.innerHTML = "|◀";
 		interface.media_music_play.innerHTML = "∅" + (active && !ready ? "⧗" : "");
 		interface.media_music_next.innerHTML = "▶|";
@@ -495,13 +486,11 @@ function interface_update_media_music() {
 		interface_style_button_color(interface.media_music_previous, "green");
 		interface_style_button_color(interface.media_music_play, "green");
 		interface_style_button_color(interface.media_music_next, "green");
-	}
-	else if(active && ready) {
+	} else if(active && ready) {
 		interface_style_button_color(interface.media_music_previous, "yellow");
 		interface_style_button_color(interface.media_music_play, "yellow");
 		interface_style_button_color(interface.media_music_next, "yellow");
-	}
-	else {
+	} else {
 		interface_style_button_color(interface.media_music_previous, "red");
 		interface_style_button_color(interface.media_music_play, "red");
 		interface_style_button_color(interface.media_music_next, "red");
@@ -522,8 +511,7 @@ function interface_update_media_music() {
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
 		interface.media_music_info.innerHTML = "<font class=text_size_small><b>" + label_title + "</b> by <b>" + label_author + "</b></font>";
 		interface.player_icon_music.innerHTML = ready ? "" : "⧖";
-	}
-	else {
+	} else {
 		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>No music loaded</b></font>";
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
@@ -682,15 +670,13 @@ function interface_update_media_controls() {
 		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_player + "</font>";
 		interface_style_button_color(interface.media_controls_play, "green");
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ▶";
-	}
-	else if(player_available()) {
+	} else if(player_available()) {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "▶";
 		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_player + "</font>";
 		interface_style_button_color(interface.media_controls_play, "yellow");
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ■";
-	}
-	else {
+	} else {
 		interface.media_controls_play.removeAttribute("onclick");
 		interface.media_controls_play.innerHTML = "∅";
 		interface.media_controls_label.innerHTML = "<font class=text_size_large><b>No content to play</b></font>";
@@ -704,8 +690,7 @@ function interface_update_media_controls() {
 		interface.media_controls_label.innerHTML = "<font class=text_size_large><b>Fetching content:</b> " + busy + " left</font>";
 		interface.media_controls_play.innerHTML += " ⧗";
 		document.title += " ⧗";
-	}
-	else if(interface_refresh.timer > 0) {
+	} else if(interface_refresh.timer > 0) {
 		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_plugin + "</font>";
 		interface.media_controls_play.innerHTML += " ⟳";
 		document.title += " ⟳";

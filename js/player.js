@@ -134,8 +134,7 @@ function player_images_fullscreen_toggle(force_to) {
 
 		// stop the periodic fullscreen check
 		clearInterval(fullscreen_timer);
-	}
-	else {
+	} else {
 		// request fullscreen mode
 		const method_request = interface.player.requestFullScreen || interface.player.webkitRequestFullScreen || interface.player.mozRequestFullScreen || interface.player.msRequestFullscreen;
 		if(method_request)
@@ -162,8 +161,8 @@ function player_images_fullscreen_toggle(force_to) {
 	interface_style_button_color(interface.media_controls_fullscreen, "white");
 }
 
-// player, images, transition
-function player_images_fade() {
+// player, images, switching, fade
+function player_images_next_fade() {
 	if(!player_available_images() || !player_active_images())
 		return;
 
@@ -229,8 +228,7 @@ function player_images_next() {
 		if(settings.images.loop) {
 			player.images.index = 0;
 			// images_shuffle(); // for images, shuffling is handled by the switch function to support transitions
-		}
-		else {
+		} else {
 			player_detach();
 			return;
 		}
@@ -269,8 +267,8 @@ function player_images_next() {
 
 	// activate the fading function, also run it to instantly apply initial opacities
 	clearInterval(player.images.timer_fade);
-	player.images.timer_fade = setInterval(player_images_fade, RATE);
-	player_images_fade();
+	player.images.timer_fade = setInterval(player_images_next_fade, RATE);
+	player_images_next_fade();
 
 	// refresh recommended tags
 	recommendations_timer();
@@ -311,8 +309,7 @@ function player_images_play() {
 	if(player.images.stopped) {
 		player.images.stopped = false;
 		player_images_next();
-	}
-	else {
+	} else {
 		player.images.stopped = true;
 		interface_update_media(false, true, false);
 	}
@@ -370,8 +367,7 @@ function player_music_next() {
 		if(settings.music.loop) {
 			player.music.index = 0;
 			music_shuffle();
-		}
-		else {
+		} else {
 			player_detach();
 			return;
 		}
@@ -436,8 +432,7 @@ function player_music_play() {
 
 		player.music.element.play();
 		player.music.stopped = false;
-	}
-	else {
+	} else {
 		player.music.element.pause();
 		player.music.stopped = true;
 	}
