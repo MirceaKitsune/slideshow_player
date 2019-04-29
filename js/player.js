@@ -29,6 +29,7 @@ var player = {
 	images: {
 		index: 0,
 		preloading_previous: false,
+		preloading_current: false,
 		preloading_next: false,
 		stopped: false,
 		reverse: false,
@@ -258,6 +259,7 @@ function player_images_next() {
 		interface_update_media(false, true, false);
 		interface_ring_images_set(settings.images.duration);
 		player.images.preloading_previous = true;
+		player.images.preloading_current = true;
 		player.images.preloading_next = true;
 	}
 
@@ -489,7 +491,7 @@ function player_active_music() {
 
 // player, is busy, images
 function player_busy_images() {
-	return (!player.images.reverse && player.images.preloading_next) || (player.images.reverse && player.images.preloading_previous);
+	return player.images.preloading_current || (!player.images.reverse && player.images.preloading_next) || (player.images.reverse && player.images.preloading_previous);
 }
 
 // player, is busy, music
@@ -525,6 +527,8 @@ function player_attach() {
 	player.images.element_current.setAttribute("class", "player_image");
 	player.images.element_current.setAttribute("style", "opacity: 0");
 	player.images.element_current.setAttribute("src", SRC_BLANK);
+	player.images.element_current.setAttribute("onload", "player.images.preloading_current = false");
+	player.images.element_current.setAttribute("onerror", "player_detach()");
 	player.element.appendChild(player.images.element_current);
 
 	// configure the next image element
@@ -573,6 +577,7 @@ function player_detach() {
 	player.element = null;
 	player.images.index = 0;
 	player.images.preloading_previous = false;
+	player.images.preloading_current = false;
 	player.images.preloading_next = false;
 	player.images.stopped = false;
 	player.images.reverse = false;
