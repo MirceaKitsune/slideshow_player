@@ -127,7 +127,7 @@ function interface_autorefresh() {
 		interface_load(true);
 	} else {
 		interface_refresh.timer = Math.floor(interface_refresh.timer - 1);
-		interface_update_media(true, false, false);
+		interface_update_media(false, false, true, false, false);
 	}
 }
 
@@ -246,7 +246,7 @@ function interface_load(pull) {
 		}
 	}
 
-	interface_update_media(true, true, true);
+	interface_update_media(false, true, true, true, false);
 }
 
 // interface, functions, play button
@@ -366,18 +366,17 @@ function interface_update_controls_sites() {
 }
 
 // interface, functions, media
-function interface_update_media(update_controls, update_images, update_music) {
-	if(update_controls) {
-		interface_update_media_controls();
-	}
-	if(update_images) {
-		interface_update_media_images();
+function interface_update_media(update_images_tags, update_images, update_controls, update_music, update_music_tags) {
+	if(update_images_tags)
 		interface_update_recommendations_images();
-	}
-	if(update_music) {
+	if(update_images)
+		interface_update_media_images();
+	if(update_controls)
+		interface_update_media_controls();
+	if(update_music)
 		interface_update_media_music();
+	if(update_music_tags)
 		interface_update_recommendations_music();
-	}
 }
 
 // interface, update HTML, media images
@@ -530,7 +529,7 @@ function interface_update_media_music() {
 function interface_update_recommendations_images_clear() {
 	recommendations.images = {};
 	recommendations_timer();
-	interface_update_media(false, true, false);
+	interface_update_media(true, false, false, false, false);
 }
 
 // interface, update HTML, recommendation images, set
@@ -538,7 +537,7 @@ function interface_update_recommendations_images_set(tag) {
 	interface.controls_images_search_keywords_input.setAttribute("value", tag);
 	interface.controls_images_search_keywords_input.value = tag;
 	interface_preload("keywords", TYPE_IMAGES);
-	interface_update_media(false, true, false);
+	interface_update_media(true, false, false, false, false);
 }
 
 // interface, update HTML, recommendation images
@@ -586,7 +585,7 @@ function interface_update_recommendations_images() {
 function interface_update_recommendations_music_clear() {
 	recommendations.music = {};
 	recommendations_timer();
-	interface_update_media(false, false, true);
+	interface_update_media(false, false, false, false, true);
 }
 
 // interface, update HTML, recommendation music, set
@@ -594,7 +593,7 @@ function interface_update_recommendations_music_set(tag) {
 	interface.controls_music_search_keywords_input.setAttribute("value", tag);
 	interface.controls_music_search_keywords_input.value = tag;
 	interface_preload("keywords", TYPE_MUSIC);
-	interface_update_media(false, false, true);
+	interface_update_media(false, false, false, false, true);
 }
 
 // interface, update HTML, recommendation music
@@ -1237,6 +1236,6 @@ function interface_init() {
 	clearInterval(interface_refresh.interval);
 	interface_refresh.interval = setInterval(interface_autorefresh, 1000);
 	interface_refresh.timer = 1;
-	interface_update_media(true, true, true);
+	interface_update_media(false, true, true, true, false);
 	settings_url_set();
 }

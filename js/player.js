@@ -88,10 +88,7 @@ function recommendations_timer() {
 		}
 	}
 
-	if(!player_busy_images())
-		interface_update_media(false, true, false);
-	if(!player_busy_music())
-		interface_update_media(false, false, true);
+	interface_update_media(true, false, false, false, true);
 }
 
 // player, images, timer function for fullscreen
@@ -161,49 +158,51 @@ function player_images_fullscreen_toggle(force_to) {
 	interface_style_button_color(interface.media_controls_fullscreen, "white");
 }
 
+// player, images, switching, onload, previous
+function player_images_next_onload_previous() {
+	player.images.preloading_previous = false;
+
+	if(!player_busy_images())
+		interface_update_media(false, true, false, false, false);
+}
+
+// player, images, switching, onload, current
+function player_images_next_onload_current() {
+	player.images.preloading_current = false;
+
+	if(!player_busy_images())
+		interface_update_media(false, true, false, false, false);
+}
+
+// player, images, switching, onload, next
+function player_images_next_onload_next() {
+	player.images.preloading_next = false;
+
+	if(!player_busy_images())
+		interface_update_media(false, true, false, false, false);
+}
+
 // player, images, switching, fade
 function player_images_next_fade() {
 	if(!player_available_images() || !player_active_images())
 		return;
 
 	// set the image element opacities
-	if(player.images.transition >= 1) {
-		// preform end operations
-		// element_previous: opacity is set to 0
-		// element_current: opacity is set to 1
-		// element_next: opacity is set to 0
+	player.images.element_current.setAttribute("style", "opacity: " + Math.min(0 + player.images.transition, 1));
+	if(player.images.reverse) {
 		player.images.element_previous.setAttribute("style", "opacity: 0");
-		player.images.element_current.setAttribute("style", "opacity: 1");
-		player.images.element_next.setAttribute("style", "opacity: 0");
-	} else if(player.images.transition <= 0) {
-		// preform start operations
-		// element_previous: opacity is set to 1, or 0 if in reverse
-		// element_current: opacity is set to 0
-		// element_next: opacity is set to 0, or 1 if in reverse
-		player.images.element_previous.setAttribute("style", "opacity: " + (player.images.reverse ? 0 : 1));
-		player.images.element_current.setAttribute("style", "opacity: 0");
-		player.images.element_next.setAttribute("style", "opacity: " + (player.images.reverse ? 1 : 0));
+		player.images.element_next.setAttribute("style", "opacity: " + Math.max(1 - player.images.transition, 0));
 	} else {
-		// preform transition operations
-		// element_previous: opacity translates from 1 to 0, or is set to 0 if in reverse
-		// element_current: opacity translates from 0 to 1
-		// element_next: opacity translates from 1 to 0, or is set to 0 if not in reverse
-		player.images.element_current.setAttribute("style", "opacity: " + (0 + player.images.transition));
-		if(player.images.reverse) {
-			player.images.element_previous.setAttribute("style", "opacity: 0");
-			player.images.element_next.setAttribute("style", "opacity: " + (1 - player.images.transition));
-		} else {
-			player.images.element_previous.setAttribute("style", "opacity: " + (1 - player.images.transition));
-			player.images.element_next.setAttribute("style", "opacity: 0");
-		}
+		player.images.element_previous.setAttribute("style", "opacity: " + Math.max(1 - player.images.transition, 0));
+		player.images.element_next.setAttribute("style", "opacity: 0");
 	}
 
 	// advance or stop the transition
 	if(player.images.transition < 1) {
 		player.images.transition = Math.min(player.images.transition + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
 	} else {
-		player.images.transition = 0;
 		clearInterval(player.images.timer_fade);
+		player.images.transition = 0;
 		player.images.reverse = false; // only used once
 	}
 }
@@ -213,15 +212,10 @@ function player_images_next() {
 	if(!player_available_images() || !player_active_images())
 		return;
 
-	// if the player is still preloading the target image, wait and retry every second
-	// otherwise schedule the next image
-	if(player_busy_images()) {
-		player.images.timer_next = setTimeout(player_images_next, 1000);
-		interface_update_media(false, true, false);
-		return;
-	} else if(!player.images.stopped) {
+	// schedule the next image
+	clearTimeout(player.images.timer_next);
+	if(!player.images.stopped)
 		player.images.timer_next = setTimeout(player_images_next, settings.images.duration * 1000);
-	}
 
 	// stop or restart the slideshow if this is the final image
 	if(player.images.index >= data_images.length) {
@@ -244,9 +238,9 @@ function player_images_next() {
 		var index_current = player.images.index - 1;
 		var index_next = player.images.index - 0;
 		if(index_previous < 0)
-			index_previous = settings.images.loop ? data_images.length - 1 : 0;
-		if(index_next >= data_images.length)
-			index_next = settings.images.loop ? 0 : data_images.length - 1;
+			index_previous = data_images.length - 1;
+		if(index_next > data_images.length - 1)
+			index_next = 0;
 
 		player.images.element_previous.setAttribute("src", data_images[index_previous].src);
 		player.images.element_next.setAttribute("src", data_images[index_next].src);
@@ -254,21 +248,23 @@ function player_images_next() {
 			images_shuffle();
 		player.images.element_current.setAttribute("src", data_images[index_current].src);
 
-		interface_update_media(false, true, false);
-		interface_ring_images_set(settings.images.duration);
+		interface_ring_images_set(player.images.stopped ? null : settings.images.duration);
+		interface_update_media(false, true, false, false, false);
+
+		// mark the elements as preloading after updating the interface, so we only see the busy icon if we make another call after this
 		player.images.preloading_previous = true;
 		player.images.preloading_current = true;
 		player.images.preloading_next = true;
+
+		// if we're interrupting an existing transition, reset the effect
+		if(player.images.transition > 0 && player.images.transition < 1)
+			player.images.transition = 0;
+
+		// activate the fading function, also run it to instantly apply initial opacities
+		clearInterval(player.images.timer_fade);
+		player.images.timer_fade = setInterval(player_images_next_fade, RATE);
+		player_images_next_fade();
 	}
-
-	// if we're interrupting an existing transition, reset the effect
-	if(player.images.transition > 0 && player.images.transition < 1)
-		player.images.transition = 0;
-
-	// activate the fading function, also run it to instantly apply initial opacities
-	clearInterval(player.images.timer_fade);
-	player.images.timer_fade = setInterval(player_images_next_fade, RATE);
-	player_images_next_fade();
 
 	// refresh recommended tags
 	recommendations_timer();
@@ -311,7 +307,7 @@ function player_images_play() {
 		player_images_next();
 	} else {
 		player.images.stopped = true;
-		interface_update_media(false, true, false);
+		interface_update_media(false, true, false, false, false);
 	}
 }
 
@@ -329,7 +325,7 @@ function player_images_clear() {
 	player.images.element_next.setAttribute("style", "opacity: 0");
 	player.images.element_next.setAttribute("src", SRC_BLANK);
 
-	interface_update_media(false, true, false);
+	interface_update_media(false, true, false, false, false);
 }
 
 // player, music, switching, canplay
@@ -341,12 +337,13 @@ function player_music_next_canplay() {
 		return;
 	player.music.preloading = false;
 
-	// schedule the next song
 	const duration = player.music.element.duration;
 	if(duration === NaN || duration <= 0) {
 		player_detach();
 		return;
 	}
+
+	// schedule the next song
 	clearTimeout(player.music.timer_next);
 	player.music.timer_next = setTimeout(player_music_next, duration * 1000);
 
@@ -354,7 +351,7 @@ function player_music_next_canplay() {
 	if(!player.music.stopped)
 		player.music.element.play();
 
-	interface_update_media(false, false, true);
+	interface_update_media(false, false, false, true, false);
 }
 
 // player, music, switching
@@ -379,11 +376,12 @@ function player_music_next() {
 	// apply the current song
 	if(player.music.index > 0) {
 		player.music.element.setAttribute("src", data_music[player.music.index - 1].src);
-		player.music.element.setAttribute("oncanplay", "player_music_next_canplay()");
 		player.music.element.volume = settings.music.volume;
 
-		interface_update_media(false, false, true);
 		interface_ring_music_set(player.music.element);
+		interface_update_media(false, false, false, true, false);
+
+		// mark the elements as preloading after updating the interface, so we only see the busy icon if we make another call after this
 		player.music.preloading = true;
 	}
 
@@ -437,7 +435,7 @@ function player_music_play() {
 		player.music.stopped = true;
 	}
 
-	interface_update_media(false, false, true);
+	interface_update_media(false, false, false, true, false);
 }
 
 // player, music, clear
@@ -451,7 +449,7 @@ function player_music_clear() {
 	player.music.element.currentTime = 0;
 	player.music.element.removeAttribute("src");
 
-	interface_update_media(false, false, true);
+	interface_update_media(false, false, false, true, false);
 }
 
 // player, is available
@@ -513,7 +511,7 @@ function player_attach() {
 	player.images.element_previous.setAttribute("class", "player_image");
 	player.images.element_previous.setAttribute("style", "opacity: 0");
 	player.images.element_previous.setAttribute("src", SRC_BLANK);
-	player.images.element_previous.setAttribute("onload", "player.images.preloading_previous = false");
+	player.images.element_previous.setAttribute("onload", "player_images_next_onload_previous()");
 	player.images.element_previous.setAttribute("onerror", "player_detach()");
 	player.element.appendChild(player.images.element_previous);
 
@@ -522,7 +520,7 @@ function player_attach() {
 	player.images.element_current.setAttribute("class", "player_image");
 	player.images.element_current.setAttribute("style", "opacity: 0");
 	player.images.element_current.setAttribute("src", SRC_BLANK);
-	player.images.element_current.setAttribute("onload", "player.images.preloading_current = false");
+	player.images.element_current.setAttribute("onload", "player_images_next_onload_current()");
 	player.images.element_current.setAttribute("onerror", "player_detach()");
 	player.element.appendChild(player.images.element_current);
 
@@ -531,12 +529,13 @@ function player_attach() {
 	player.images.element_next.setAttribute("class", "player_image");
 	player.images.element_next.setAttribute("style", "opacity: 0");
 	player.images.element_next.setAttribute("src", SRC_BLANK);
-	player.images.element_next.setAttribute("onload", "player.images.preloading_next = false");	
+	player.images.element_next.setAttribute("onload", "player_images_next_onload_next()");	
 	player.images.element_next.setAttribute("onerror", "player_detach()");
 	player.element.appendChild(player.images.element_next);
 
 	// configure the music element
 	player.music.element = document.createElement("audio");
+	player.music.element.setAttribute("oncanplay", "player_music_next_canplay()");
 	player.element.appendChild(player.music.element);
 
 	// start the image player, images_pick will take care executing player_images_next
@@ -552,7 +551,7 @@ function player_attach() {
 	// set the recommendations interval
 	recommendations.timer = setInterval(recommendations_timer, RECOMMENDATIONS_RATE * 1000);
 
-	interface_update_media(true, true, true);
+	interface_update_media(false, true, true, true, false);
 }
 
 // player, HTML, destroy
@@ -585,5 +584,5 @@ function player_detach() {
 	player.music.stopped = false;
 	player.music.element = null;
 
-	interface_update_media(true, true, true);
+	interface_update_media(false, true, true, true, false);
 }

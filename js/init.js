@@ -195,7 +195,7 @@ function plugins_busy_set(name, timeout) {
 		plugins_ready();
 	}
 
-	interface_update_media(true, false, false);
+	interface_update_media(false, false, true, false, false);
 }
 
 // plugins, functions, settings, read
@@ -225,7 +225,7 @@ var data_images_all = data_images = [];
 // data, images, functions, clear
 function images_clear() {
 	data_images_all = [];
-	interface_update_media(true, true, false);
+	interface_update_media(false, true, true, false, false);
 }
 
 // data, images, functions, add
@@ -321,7 +321,7 @@ var data_music_all = data_music = [];
 // data, music, functions, clear
 function music_clear() {
 	data_music_all = [];
-	interface_update_media(true, false, true);
+	interface_update_media(false, false, true, true, false);
 }
 
 // data, music, functions, add
