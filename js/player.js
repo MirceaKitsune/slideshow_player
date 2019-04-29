@@ -221,7 +221,6 @@ function player_images_next() {
 		return;
 	} else if(!player.images.stopped) {
 		player.images.timer_next = setTimeout(player_images_next, settings.images.duration * 1000);
-		interface_ring_images_set(settings.images.duration);
 	}
 
 	// stop or restart the slideshow if this is the final image
@@ -238,7 +237,6 @@ function player_images_next() {
 
 	// bump the index to the next image
 	++player.images.index;
-	interface_update_media(false, true, false);
 
 	// apply the current image
 	// since the indexes of images change when shuffling, shuffle after storing the previous and next elements
@@ -257,12 +255,10 @@ function player_images_next() {
 			images_shuffle();
 		player.images.element_current.setAttribute("src", data_images[index_current].src);
 
+		interface_update_media(false, true, false);
+		interface_ring_images_set(settings.images.duration);
 		player.images.preloading_previous = true;
 		player.images.preloading_next = true;
-		player.images.element_previous.setAttribute("onload", "player.images.preloading_previous = false");
-		player.images.element_previous.setAttribute("onerror", "player_detach()");
-		player.images.element_next.setAttribute("onload", "player.images.preloading_next = false");	
-		player.images.element_next.setAttribute("onerror", "player_detach()");
 	}
 
 	// if we're interrupting an existing transition, reset the effect
@@ -359,7 +355,6 @@ function player_music_next_canplay() {
 	if(!player.music.stopped)
 		player.music.element.play();
 
-	interface_ring_music_set(player.music.element);
 	interface_update_media(false, false, true);
 }
 
@@ -382,14 +377,16 @@ function player_music_next() {
 
 	// bump the index to the next song
 	++player.music.index;
-	interface_update_media(false, false, true);
 
 	// apply the current song
 	if(player.music.index > 0) {
-		player.music.preloading = true;
 		player.music.element.setAttribute("src", data_music[player.music.index - 1].src);
 		player.music.element.setAttribute("oncanplay", "player_music_next_canplay()");
 		player.music.element.volume = settings.music.volume;
+
+		interface_update_media(false, false, true);
+		interface_ring_music_set(player.music.element);
+		player.music.preloading = true;
 	}
 
 	// refresh recommended tags
@@ -519,6 +516,8 @@ function player_attach() {
 	player.images.element_previous.setAttribute("class", "player_image");
 	player.images.element_previous.setAttribute("style", "opacity: 0");
 	player.images.element_previous.setAttribute("src", SRC_BLANK);
+	player.images.element_previous.setAttribute("onload", "player.images.preloading_previous = false");
+	player.images.element_previous.setAttribute("onerror", "player_detach()");
 	player.element.appendChild(player.images.element_previous);
 
 	// configure the current image element
@@ -533,6 +532,8 @@ function player_attach() {
 	player.images.element_next.setAttribute("class", "player_image");
 	player.images.element_next.setAttribute("style", "opacity: 0");
 	player.images.element_next.setAttribute("src", SRC_BLANK);
+	player.images.element_next.setAttribute("onload", "player.images.preloading_next = false");	
+	player.images.element_next.setAttribute("onerror", "player_detach()");
 	player.element.appendChild(player.images.element_next);
 
 	// configure the music element

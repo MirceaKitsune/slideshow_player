@@ -385,58 +385,52 @@ function interface_update_media_images() {
 	const active = player_available_images() && player_active_images();
 	const ready = !player_busy_images() && player.images.index > 0;
 
-	// configure previous / play / next elements
-	if(active && ready) {
-		if(player.images.stopped) {
-			interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
-			interface.media_images_previous.innerHTML = "|◀";
-			interface_style_button_color(interface.media_images_previous, "yellow");
-
-			interface.media_images_play.setAttribute("onclick", "player_images_play()");
-			interface.media_images_play.innerHTML = "▶";
-			interface_style_button_color(interface.media_images_play, "yellow");
-
-			interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
-			interface.media_images_next.innerHTML = "▶|";
-			interface_style_button_color(interface.media_images_next, "yellow");
-		}
-		else {
-			interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
-			interface.media_images_previous.innerHTML = "|◀";
-			interface_style_button_color(interface.media_images_previous, "green");
-
-			interface.media_images_play.setAttribute("onclick", "player_images_play()");
-			interface.media_images_play.innerHTML = "||";
-			interface_style_button_color(interface.media_images_play, "green");
-
-			interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
-			interface.media_images_next.innerHTML = "▶|";
-			interface_style_button_color(interface.media_images_next, "green");
-		}
+	// configure previous / play / next elements (onclick)
+	if(active) {
+		interface.media_images_previous.setAttribute("onclick", "player_images_skip(player.images.index - 1)");
+		interface.media_images_play.setAttribute("onclick", "player_images_play()");
+		interface.media_images_next.setAttribute("onclick", "player_images_skip(player.images.index + 1)");
 	}
 	else {
 		interface.media_images_previous.removeAttribute("onclick");
-		interface.media_images_previous.innerHTML = "∅";
-		interface_style_button_color(interface.media_images_previous, "red");
-
 		interface.media_images_play.removeAttribute("onclick");
-		interface.media_images_play.innerHTML = "∅";
-		interface_style_button_color(interface.media_images_play, "red");
-
 		interface.media_images_next.removeAttribute("onclick");
-		interface.media_images_next.innerHTML = "∅";
+	}
+	// configure previous / play / next elements (innerHTML)
+	if(active && !player.images.stopped) {
+		interface.media_images_previous.innerHTML = "|◀";
+		interface.media_images_play.innerHTML = "||" + (active && !ready ? "⧗" : "");
+		interface.media_images_next.innerHTML = "▶|";
+	}
+	else if(active) {
+		interface.media_images_previous.innerHTML = "|◀";
+		interface.media_images_play.innerHTML = "▶" + (active && !ready ? "⧗" : "");
+		interface.media_images_next.innerHTML = "▶|";
+	}
+	else {
+		interface.media_images_previous.innerHTML = "|◀";
+		interface.media_images_play.innerHTML = "∅" + (active && !ready ? "⧗" : "");
+		interface.media_images_next.innerHTML = "▶|";
+	}
+	// configure previous / play / next elements (color)
+	if(active && ready && !player.images.stopped) {
+		interface_style_button_color(interface.media_images_previous, "green");
+		interface_style_button_color(interface.media_images_play, "green");
+		interface_style_button_color(interface.media_images_next, "green");
+	}
+	else if(active && ready) {
+		interface_style_button_color(interface.media_images_previous, "yellow");
+		interface_style_button_color(interface.media_images_play, "yellow");
+		interface_style_button_color(interface.media_images_next, "yellow");
+	}
+	else {
+		interface_style_button_color(interface.media_images_previous, "red");
+		interface_style_button_color(interface.media_images_play, "red");
 		interface_style_button_color(interface.media_images_next, "red");
 	}
 
 	// configure label / thumb / info / player_icon elements
-	if(active && !ready) {
-		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>? / " + data_images.length + "</b></font>";
-		interface.media_images_thumb.removeAttribute("href");
-		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
-		interface.media_images_info.innerHTML = "<font class=text_size_small><b>Loading image</b></font>";
-		interface.player_icon_images.innerHTML = "⧗";
-	}
-	else if(active) {
+	if(active && player.images.index > 0) {
 		var label_title = data_images[player.images.index - 1].title;
 		if(label_title.length > 32)
 			label_title = label_title.substring(0, 32) + "...";
@@ -449,7 +443,7 @@ function interface_update_media_images() {
 		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
 		interface.media_images_info.innerHTML = "<font class=text_size_small><b>" + label_title + "</b> by <b>" + label_author + "</b></font>";
-		interface.player_icon_images.innerHTML = "";
+		interface.player_icon_images.innerHTML = ready ? "" : "⧗";
 	}
 	else {
 		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>No images loaded</b></font>";
@@ -469,58 +463,52 @@ function interface_update_media_music() {
 	const active = player_available_music() && player_active_music();
 	const ready = !player_busy_music() && player.music.index > 0;
 
-	// configure previous / play / next elements
-	if(active && ready) {
-		if(player.music.stopped) {
-			interface.media_music_previous.setAttribute("onclick", "player_music_skip(player.music.index - 1)");
-			interface.media_music_previous.innerHTML = "|◀";
-			interface_style_button_color(interface.media_music_previous, "yellow");
-
-			interface.media_music_play.setAttribute("onclick", "player_music_play()");
-			interface.media_music_play.innerHTML = "▶";
-			interface_style_button_color(interface.media_music_play, "yellow");
-
-			interface.media_music_next.setAttribute("onclick", "player_music_skip(player.music.index + 1)");
-			interface.media_music_next.innerHTML = "▶|";
-			interface_style_button_color(interface.media_music_next, "yellow");
-		}
-		else {
-			interface.media_music_previous.setAttribute("onclick", "player_music_skip(player.music.index - 1)");
-			interface.media_music_previous.innerHTML = "|◀";
-			interface_style_button_color(interface.media_music_previous, "green");
-
-			interface.media_music_play.setAttribute("onclick", "player_music_play()");
-			interface.media_music_play.innerHTML = "||";
-			interface_style_button_color(interface.media_music_play, "green");
-
-			interface.media_music_next.setAttribute("onclick", "player_music_skip(player.music.index + 1)");
-			interface.media_music_next.innerHTML = "▶|";
-			interface_style_button_color(interface.media_music_next, "green");
-		}
+	// configure previous / play / next elements (onclick)
+	if(active) {
+		interface.media_music_previous.setAttribute("onclick", "player_music_skip(player.music.index - 1)");
+		interface.media_music_play.setAttribute("onclick", "player_music_play()");
+		interface.media_music_next.setAttribute("onclick", "player_music_skip(player.music.index + 1)");
 	}
 	else {
 		interface.media_music_previous.removeAttribute("onclick");
-		interface.media_music_previous.innerHTML = "∅";
-		interface_style_button_color(interface.media_music_previous, "red");
-
 		interface.media_music_play.removeAttribute("onclick");
-		interface.media_music_play.innerHTML = "∅";
-		interface_style_button_color(interface.media_music_play, "red");
-
 		interface.media_music_next.removeAttribute("onclick");
-		interface.media_music_next.innerHTML = "∅";
+	}
+	// configure previous / play / next elements (innerHTML)
+	if(active && !player.music.stopped) {
+		interface.media_music_previous.innerHTML = "|◀";
+		interface.media_music_play.innerHTML = "||" + (active && !ready ? "⧗" : "");
+		interface.media_music_next.innerHTML = "▶|";
+	}
+	else if(active) {
+		interface.media_music_previous.innerHTML = "|◀";
+		interface.media_music_play.innerHTML = "▶" + (active && !ready ? "⧗" : "");
+		interface.media_music_next.innerHTML = "▶|";
+	}
+	else {
+		interface.media_music_previous.innerHTML = "|◀";
+		interface.media_music_play.innerHTML = "∅" + (active && !ready ? "⧗" : "");
+		interface.media_music_next.innerHTML = "▶|";
+	}
+	// configure previous / play / next elements (color)
+	if(active && ready && !player.music.stopped) {
+		interface_style_button_color(interface.media_music_previous, "green");
+		interface_style_button_color(interface.media_music_play, "green");
+		interface_style_button_color(interface.media_music_next, "green");
+	}
+	else if(active && ready) {
+		interface_style_button_color(interface.media_music_previous, "yellow");
+		interface_style_button_color(interface.media_music_play, "yellow");
+		interface_style_button_color(interface.media_music_next, "yellow");
+	}
+	else {
+		interface_style_button_color(interface.media_music_previous, "red");
+		interface_style_button_color(interface.media_music_play, "red");
 		interface_style_button_color(interface.media_music_next, "red");
 	}
 
 	// configure label / thumb / info / player_icon elements
-	if(active && !ready) {
-		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>? / " + data_music.length + "</b></font>";
-		interface.media_music_thumb.removeAttribute("href");
-		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
-		interface.media_music_info.innerHTML = "<font class=text_size_small><b>Loading song</b></font>";
-		interface.player_icon_music.innerHTML = "⧖";
-	}
-	else if(active) {
+	if(active && player.music.index > 0) {
 		var label_title = data_music[player.music.index - 1].title;
 		if(label_title.length > 32)
 			label_title = label_title.substring(0, 32) + "...";
@@ -533,7 +521,7 @@ function interface_update_media_music() {
 		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
 		interface.media_music_info.innerHTML = "<font class=text_size_small><b>" + label_title + "</b> by <b>" + label_author + "</b></font>";
-		interface.player_icon_music.innerHTML = "";
+		interface.player_icon_music.innerHTML = ready ? "" : "⧖";
 	}
 	else {
 		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>No music loaded</b></font>";
