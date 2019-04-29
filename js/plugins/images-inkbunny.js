@@ -44,12 +44,13 @@ function parse_inkbunny(data) {
 		const this_data = data.submissions[entry];
 		var this_image = {};
 
+		const this_data_url = "https://inkbunny.net/s/" + this_data.submission_id;
 		this_image.src = String(this_data.file_url_full);
 		this_image.thumb = String(this_data.thumbnail_url_huge || this_data.file_url_preview); // some entries don't provide a thumbnail, use the file preview if so
 		this_image.title = String(this_data.title);
 		this_image.author = String(this_data.username);
-		this_image.url = String(this_data.file_url_full); // API doesn't provide the page URL, use the image file instead
-		this_image.score = 0;
+		this_image.url = String(this_data_url);
+		this_image.score = 0; // API doesn't provide a score
 		this_image.tags = []; // API doesn't provide tags
 
 		images_add(this_image);

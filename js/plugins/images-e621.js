@@ -25,11 +25,12 @@ function parse_e621(data) {
 		const this_data = data[entry];
 		var this_image = {};
 
+		const this_data_url = "https://e621.net/post/show/" + this_data.id;
 		this_image.src = String(this_data.file_url);
 		this_image.thumb = String(this_data.preview_url);
-		this_image.title = String(this_data.source); // API doesn't provide the title, use the file name instead
+		this_image.title = String(this_data.id); // API doesn't provide the title, use the ID instead
 		this_image.author = String(this_data.artist[0]);
-		this_image.url = String(this_data.source);
+		this_image.url = String(this_data.source || this_data_url); // prefer the source URL, fallback to submission URL
 		this_image.score = Number(this_data.score);
 		this_image.tags = this_data.tags.split(" ");
 

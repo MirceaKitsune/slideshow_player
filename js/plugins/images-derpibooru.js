@@ -25,11 +25,12 @@ function parse_derpibooru(data) {
 		const this_data = data.search[entry];
 		var this_image = {};
 
+		const this_data_url = "https://derpibooru.org/" + this_data.id;
 		this_image.src = "https:" + String(this_data.representations.large); // representations.full is better but occasionally causes errors
 		this_image.thumb = "https:" + String(this_data.representations.thumb);
-		this_image.title = String(this_data.file_name); // API doesn't provide the title, use the file name instead
+		this_image.title = String(this_data.id); // API doesn't provide the title, use the ID instead
 		this_image.author = String(this_data.uploader);
-		this_image.url = "https:" + String(this_data.representations.full); // API doesn't provide a page link, use the image instead
+		this_image.url = String(this_data_url);
 		this_image.score = Number(this_data.score);
 		this_image.tags = this_data.tags.split(",");
 
