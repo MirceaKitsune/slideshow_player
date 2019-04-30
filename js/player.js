@@ -29,16 +29,16 @@ var player = {
 	images: {
 		index: 0,
 		preloading_previous: false,
-		preloading_current: false,
 		preloading_next: false,
+		preloading_current: false,
 		stopped: false,
 		reverse: false,
 		transition: 0,
 		timer_fade: null,
 		timer_next: null,
 		element_previous: null,
-		element_current: null,
-		element_next: null
+		element_next: null,
+		element_current: null
 	},
 	music: {
 		index: 0,
@@ -166,17 +166,17 @@ function player_images_next_onload_previous() {
 		interface_update_media(false, true, false, false, false);
 }
 
-// player, images, switching, onload, current
-function player_images_next_onload_current() {
-	player.images.preloading_current = false;
+// player, images, switching, onload, next
+function player_images_next_onload_next() {
+	player.images.preloading_next = false;
 
 	if(!player_busy_images())
 		interface_update_media(false, true, false, false, false);
 }
 
-// player, images, switching, onload, next
-function player_images_next_onload_next() {
-	player.images.preloading_next = false;
+// player, images, switching, onload, current
+function player_images_next_onload_current() {
+	player.images.preloading_current = false;
 
 	if(!player_busy_images())
 		interface_update_media(false, true, false, false, false);
@@ -188,7 +188,6 @@ function player_images_next_fade() {
 		return;
 
 	// set the image element opacities
-	player.images.element_current.setAttribute("style", "opacity: " + Math.min(0 + player.images.transition, 1));
 	if(player.images.reverse) {
 		player.images.element_previous.setAttribute("style", "opacity: 0");
 		player.images.element_next.setAttribute("style", "opacity: " + Math.max(1 - player.images.transition, 0));
@@ -196,6 +195,7 @@ function player_images_next_fade() {
 		player.images.element_previous.setAttribute("style", "opacity: " + Math.max(1 - player.images.transition, 0));
 		player.images.element_next.setAttribute("style", "opacity: 0");
 	}
+	player.images.element_current.setAttribute("style", "opacity: " + Math.min(0 + player.images.transition, 1));
 
 	// advance or stop the transition
 	if(player.images.transition < 1) {
@@ -253,8 +253,8 @@ function player_images_next() {
 
 		// mark the elements as preloading after updating the interface, so we only see the busy icon if we make another call after this
 		player.images.preloading_previous = true;
-		player.images.preloading_current = true;
 		player.images.preloading_next = true;
+		player.images.preloading_current = true;
 
 		// if we're interrupting an existing transition, reset the effect
 		if(player.images.transition > 0 && player.images.transition < 1)
@@ -320,10 +320,10 @@ function player_images_clear() {
 	player.images.stopped = false;
 	player.images.element_previous.setAttribute("style", "opacity: 0");
 	player.images.element_previous.setAttribute("src", SRC_BLANK);
-	player.images.element_current.setAttribute("style", "opacity: 0");
-	player.images.element_current.setAttribute("src", SRC_BLANK);
 	player.images.element_next.setAttribute("style", "opacity: 0");
 	player.images.element_next.setAttribute("src", SRC_BLANK);
+	player.images.element_current.setAttribute("style", "opacity: 0");
+	player.images.element_current.setAttribute("src", SRC_BLANK);
 
 	interface_update_media(false, true, false, false, false);
 }
@@ -474,7 +474,7 @@ function player_active() {
 
 // player, is active, images
 function player_active_images() {
-	return document.body.contains(player.images.element_previous) && document.body.contains(player.images.element_current) && document.body.contains(player.images.element_next);
+	return document.body.contains(player.images.element_previous) && document.body.contains(player.images.element_next) && document.body.contains(player.images.element_current);
 }
 
 // player, is active, music
@@ -484,7 +484,7 @@ function player_active_music() {
 
 // player, is busy, images
 function player_busy_images() {
-	return player.images.preloading_previous || player.images.preloading_current || player.images.preloading_next;
+	return player.images.preloading_previous || player.images.preloading_next || player.images.preloading_current;
 }
 
 // player, is busy, music
@@ -515,15 +515,6 @@ function player_attach() {
 	player.images.element_previous.setAttribute("onerror", "player_detach()");
 	player.element.appendChild(player.images.element_previous);
 
-	// configure the current image element
-	player.images.element_current = document.createElement("img");
-	player.images.element_current.setAttribute("class", "player_image");
-	player.images.element_current.setAttribute("style", "opacity: 0");
-	player.images.element_current.setAttribute("src", SRC_BLANK);
-	player.images.element_current.setAttribute("onload", "player_images_next_onload_current()");
-	player.images.element_current.setAttribute("onerror", "player_detach()");
-	player.element.appendChild(player.images.element_current);
-
 	// configure the next image element
 	player.images.element_next = document.createElement("img");
 	player.images.element_next.setAttribute("class", "player_image");
@@ -532,6 +523,15 @@ function player_attach() {
 	player.images.element_next.setAttribute("onload", "player_images_next_onload_next()");	
 	player.images.element_next.setAttribute("onerror", "player_detach()");
 	player.element.appendChild(player.images.element_next);
+
+	// configure the current image element
+	player.images.element_current = document.createElement("img");
+	player.images.element_current.setAttribute("class", "player_image");
+	player.images.element_current.setAttribute("style", "opacity: 0");
+	player.images.element_current.setAttribute("src", SRC_BLANK);
+	player.images.element_current.setAttribute("onload", "player_images_next_onload_current()");
+	player.images.element_current.setAttribute("onerror", "player_detach()");
+	player.element.appendChild(player.images.element_current);
 
 	// configure the music element
 	player.music.element = document.createElement("audio");
@@ -571,14 +571,14 @@ function player_detach() {
 	player.element = null;
 	player.images.index = 0;
 	player.images.preloading_previous = false;
-	player.images.preloading_current = false;
 	player.images.preloading_next = false;
+	player.images.preloading_current = false;
 	player.images.stopped = false;
 	player.images.reverse = false;
 	player.images.transition = 0;
 	player.images.element_previous = null;
-	player.images.element_current = null;
 	player.images.element_next = null;
+	player.images.element_current = null;
 	player.music.index = 0;
 	player.music.preloading = false;
 	player.music.stopped = false;
