@@ -1,10 +1,6 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
-// update rate for rings in miliseconds (1000 = 1 second)
-// lower values are smoother but use more browser resources
-const RING_RATE = 10;
-
 // style constants
 const STYLE_MEDIA_RING_COLOR_EMPTY = "#ffffff";
 const STYLE_MEDIA_RING_COLOR_FULL = "#00aacc";
@@ -74,7 +70,7 @@ function interface_ring_images_set(duration) {
 		// set
 		interface_ring.images.date = new Date();
 		interface_ring.images.duration = duration;
-		interface_ring.images.timer = setInterval(interface_ring_images_timer, RING_RATE);
+		interface_ring.images.timer = setInterval(interface_ring_images_timer, RATE);
 	}
 }
 
@@ -105,11 +101,11 @@ function interface_ring_music_set(element) {
 		// pause
 	} else if(element === false) {
 		// resume
-		interface_ring.music.timer = setInterval(interface_ring_music_timer, RING_RATE);
+		interface_ring.music.timer = setInterval(interface_ring_music_timer, RATE);
 	} else if(element !== null && element !== undefined) {
 		// set
 		interface_ring.music.element = element;
-		interface_ring.music.timer = setInterval(interface_ring_music_timer, RING_RATE);
+		interface_ring.music.timer = setInterval(interface_ring_music_timer, RATE);
 	} else {
 		// clear
 		interface_ring.music.element = null;

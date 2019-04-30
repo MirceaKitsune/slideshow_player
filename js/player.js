@@ -4,10 +4,6 @@
 // distance (in pixels) under which to fade in the media bar as the mouse nears it (fullscreen)
 const FULLSCREEN_MOUSE_FADE = 64;
 
-// update rate in miliseconds (1000 = 1 second)
-// lower values are smoother but use more browser resources
-const RATE = 10;
-
 // amount of time it takes to transition between images
 // 0 is instant, 1 makes the transition last throughout the full duration of the image
 const TRANSITION = 0.1;
