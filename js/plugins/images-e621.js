@@ -7,14 +7,18 @@
 // the name string of this plugin
 const name_e621 = "e621";
 
-// the number of pages to return
+// the number of pages to return per keyword pair
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
 const page_count_e621 = 5;
 // this should represent the maximum number of results the API may return per page
 const page_limit_e621 = 320;
 
+// the number of seconds between requests made to the server
+// lower values mean less waiting time, but are more likely to trigger the flood protection of servers
+const delay_e621 = 0.5;
+
 // this counter reaches 0 once all pages finished loading
-var pages_left_e621 = 0;
+var pages_e621 = 0;
 
 // the script elements for this plugin
 var elements_e621 = [];
@@ -37,11 +41,13 @@ function parse_e621(data) {
 		images_add(this_image);
 	}
 
-	--pages_left_e621;
-	if(pages_left_e621 <= 0) {
+	--pages_e621;
+	if(pages_e621 <= 0) {
 		for(var page = 1; page <= page_count_e621; page++) {
-			document.body.removeChild(elements_e621[page]);
-			elements_e621[page] = null;
+			if(document.body.contains(elements_e621[page])) {
+				document.body.removeChild(elements_e621[page]);
+				elements_e621[page] = null;
+			}
 		}
 
 		plugins_busy_set(name_e621, null);
@@ -50,19 +56,26 @@ function parse_e621(data) {
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
-	plugins_busy_set(name_e621, 10);
+	plugins_busy_set(name_e621, 30);
 
 	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) ? "e621" : "e926"; // e926 is the SFW version of e621
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	const keywords_all = parse_keywords(keywords);
 
-	for(var page = 1; page <= page_count_e621; page++) {
-		elements_e621[page] = document.createElement("script");
-		elements_e621[page].type = "text/javascript";
-		elements_e621[page].src = "https://" + domain + ".net/post/index.json?tags=" + keywords + "&page=" + page + "&limit=" + page_limit_e621 + "&callback=parse_e621";
-		document.body.appendChild(elements_e621[page]);
+	pages_e621 = 0;
+	for(var item in keywords_all) {
+		for(var page = 1; page <= page_count_e621; page++) {
+			const this_keywords = keywords_all[item];
+			const this_page = page;
+			setTimeout(function() {
+				elements_e621[page] = document.createElement("script");
+				elements_e621[page].type = "text/javascript";
+				elements_e621[page].src = "https://" + domain + ".net/post/index.json?tags=" + this_keywords + "&page=" + this_page + "&limit=" + page_limit_e621 + "&callback=parse_e621";
+				document.body.appendChild(elements_e621[page]);
+			}, (pages_e621 * delay_e621) * 1000);
+			++pages_e621;
+		}
 	}
-
-	pages_left_e621 = page_count_e621;
 }
 
 // register the plugin

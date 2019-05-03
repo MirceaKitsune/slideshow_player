@@ -7,14 +7,18 @@
 // the name string of this plugin
 const name_ccmixter = "CCMixter";
 
-// the number of pages to return
+// the number of pages to return per keyword pair
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
 const page_count_ccmixter = 5;
 // this should represent the maximum number of results the API may return per page
 const page_limit_ccmixter = 15;
 
+// the number of seconds between requests made to the server
+// lower values mean less waiting time, but are more likely to trigger the flood protection of servers
+const delay_ccmixter = 0.5;
+
 // this counter reaches 0 once all pages finished loading
-var pages_left_ccmixter = 0;
+var pages_ccmixter = 0;
 
 // the script elements for this plugin
 var elements_ccmixter = [];
@@ -36,11 +40,13 @@ function parse_ccmixter(data) {
 		music_add(this_song);
 	}
 
-	--pages_left_ccmixter;
-	if(pages_left_ccmixter <= 0) {
+	--pages_ccmixter;
+	if(pages_ccmixter <= 0) {
 		for(var page = 1; page <= page_count_ccmixter; page++) {
-			document.body.removeChild(elements_ccmixter[page]);
-			elements_ccmixter[page] = null;
+			if(document.body.contains(elements_ccmixter[page])) {
+				document.body.removeChild(elements_ccmixter[page]);
+				elements_ccmixter[page] = null;
+			}
 		}
 
 		plugins_busy_set(name_ccmixter, null);	
@@ -49,23 +55,25 @@ function parse_ccmixter(data) {
 
 // fetch the json object containing the data and execute it as a script
 function music_ccmixter() {
-	plugins_busy_set(name_ccmixter, 5); // this site returns an invalid object if the given keywords are not found, use a low timeout
+	plugins_busy_set(name_ccmixter, 10); // this site returns an invalid object if the given keywords are not found, use a low timeout
 
-	// since this site doesn't offer builtin JSONP support, use a JSON to JSONP converter from: json2jsonp.com
-	const url_prefix = "https://json2jsonp.com/?url=";
-	const url_sufix = "&callback=parse_ccmixter";
+	const keywords = plugins_settings_read("keywords", TYPE_MUSIC);
+	const keywords_all = parse_keywords(keywords);
 
-	var keywords = plugins_settings_read("keywords", TYPE_MUSIC); // load the keywords
-	keywords = keywords.replace(" ", ","); // json2jsonp.com returns an error when spaces are included in the URL, convert spaces to commas
-
-	for(var page = 1; page <= page_count_ccmixter; page++) {
-		elements_ccmixter[page] = document.createElement("script");
-		elements_ccmixter[page].type = "text/javascript";
-		elements_ccmixter[page].src = url_prefix + encodeURIComponent("http://ccmixter.org/api/query?f=json&tags=" + keywords + "&offset=" + page + "&limit=" + page_limit_ccmixter) + url_sufix;
-		document.body.appendChild(elements_ccmixter[page]);
+	pages_ccmixter = 0;
+	for(var item in keywords_all) {
+		for(var page = 1; page <= page_count_ccmixter; page++) {
+			const this_keywords = keywords_all[item];
+			const this_page = page;
+			setTimeout(function() {
+				elements_ccmixter[page] = document.createElement("script");
+				elements_ccmixter[page].type = "text/javascript";
+				elements_ccmixter[page].src = parse_jsonp("http://ccmixter.org/api/query?f=json&tags=" + this_keywords + "&offset=" + this_page + "&limit=" + page_limit_ccmixter, "parse_ccmixter");
+				document.body.appendChild(elements_ccmixter[page]);
+			}, (pages_ccmixter * delay_ccmixter) * 1000);
+			++pages_ccmixter;
+		}
 	}
-
-	pages_left_ccmixter = page_count_ccmixter;
 }
 
 // register the plugin

@@ -35,6 +35,28 @@ Object.defineProperty(navigator, "userAgent", {
 	}
 });
 
+// parse, json to jsonp
+function parse_jsonp(url, callback) {
+	// since some sources don't offer builtin JSONP support, use a JSON to JSONP converter
+	// json2jsonp.com
+	return "https://json2jsonp.com/?url=" + encodeURIComponent(url + " ") + "&callback=" + callback;
+}
+
+// parse, keywords
+function parse_keywords(keywords) {
+	var search = keywords.toLowerCase();
+
+	// properly format symbols that act as separators
+	search = search.replace(/ /g, "_");
+	search = search.replace(/\./g, ",");
+	search = search.replace(/\:/g, ";");
+
+	// return an array of search items separated by a common symbol
+	// allow no more than 100 characters and 5 search pairs
+	search = search.substring(0, 100);
+	return search.split(";").slice(0, 5);
+}
+
 // settings, url, set
 function settings_url_set() {
 	var params = "";

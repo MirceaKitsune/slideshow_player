@@ -7,14 +7,18 @@
 // the name string of this plugin
 const name_inkbunny = "Inkbunny";
 
-// the number of pages to return
+// the number of pages to return per keyword pair
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
 const page_count_inkbunny = 5;
 // this should represent the maximum number of results the API may return per page
 const page_limit_inkbunny = 100;
 
+// the number of seconds between requests made to the server
+// lower values mean less waiting time, but are more likely to trigger the flood protection of servers
+const delay_inkbunny = 0.5;
+
 // this counter reaches 0 once all pages finished loading
-var pages_left_inkbunny = 0;
+var pages_inkbunny = 0;
 
 // the script elements for this plugin
 var element_login_inkbunny = null;
@@ -56,13 +60,15 @@ function parse_inkbunny(data) {
 		images_add(this_image);
 	}
 
-	--pages_left_inkbunny;
-	if(pages_left_inkbunny <= 0) {
+	--pages_inkbunny;
+	if(pages_inkbunny <= 0) {
 		parse_inkbunny_logout(data);
 
 		for(var page = 1; page <= page_count_inkbunny; page++) {
-			document.body.removeChild(elements_inkbunny[page]);
-			elements_inkbunny[page] = null;
+			if(document.body.contains(elements_inkbunny[page])) {
+				document.body.removeChild(elements_inkbunny[page]);
+				elements_inkbunny[page] = null;
+			}
 		}
 	}
 }
@@ -70,12 +76,21 @@ function parse_inkbunny(data) {
 // change the rating, then call the image parser with the session id
 function parse_inkbunny_rating(data) {
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	const keywords_all = parse_keywords(keywords);
 
-	for(var page = 1; page <= page_count_inkbunny; page++) {
-		elements_inkbunny[page] = document.createElement("script");
-		elements_inkbunny[page].type = "text/javascript";
-		elements_inkbunny[page].src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + keywords + "&page=" + page + "&submissions_per_page=" + page_limit_inkbunny + "&callback=parse_inkbunny";
-		document.body.appendChild(elements_inkbunny[page]);
+	pages_inkbunny = 0;
+	for(var item in keywords_all) {
+		for(var page = 1; page <= page_count_inkbunny; page++) {
+			const this_keywords = keywords_all[item];
+			const this_page = page;
+			setTimeout(function() {
+				elements_inkbunny[page] = document.createElement("script");
+				elements_inkbunny[page].type = "text/javascript";
+				elements_inkbunny[page].src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + this_keywords + "&page=" + this_page + "&submissions_per_page=" + page_limit_inkbunny + "&callback=parse_inkbunny";
+				document.body.appendChild(elements_inkbunny[page]);
+			}, (pages_inkbunny * delay_inkbunny) * 1000);
+			++pages_inkbunny;
+		}
 	}
 
 	document.body.removeChild(element_rating_inkbunny);
@@ -98,13 +113,11 @@ function parse_inkbunny_login(data) {
 
 // fetch the json object containing the data and execute it as a script
 function images_inkbunny() {
-	plugins_busy_set(name_inkbunny, 10);
+	plugins_busy_set(name_inkbunny, 30);
 
 	element_login_inkbunny = document.createElement("script");
 	element_login_inkbunny.src = "https://inkbunny.net/api_login.php?output_mode=json&username=guest&callback=parse_inkbunny_login";
 	document.body.appendChild(element_login_inkbunny);
-
-	pages_left_inkbunny = page_count_inkbunny;
 }
 
 // register the plugin
