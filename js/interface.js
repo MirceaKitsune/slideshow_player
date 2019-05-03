@@ -129,20 +129,17 @@ function interface_autorefresh() {
 
 // interface, functions, preload
 function interface_preload(name, type) {
-	// if this setting was used by any plugins, we will want to pull new contents from the server
-	// when the name variable is set to true rather than a setting name, force a refresh for that category
-	// if sites don't need to be refreshed, automatically load the new settings instead of starting the timer
-	if(name === true || plugins_settings_used(name, type)) {
-		if(type === TYPE_IMAGES || type === TYPE_MUSIC) {
-			if(type === TYPE_IMAGES)
-				interface_refresh.images = true;
-			if(type === TYPE_MUSIC)
-				interface_refresh.music = true;
+	// if this setting belongs to any plugin, we will want to pull new contents from the server
+	// if sites don't need to be refreshed, the new settings will just be loaded without starting the timer
+	if((plugins[name] && plugins[name].type === type) || plugins_settings_used(name, type)) {
+		if(type === TYPE_IMAGES)
+			interface_refresh.images = true;
+		if(type === TYPE_MUSIC)
+			interface_refresh.music = true;
 
-			clearInterval(interface_refresh.interval);
-			interface_refresh.interval = setInterval(interface_autorefresh, 1000);
-			interface_refresh.timer = AUTOREFRESH;
-		}
+		clearInterval(interface_refresh.interval);
+		interface_refresh.interval = setInterval(interface_autorefresh, 1000);
+		interface_refresh.timer = AUTOREFRESH;
 	}
 
 	interface_load(false);
@@ -211,11 +208,11 @@ function interface_load(pull) {
 			var has_images = has_music = false;
 			for(var site in settings.sites) {
 				const name = settings.sites[site];
-				if(interface_refresh.images && plugins[name].type === TYPE_IMAGES) {
+				if(interface_refresh.images && plugins[name] && plugins[name].type === TYPE_IMAGES) {
 					plugins_load(name);
 					has_images = true;
 				}
-				if(interface_refresh.music && plugins[name].type === TYPE_MUSIC) {
+				if(interface_refresh.music && plugins[name] && plugins[name].type === TYPE_MUSIC) {
 					plugins_load(name);
 					has_music = true;
 				}
@@ -234,6 +231,7 @@ function interface_load(pull) {
 			}
 		} else {
 			// if there are no items available, clear everything
+			plugins_ready();
 			player_detach();
 			data_images = [];
 			data_music = [];
@@ -335,12 +333,6 @@ function interface_update_controls_music() {
 function interface_update_controls_sites() {
 	interface.controls_sites_list.innerHTML = "";
 	for(var item in plugins) {
-		var type = "";
-		if(plugins[item].type === TYPE_IMAGES)
-			type = "TYPE_IMAGES";
-		if(plugins[item].type === TYPE_MUSIC)
-			type = "TYPE_MUSIC";
-
 		// interface HTML: controls, images, sites, list, checkbox
 		const id_checkbox = "controls_images_list_sites_" + item + "_checkbox";
 		interface[id_checkbox] = document.createElement("input");
@@ -350,7 +342,7 @@ function interface_update_controls_sites() {
 		interface[id_checkbox].setAttribute("name", item);
 		if(settings.sites.length == 0 || settings.sites.indexOf(item) >= 0)
 			interface[id_checkbox].setAttribute("checked", true);
-		interface[id_checkbox].setAttribute("onclick", "interface_preload(true, " + type + ")");
+		interface[id_checkbox].setAttribute("onclick", "interface_preload(\"" + item + "\", \"" + plugins[item].type + "\")");
 		interface.controls_sites_list.appendChild(interface[id_checkbox]);
 
 		// interface HTML: controls, images, sites, list, label

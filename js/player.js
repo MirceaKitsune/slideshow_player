@@ -309,10 +309,10 @@ function player_images_play() {
 
 // player, images, clear
 function player_images_clear() {
-	if(!player_active_images())
+	if(!player_active())
 		return;
 
-	player.images.index = 1;
+	player.images.index = 0;
 	player.images.stopped = false;
 	player.images.element_previous.setAttribute("style", "opacity: 0");
 	player.images.element_previous.setAttribute("src", SRC_BLANK);
@@ -436,10 +436,10 @@ function player_music_play() {
 
 // player, music, clear
 function player_music_clear() {
-	if(!player_active_music())
+	if(!player_active())
 		return;
 
-	player.music.index = 1;
+	player.music.index = 0;
 	player.music.stopped = false;
 	player.music.element.pause();
 	player.music.element.currentTime = 0;
@@ -535,8 +535,6 @@ function player_attach() {
 	player.element.appendChild(player.music.element);
 
 	// start the image player, images_pick will take care executing player_images_next
-	// as this is the first image and there's nothing to fade from, disable the transition
-	player.images.transition = 1;
 	player.images.index = 0;
 	images_pick();
 

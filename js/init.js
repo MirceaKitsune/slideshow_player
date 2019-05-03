@@ -31,7 +31,7 @@ const KEY_MUSIC_OPEN = "`";
 // set the user agent
 Object.defineProperty(navigator, "userAgent", {
 	get: function() {
-		return "SlideshowViewer/0.1 (by MirceaKitsune)";
+		return "Slideshow Player (by MirceaKitsune)";
 	}
 });
 
@@ -276,7 +276,7 @@ function images_add(item) {
 
 // data, images, functions, pick
 function images_pick() {
-	const current_image = data_images[player.images.index];
+	const current_image = data_images[player.images.index - 1];
 
 	// pick the images with the highest score
 	data_images = data_images_all.slice();
@@ -291,11 +291,11 @@ function images_pick() {
 		// suffle the images again
 		images_shuffle();
 
-		// the order and availability of images has changed, disable the transition effect
-		player.images.transition = 1;
-
 		// refresh the image player if there are changes to apply
-		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index].src !== current_image.src) {
+		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index - 1].src !== current_image.src) {
+			// the order and availability of images has changed, disable the transition effect for this turn
+			player.images.transition = 1;
+
 			if(player.images.index <= 0 || player.images.index >= data_images.length)
 				player.images.index = 1;
 			player_images_skip(player.images.index);
@@ -372,7 +372,7 @@ function music_add(item) {
 
 // data, music, functions, pick
 function music_pick() {
-	const current_song = data_music[player.music.index];
+	const current_song = data_music[player.music.index - 1];
 
 	// pick the songs with the highest score
 	data_music = data_music_all.slice();
@@ -388,7 +388,7 @@ function music_pick() {
 		music_shuffle();
 
 		// refresh the music player if there are changes to apply
-		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index].src !== current_song.src) {
+		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index - 1].src !== current_song.src) {
 			if(player.music.index <= 0 || player.music.index >= data_music.length)
 				player.music.index = 1;
 			player_music_skip(player.music.index);
