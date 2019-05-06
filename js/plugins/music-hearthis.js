@@ -7,18 +7,19 @@
 // the name string of this plugin
 const name_hearthis = "HearThis";
 
-// the number of pages to return per keyword pair
+// the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_hearthis = 5;
+const page_count_hearthis = 10;
 // this should represent the maximum number of results the API may return per page
 const page_limit_hearthis = 20;
 
 // the number of seconds between requests made to the server
 // lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_hearthis = 0.5;
+const delay_hearthis = 0.1;
 
-// this counter reaches 0 once all pages finished loading
+// the active and maximum number of pages currently in use
 var pages_hearthis = 0;
+var pages_total_hearthis = 0;
 
 // the script elements for this plugin
 var elements_hearthis = [];
@@ -42,13 +43,15 @@ function parse_hearthis(data) {
 
 	--pages_hearthis;
 	if(pages_hearthis <= 0) {
-		for(var page = 1; page <= page_count_hearthis; page++) {
+		for(var page = 1; page <= pages_total_hearthis; page++) {
 			if(document.body.contains(elements_hearthis[page])) {
 				document.body.removeChild(elements_hearthis[page]);
 				elements_hearthis[page] = null;
 			}
 		}
 
+		pages_hearthis = 0;
+		pages_total_hearthis = 0;
 		plugins_busy_set(name_hearthis, null);
 	}
 }
@@ -61,8 +64,9 @@ function music_hearthis() {
 	const keywords_all = parse_keywords(keywords.split(",")[0].split(".")[0]); // only one word is supported for this API
 
 	pages_hearthis = 0;
+	pages_total_hearthis = Math.max(Math.floor(page_count_hearthis / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= page_count_hearthis; page++) {
+		for(var page = 1; page <= pages_total_hearthis; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {

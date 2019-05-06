@@ -7,18 +7,19 @@
 // the name string of this plugin
 const name_ccmixter = "CCMixter";
 
-// the number of pages to return per keyword pair
+// the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_ccmixter = 5;
+const page_count_ccmixter = 10;
 // this should represent the maximum number of results the API may return per page
 const page_limit_ccmixter = 15;
 
 // the number of seconds between requests made to the server
 // lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_ccmixter = 0.5;
+const delay_ccmixter = 0.1;
 
-// this counter reaches 0 once all pages finished loading
+// the active and maximum number of pages currently in use
 var pages_ccmixter = 0;
+var pages_total_ccmixter = 0;
 
 // the script elements for this plugin
 var elements_ccmixter = [];
@@ -42,13 +43,15 @@ function parse_ccmixter(data) {
 
 	--pages_ccmixter;
 	if(pages_ccmixter <= 0) {
-		for(var page = 1; page <= page_count_ccmixter; page++) {
+		for(var page = 1; page <= pages_total_ccmixter; page++) {
 			if(document.body.contains(elements_ccmixter[page])) {
 				document.body.removeChild(elements_ccmixter[page]);
 				elements_ccmixter[page] = null;
 			}
 		}
 
+		pages_ccmixter = 0;
+		pages_total_ccmixter = 0;
 		plugins_busy_set(name_ccmixter, null);	
 	}
 }
@@ -61,8 +64,9 @@ function music_ccmixter() {
 	const keywords_all = parse_keywords(keywords);
 
 	pages_ccmixter = 0;
+	pages_total_ccmixter = Math.max(Math.floor(page_count_ccmixter / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= page_count_ccmixter; page++) {
+		for(var page = 1; page <= pages_total_ccmixter; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {

@@ -7,18 +7,19 @@
 // the name string of this plugin
 const name_derpibooru = "Derpibooru";
 
-// the number of pages to return per keyword pair
+// the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_derpibooru = 5;
+const page_count_derpibooru = 10;
 // this should represent the maximum number of results the API may return per page
 const page_limit_derpibooru = 50;
 
 // the number of seconds between requests made to the server
 // lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_derpibooru = 0.5;
+const delay_derpibooru = 0.1;
 
-// this counter reaches 0 once all pages finished loading
+// the active and maximum number of pages currently in use
 var pages_derpibooru = 0;
+var pages_total_derpibooru = 0;
 
 // the script elements for this plugin
 var elements_derpibooru = [];
@@ -43,13 +44,15 @@ function parse_derpibooru(data) {
 
 	--pages_derpibooru;
 	if(pages_derpibooru <= 0) {
-		for(var page = 1; page <= page_count_derpibooru; page++) {
+		for(var page = 1; page <= pages_total_derpibooru; page++) {
 			if(document.body.contains(elements_derpibooru[page])) {
 				document.body.removeChild(elements_derpibooru[page]);
 				elements_derpibooru[page] = null;
 			}
 		}
 
+		pages_derpibooru = 0;
+		pages_total_derpibooru = 0;
 		plugins_busy_set(name_derpibooru, null);
 	}
 }
@@ -63,8 +66,9 @@ function images_derpibooru() {
 	const keywords_all = parse_keywords(keywords);
 
 	pages_derpibooru = 0;
+	pages_total_derpibooru = Math.max(Math.floor(page_count_derpibooru / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= page_count_derpibooru; page++) {
+		for(var page = 1; page <= pages_total_derpibooru; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {

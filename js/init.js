@@ -52,9 +52,9 @@ function parse_keywords(keywords) {
 	search = search.replace(/\:/g, ";");
 
 	// return an array of search items separated by a common symbol
-	// allow no more than 100 characters and 5 search pairs
+	// allow no more than 100 characters and 10 search pairs
 	search = search.substring(0, 100);
-	return search.split(";").slice(0, 5);
+	return search.split(";").slice(0, 10);
 }
 
 // settings, url, set

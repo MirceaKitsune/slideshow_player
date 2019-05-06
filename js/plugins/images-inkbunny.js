@@ -7,18 +7,19 @@
 // the name string of this plugin
 const name_inkbunny = "Inkbunny";
 
-// the number of pages to return per keyword pair
+// the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_inkbunny = 5;
+const page_count_inkbunny = 10;
 // this should represent the maximum number of results the API may return per page
 const page_limit_inkbunny = 100;
 
 // the number of seconds between requests made to the server
 // lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_inkbunny = 0.5;
+const delay_inkbunny = 0.1;
 
-// this counter reaches 0 once all pages finished loading
+// the active and maximum number of pages currently in use
 var pages_inkbunny = 0;
+var pages_total_inkbunny = 0;
 
 // the script elements for this plugin
 var element_login_inkbunny = null;
@@ -31,6 +32,8 @@ function parse_inkbunny_ready(data) {
 	document.body.removeChild(element_logout_inkbunny);
 	element_logout_inkbunny = null;
 
+	pages_inkbunny = 0;
+	pages_total_inkbunny = 0;
 	plugins_busy_set(name_inkbunny, null);
 }
 
@@ -64,7 +67,7 @@ function parse_inkbunny(data) {
 	if(pages_inkbunny <= 0) {
 		parse_inkbunny_logout(data);
 
-		for(var page = 1; page <= page_count_inkbunny; page++) {
+		for(var page = 1; page <= pages_total_inkbunny; page++) {
 			if(document.body.contains(elements_inkbunny[page])) {
 				document.body.removeChild(elements_inkbunny[page]);
 				elements_inkbunny[page] = null;
@@ -80,8 +83,9 @@ function parse_inkbunny_rating(data) {
 	const type = "1,2,3,4,5,6";
 
 	pages_inkbunny = 0;
+	pages_total_inkbunny = Math.max(Math.floor(page_count_inkbunny / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= page_count_inkbunny; page++) {
+		for(var page = 1; page <= pages_total_inkbunny; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
