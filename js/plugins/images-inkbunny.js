@@ -77,6 +77,7 @@ function parse_inkbunny(data) {
 function parse_inkbunny_rating(data) {
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 	const keywords_all = parse_keywords(keywords);
+	const type = "1,2,3,4,5,6";
 
 	pages_inkbunny = 0;
 	for(var item in keywords_all) {
@@ -86,7 +87,7 @@ function parse_inkbunny_rating(data) {
 			setTimeout(function() {
 				elements_inkbunny[page] = document.createElement("script");
 				elements_inkbunny[page].type = "text/javascript";
-				elements_inkbunny[page].src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&text=" + this_keywords + "&page=" + this_page + "&submissions_per_page=" + page_limit_inkbunny + "&callback=parse_inkbunny";
+				elements_inkbunny[page].src = "https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&type=" + type + "&text=" + this_keywords + "&page=" + this_page + "&submissions_per_page=" + page_limit_inkbunny + "&callback=parse_inkbunny";
 				document.body.appendChild(elements_inkbunny[page]);
 			}, (pages_inkbunny * delay_inkbunny) * 1000);
 			++pages_inkbunny;
@@ -99,7 +100,6 @@ function parse_inkbunny_rating(data) {
 
 // create a new session as guest, then call the rating api with its session id
 function parse_inkbunny_login(data) {
-	// whether or not to enable the NSFW tags
 	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "yes" : "no";
 
 	element_rating_inkbunny = document.createElement("script");

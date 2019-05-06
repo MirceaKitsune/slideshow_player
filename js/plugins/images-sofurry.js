@@ -59,9 +59,10 @@ function parse_sofurry(data) {
 function images_sofurry() {
 	plugins_busy_set(name_sofurry, 30);
 
-	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "0" : "2"; // whether or not to enable the NSFW tags
+	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "2" : "0";
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 	const keywords_all = parse_keywords(keywords);
+	const type = "artwork";
 
 	pages_sofurry = 0;
 	for(var item in keywords_all) {
@@ -71,7 +72,7 @@ function images_sofurry() {
 			setTimeout(function() {
 				elements_sofurry[page] = document.createElement("script");
 				elements_sofurry[page].type = "text/javascript";
-				elements_sofurry[page].src = parse_jsonp("https://api2.sofurry.com/browse/search?format=json&search=" + this_keywords + "&page=" + this_page + "&minlevel=0&maxlevel=" + nsfw, "parse_sofurry");
+				elements_sofurry[page].src = parse_jsonp("https://api2.sofurry.com/browse/search?format=json&search=" + this_keywords + "&filter=" + type + "&page=" + this_page + "&maxlevel=" + nsfw, "parse_sofurry");
 				document.body.appendChild(elements_sofurry[page]);
 			}, (pages_sofurry * delay_sofurry) * 1000);
 			++pages_sofurry;
