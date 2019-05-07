@@ -173,12 +173,22 @@ function plugins_load(name) {
 function plugins_get_jsonp(url, callback, proxy) {
 	// most sources that offer JSON don't offer JSONP support too, meaning the callback parameter will have no effect by default
 	// if so we need to run the URL through a JSON to JSONP converter, which can wrap our response in a callback function
-	// json2jsonp.com provides such a tool
-	var src = "";
-	if(proxy)
-		src = "https://json2jsonp.com/?url=" + encodeURIComponent(url + " ") + "&callback=" + callback;
-	else
-		src = url + "&callback=" + callback;
+	var src = url + "&callback=" + callback;
+
+	// list of known JSONP proxies, pick one below
+	// 1: json2jsonp.com
+	// 2: jsonp.afeld.me
+	const proxy_server = 1;
+	if(proxy) {
+		switch(proxy_server) {
+			case 1:
+				src = "https://json2jsonp.com/?url=" + encodeURIComponent(url + " ") + "&callback=" + callback;
+				break;
+			case 2:
+				src = "https://jsonp.afeld.me/?callback=" + callback + "&url=" + encodeURIComponent(url);
+				break;
+		}
+	}
 
 	// create a script element and give it the new URL
 	var element = document.createElement("script");
