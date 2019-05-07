@@ -66,4 +66,4 @@ function images_derpibooru() {
 }
 
 // register the plugin
-plugins_register(name_derpibooru, TYPE_IMAGES, images_derpibooru);
+plugins_register(name_derpibooru, TYPE_IMAGES, "https://derpibooru.org", images_derpibooru);

@@ -17,10 +17,11 @@ plugins_settings[TYPE_IMAGES] = [];
 plugins_settings[TYPE_MUSIC] = [];
 
 // plugins, functions, register
-function plugins_register(name, type, func) {
+function plugins_register(name, type, url, func) {
 	plugins[name] = {
 		func: func,
 		type: type,
+		url: url,
 		busy: false,
 		busy_timeout: null
 	};

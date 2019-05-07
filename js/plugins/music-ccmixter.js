@@ -64,4 +64,4 @@ function music_ccmixter() {
 }
 
 // register the plugin
-plugins_register(name_ccmixter, TYPE_MUSIC, music_ccmixter);
+plugins_register(name_ccmixter, TYPE_MUSIC, "http://ccmixter.org", music_ccmixter);

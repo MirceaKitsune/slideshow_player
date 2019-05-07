@@ -64,4 +64,4 @@ function music_hearthis() {
 }
 
 // register the plugin
-plugins_register(name_hearthis, TYPE_MUSIC, music_hearthis);
+plugins_register(name_hearthis, TYPE_MUSIC, "http://hearthis.at", music_hearthis);

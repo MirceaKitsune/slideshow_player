@@ -102,7 +102,7 @@ function player_images_fullscreen_has() {
 // player, images, fullscreen mouse movement
 function player_images_fullscreen_mouse(event) {
 	const opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
-	interface.media.setAttribute("style", "z-index: 1; opacity: " + opacity);
+	interface.media.style["opacity"] = opacity;
 }
 
 // player, images, toggle fullscreen
@@ -225,13 +225,13 @@ function player_images_next_fade() {
 
 	// set the image element opacities
 	if(player.images.reverse) {
-		player.images.element_previous.setAttribute("style", "opacity: 0");
-		player.images.element_next.setAttribute("style", "opacity: " + Math.max(1 - player.images.transition, 0));
+		player.images.element_previous.style["opacity"] = 0;
+		player.images.element_next.style["opacity"] = Math.max(1 - player.images.transition, 0);
 	} else {
-		player.images.element_previous.setAttribute("style", "opacity: " + Math.max(1 - player.images.transition, 0));
-		player.images.element_next.setAttribute("style", "opacity: 0");
+		player.images.element_previous.style["opacity"] = Math.max(1 - player.images.transition, 0);
+		player.images.element_next.style["opacity"] = 0;
 	}
-	player.images.element_current.setAttribute("style", "opacity: " + Math.min(0 + player.images.transition, 1));
+	player.images.element_current.style["opacity"] = Math.min(0 + player.images.transition, 1);
 
 	// advance or stop the transition
 	if(player.images.transition < 1) {
@@ -350,11 +350,11 @@ function player_images_clear() {
 
 	player.images.index = 0;
 	player.images.stopped = false;
-	player.images.element_previous.setAttribute("style", "opacity: 0");
+	player.images.element_previous.style["opacity"] = 0;
 	player.images.element_previous.setAttribute("src", SRC_BLANK);
-	player.images.element_next.setAttribute("style", "opacity: 0");
+	player.images.element_next.style["opacity"] = 0;
 	player.images.element_next.setAttribute("src", SRC_BLANK);
-	player.images.element_current.setAttribute("style", "opacity: 0");
+	player.images.element_current.style["opacity"] = 0;
 	player.images.element_current.setAttribute("src", SRC_BLANK);
 
 	interface_update_media(false, true, false, false, false);
@@ -550,7 +550,7 @@ function player_attach() {
 	// configure the previous image element
 	player.images.element_previous = document.createElement("img");
 	player.images.element_previous.setAttribute("class", "player_image");
-	player.images.element_previous.setAttribute("style", "opacity: 0");
+	player.images.element_previous.setAttribute("style", "opacity: 0; pointer-events: none");
 	player.images.element_previous.setAttribute("src", SRC_BLANK);
 	player.images.element_previous.setAttribute("onload", "player_images_next_onload_previous()");
 	player.images.element_previous.setAttribute("onerror", "player_images_next_onerror_previous()");
@@ -559,7 +559,7 @@ function player_attach() {
 	// configure the next image element
 	player.images.element_next = document.createElement("img");
 	player.images.element_next.setAttribute("class", "player_image");
-	player.images.element_next.setAttribute("style", "opacity: 0");
+	player.images.element_next.setAttribute("style", "opacity: 0; pointer-events: none");
 	player.images.element_next.setAttribute("src", SRC_BLANK);
 	player.images.element_next.setAttribute("onload", "player_images_next_onload_next()");	
 	player.images.element_next.setAttribute("onerror", "player_images_next_onerror_next()");
@@ -568,7 +568,7 @@ function player_attach() {
 	// configure the current image element
 	player.images.element_current = document.createElement("img");
 	player.images.element_current.setAttribute("class", "player_image");
-	player.images.element_current.setAttribute("style", "opacity: 0");
+	player.images.element_current.setAttribute("style", "opacity: 0; pointer-events: all");
 	player.images.element_current.setAttribute("src", SRC_BLANK);
 	player.images.element_current.setAttribute("onload", "player_images_next_onload_current()");
 	player.images.element_current.setAttribute("onerror", "player_images_next_onerror_current()");

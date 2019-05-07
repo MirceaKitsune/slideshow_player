@@ -66,4 +66,4 @@ function images_e621() {
 }
 
 // register the plugin
-plugins_register(name_e621, TYPE_IMAGES, images_e621);
+plugins_register(name_e621, TYPE_IMAGES, "https://e621.net", images_e621);

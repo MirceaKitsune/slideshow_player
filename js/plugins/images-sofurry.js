@@ -1,7 +1,7 @@
 // Slideshow Viewer, Plugins, SoFurry
 // Public Domain / CC0, MirceaKitsune 2018
 
-// Image loading plugin for: https://sofurry.net
+// Image loading plugin for: https://sofurry.com
 // API documentation: https://wiki.sofurry.com/wiki/SoFurry_2.0_API
 
 // the name string of this plugin
@@ -67,4 +67,4 @@ function images_sofurry() {
 }
 
 // register the plugin
-plugins_register(name_sofurry, TYPE_IMAGES, images_sofurry);
+plugins_register(name_sofurry, TYPE_IMAGES, "https://sofurry.com", images_sofurry);

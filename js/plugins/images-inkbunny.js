@@ -88,4 +88,4 @@ function images_inkbunny() {
 }
 
 // register the plugin
-plugins_register(name_inkbunny, TYPE_IMAGES, images_inkbunny);
+plugins_register(name_inkbunny, TYPE_IMAGES, "https://inkbunny.net", images_inkbunny);

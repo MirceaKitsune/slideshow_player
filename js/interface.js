@@ -290,27 +290,31 @@ function interface_style_button_color(element, color) {
 // interface, update, attached
 function interface_update_attached(attached) {
 	if(attached) {
+		interface.media.style["opacity"] = 1;
 		interface.media.setAttribute("class", "item_media item_media_position_detached item_media_background_detached");
-		interface.media.setAttribute("style", "z-index: 1; opacity: 1");
-		interface.media_images_label.setAttribute("class", "text_color_black");
-		interface.media_images_info.setAttribute("class", "text_color_black");
-		interface.media_controls_label.setAttribute("class", "text_color_black");
-		interface.media_images_recommendations_label.setAttribute("class", "text_color_black");
-		interface.media_images_recommendations_list.setAttribute("class", "text_color_black");
-		interface.media_music_recommendations_label.setAttribute("class", "text_color_black");
-		interface.media_music_recommendations_list.setAttribute("class", "text_color_black");
+		interface.media_images_label.setAttribute("class", "text_size_medium text_color_black");
+		interface.media_images_info.setAttribute("class", "text_size_small text_color_black");
+		interface.media_music_label.setAttribute("class", "text_size_medium text_color_black");
+		interface.media_music_info.setAttribute("class", "text_size_small text_color_black");
+		interface.media_controls_label.setAttribute("class", "text_size_large text_color_black");
+		interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_black");
+		interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_black");
+		interface.media_music_recommendations_label.setAttribute("class", "text_size_large text_color_black");
+		interface.media_music_recommendations_list.setAttribute("class", "text_size_medium text_color_black");
 		interface.player.removeChild(interface.media);
 		document.body.appendChild(interface.media);
 	} else {
+		// interface.media.style["opacity"] = 1;
 		interface.media.setAttribute("class", "item_media item_media_position_attached item_media_background_attached");
-		// interface.media.setAttribute("style", "z-index: 1; opacity: 1");
-		interface.media_images_label.setAttribute("class", "text_color_white");
-		interface.media_images_info.setAttribute("class", "text_color_white");
-		interface.media_controls_label.setAttribute("class", "text_color_white");
-		interface.media_images_recommendations_label.setAttribute("class", "text_color_white");
-		interface.media_images_recommendations_list.setAttribute("class", "text_color_white");
-		interface.media_music_recommendations_label.setAttribute("class", "text_color_white");
-		interface.media_music_recommendations_list.setAttribute("class", "text_color_white");
+		interface.media_images_label.setAttribute("class", "text_size_medium text_color_white");
+		interface.media_images_info.setAttribute("class", "text_size_small text_color_white");
+		interface.media_music_label.setAttribute("class", "text_size_medium text_color_white");
+		interface.media_music_info.setAttribute("class", "text_size_small text_color_white");
+		interface.media_controls_label.setAttribute("class", "text_size_large text_color_white");
+		interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_white");
+		interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_white");
+		interface.media_music_recommendations_label.setAttribute("class", "text_size_large text_color_white");
+		interface.media_music_recommendations_list.setAttribute("class", "text_size_medium text_color_white");
 		document.body.removeChild(interface.media);
 		interface.player.appendChild(interface.media);
 	}
@@ -347,7 +351,10 @@ function interface_update_controls_sites() {
 
 		// interface HTML: controls, images, sites, list, label
 		const id_label = "controls_images_list_sites_" + item + "_label";
-		interface[id_label] = document.createElement("label");
+		interface[id_label] = document.createElement("a");
+		interface[id_label].setAttribute("style", "text-align: left; text-decoration: none; color: #000000");
+		interface[id_label].setAttribute("target", "_blank");
+		interface[id_label].setAttribute("href", plugins[item].url);
 		interface[id_label].innerHTML = plugins[item].type + " " + item + "<br/>";
 		interface.controls_sites_list.appendChild(interface[id_label]);
 	}
@@ -421,13 +428,13 @@ function interface_update_media_images() {
 		if(label_author.length > 16)
 			label_author = label_author.substring(0, 16) + "...";
 
-		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>" + player.images.index + " / " + data_images.length + "</b></font>";
+		interface.media_images_label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
 		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
-		interface.media_images_info.innerHTML = "<font class=text_size_small><b>" + label_title + "</b> by <b>" + label_author + "</b></font>";
+		interface.media_images_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 		interface.player_icon_images.innerHTML = ready ? "" : "⧗";
 	} else {
-		interface.media_images_label.innerHTML = "<font class=text_size_medium><b>No images loaded</b></font>";
+		interface.media_images_label.innerHTML = "<b>No images loaded</b>";
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 		interface.media_images_info.innerHTML = "";
@@ -493,13 +500,13 @@ function interface_update_media_music() {
 		if(label_author.length > 16)
 			label_author = label_author.substring(0, 16) + "...";
 
-		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>" + player.music.index + " / " + data_music.length + "</b></font>";
+		interface.media_music_label.innerHTML = "<b>" + player.music.index + " / " + data_music.length + "</b>";
 		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
-		interface.media_music_info.innerHTML = "<font class=text_size_small><b>" + label_title + "</b> by <b>" + label_author + "</b></font>";
+		interface.media_music_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 		interface.player_icon_music.innerHTML = ready ? "" : "⧖";
 	} else {
-		interface.media_music_label.innerHTML = "<font class=text_size_medium><b>No music loaded</b></font>";
+		interface.media_music_label.innerHTML = "<b>No music loaded</b>";
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 		interface.media_music_info.innerHTML = "";
@@ -534,7 +541,7 @@ function interface_update_recommendations_images() {
 	const recommendations_sorted = Object.keys(recommendations.images).sort(function(a, b) { return recommendations.images[b] - recommendations.images[a] });
 	const current_tag = interface.controls_images_search_keywords_input.value || interface.controls_images_search_keywords_input.getAttribute("value");
 
-	interface.media_images_recommendations_list.innerHTML = "<font class=text_size_medium>No recommended tags available</font>";
+	interface.media_images_recommendations_list.innerHTML = "No recommended tags available";
 	if(recommendations_sorted.length > 0) {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
@@ -559,7 +566,7 @@ function interface_update_recommendations_images() {
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
 			if(current_tag.toLowerCase().includes(tag_name))
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
-			tag_element.innerHTML = "<font class=text_size_medium>" + tag_element.innerHTML + "</font><br/>";
+			tag_element.innerHTML = tag_element.innerHTML + "<br/>";
 
 			// stop here if we've reached the display limit
 			++tags;
@@ -590,7 +597,7 @@ function interface_update_recommendations_music() {
 	const recommendations_sorted = Object.keys(recommendations.music).sort(function(a, b) { return recommendations.music[b] - recommendations.music[a] });
 	const current_tag = interface.controls_music_search_keywords_input.value || interface.controls_music_search_keywords_input.getAttribute("value");
 
-	interface.media_music_recommendations_list.innerHTML = "<font class=text_size_medium>No recommended tags available</font>";
+	interface.media_music_recommendations_list.innerHTML = "No recommended tags available";
 	if(recommendations_sorted.length > 0) {
 		var tags = 0;
 		for(var tag in recommendations_sorted) {
@@ -615,7 +622,7 @@ function interface_update_recommendations_music() {
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
 			if(current_tag.toLowerCase().includes(tag_name))
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
-			tag_element.innerHTML = "<font class=text_size_medium>" + tag_element.innerHTML + "</font><br/>";
+			tag_element.innerHTML = tag_element.innerHTML + "<br/>";
 
 			// stop here if we've reached the display limit
 			++tags;
@@ -654,19 +661,19 @@ function interface_update_media_controls() {
 	if(player_active()) {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "■";
-		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_player + "</font>";
+		interface.media_controls_label.innerHTML = label_player;
 		interface_style_button_color(interface.media_controls_play, "green");
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ▶";
 	} else if(player_available()) {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "▶";
-		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_player + "</font>";
+		interface.media_controls_label.innerHTML = label_player;
 		interface_style_button_color(interface.media_controls_play, "yellow");
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ■";
 	} else {
 		interface.media_controls_play.removeAttribute("onclick");
 		interface.media_controls_play.innerHTML = "∅";
-		interface.media_controls_label.innerHTML = "<font class=text_size_large><b>No content to play</b></font>";
+		interface.media_controls_label.innerHTML = "<b>No content to play</b>";
 		interface_style_button_color(interface.media_controls_play, "red");
 		document.title = "Slideshow Player ∅";
 	}
@@ -674,11 +681,11 @@ function interface_update_media_controls() {
 	// second configuration, based on plugin status
 	// configure play / label elements, window title
 	if(busy > 0) {
-		interface.media_controls_label.innerHTML = "<font class=text_size_large><b>Fetching content:</b> " + busy + " left</font>";
+		interface.media_controls_label.innerHTML = "<b>Fetching content:</b> " + busy + " left";
 		interface.media_controls_play.innerHTML += " ⧗";
 		document.title += " ⧗";
 	} else if(interface_refresh.timer > 0) {
-		interface.media_controls_label.innerHTML = "<font class=text_size_large>" + label_plugin + "</font>";
+		interface.media_controls_label.innerHTML = label_plugin;
 		interface.media_controls_play.innerHTML += " ⟳";
 		document.title += " ⟳";
 	}
@@ -695,13 +702,13 @@ function interface_init() {
 	{
 		// interface HTML: player, icon, images
 		interface.player_icon_images = document.createElement("div");
-		interface.player_icon_images.setAttribute("class", "text_color_white");
+		interface.player_icon_images.setAttribute("class", "text_size_large text_color_white");
 		interface.player_icon_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 128px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
 		interface.player.appendChild(interface.player_icon_images);
 
 		// interface HTML: player, icon, music
 		interface.player_icon_music = document.createElement("div");
-		interface.player_icon_music.setAttribute("class", "text_color_white");
+		interface.player_icon_music.setAttribute("class", "text_size_large text_color_white");
 		interface.player_icon_music.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 128px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
 		interface.player.appendChild(interface.player_icon_music);
 	}
@@ -716,26 +723,26 @@ function interface_init() {
 		interface.controls_banner.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 5%; overflow: hidden");
 		interface.controls.appendChild(interface.controls_banner);
 		{
-			// interface HTML: controls, banner, url
-			interface.controls_banner_url = document.createElement("a");
-			interface.controls_banner_url.setAttribute("target", "_blank");
-			interface.controls_banner_url.setAttribute("href", "https://github.com/MirceaKitsune/slideshow_player");
-			interface.controls_banner_url.setAttribute("style", "text-align: center; text-decoration: none; color: #000000");
-			interface.controls_banner.appendChild(interface.controls_banner_url);
+			// interface HTML: controls, banner, link
+			interface.controls_banner_link = document.createElement("a");
+			interface.controls_banner_link.setAttribute("target", "_blank");
+			interface.controls_banner_link.setAttribute("href", "https://github.com/MirceaKitsune/slideshow_player");
+			interface.controls_banner_link.setAttribute("style", "text-align: center; text-decoration: none; color: #000000");
+			interface.controls_banner.appendChild(interface.controls_banner_link);
 			{
-				// interface HTML: controls, banner, url, image
-				interface.controls_banner_url_image = document.createElement("img");
-				interface.controls_banner_url_image.setAttribute("src", "svg/icon_eye.svg");
-				interface.controls_banner_url_image.setAttribute("style", "position: absolute; top: 0%; left: 0%; height: 5%");
-				interface.controls_banner_url.appendChild(interface.controls_banner_url_image);
+				// interface HTML: controls, banner, link, image
+				interface.controls_banner_link_image = document.createElement("img");
+				interface.controls_banner_link_image.setAttribute("src", "svg/icon_eye.svg");
+				interface.controls_banner_link_image.setAttribute("style", "position: absolute; top: 0%; left: 0%; height: 5%");
+				interface.controls_banner_link.appendChild(interface.controls_banner_link_image);
 
-				// interface HTML: controls, banner, url, text
-				interface.controls_banner_url_text = document.createElement("div");
-				interface.controls_banner_url_text.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 100%");
-				interface.controls_banner_url_text.innerHTML =
+				// interface HTML: controls, banner, link, text
+				interface.controls_banner_link_text = document.createElement("div");
+				interface.controls_banner_link_text.setAttribute("style", "top: 0%; left: 0%; width: 100%; height: 100%");
+				interface.controls_banner_link_text.innerHTML =
 					"<font size=4><b>Slideshow Player</b></font><br/>" +
 					"<font size=2><b>by MirceaKitsune</b></font>";
-				interface.controls_banner_url.appendChild(interface.controls_banner_url_text);
+				interface.controls_banner_link.appendChild(interface.controls_banner_link_text);
 			}
 		}
 
@@ -1006,14 +1013,14 @@ function interface_init() {
 		{
 			// interface HTML: controls, images, recommendations, label
 			interface.media_images_recommendations_label = document.createElement("p");
-			interface.media_images_recommendations_label.setAttribute("class", "text_color_black");
+			interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_black");
 			interface.media_images_recommendations_label.setAttribute("style", "text-align: center");
-			interface.media_images_recommendations_label.innerHTML = "<font class=text_size_large><b>" + TYPE_IMAGES + " Recommendations<b/></font>";
+			interface.media_images_recommendations_label.innerHTML = "<b>" + TYPE_IMAGES + " Recommendations<b/>";
 			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_label);
 
 			// interface HTML: controls, images, recommendations, list
 			interface.media_images_recommendations_list = document.createElement("div");
-			interface.media_images_recommendations_list.setAttribute("class", "text_color_black");
+			interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_black");
 			interface.media_images_recommendations.appendChild(interface.media_images_recommendations_list);
 		}
 
@@ -1054,8 +1061,8 @@ function interface_init() {
 
 			// interface HTML: media, images, label
 			interface.media_images_label = document.createElement("p");
-			interface.media_images_label.setAttribute("class", "text_color_black");
-			interface.media_images_label.setAttribute("style", "position: absolute; top: 40px; width: 100%");
+			interface.media_images_label.setAttribute("class", "text_size_medium text_color_black");
+			interface.media_images_label.setAttribute("style", "position: absolute; top: 42px; width: 100%");
 			interface.media_images.appendChild(interface.media_images_label);
 
 			// interface HTML: media, images, thumb
@@ -1087,8 +1094,8 @@ function interface_init() {
 
 			// interface HTML: media, images, info
 			interface.media_images_info = document.createElement("p");
-			interface.media_images_info.setAttribute("class", "text_color_black");
-			interface.media_images_info.setAttribute("style", "position: absolute; top: 160px; width: 100%");
+			interface.media_images_info.setAttribute("class", "text_size_small text_color_black");
+			interface.media_images_info.setAttribute("style", "position: absolute; top: 164px; width: 100%");
 			interface.media_images.appendChild(interface.media_images_info);
 		}
 
@@ -1109,7 +1116,7 @@ function interface_init() {
 
 			// interface HTML: media, controls, label
 			interface.media_controls_label = document.createElement("p");
-			interface.media_controls_label.setAttribute("class", "text_color_black");
+			interface.media_controls_label.setAttribute("class", "text_size_large text_color_black");
 			interface.media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%");
 			interface.media_controls.appendChild(interface.media_controls_label);
 
@@ -1162,8 +1169,8 @@ function interface_init() {
 
 			// interface HTML: media, music, label
 			interface.media_music_label = document.createElement("p");
-			interface.media_music_label.setAttribute("class", "text_color_black");
-			interface.media_music_label.setAttribute("style", "position: absolute; top: 40px; width: 100%");
+			interface.media_music_label.setAttribute("class", "text_size_medium text_color_black");
+			interface.media_music_label.setAttribute("style", "position: absolute; top: 42px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_label);
 
 			// interface HTML: media, music, thumb
@@ -1195,8 +1202,8 @@ function interface_init() {
 
 			// interface HTML: media, music, info
 			interface.media_music_info = document.createElement("p");
-			interface.media_music_info.setAttribute("class", "text_color_black");
-			interface.media_music_info.setAttribute("style", "position: absolute; top: 160px; width: 100%");
+			interface.media_music_info.setAttribute("class", "text_size_small text_color_black");
+			interface.media_music_info.setAttribute("style", "position: absolute; top: 164px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_info);
 		}
 
@@ -1207,14 +1214,14 @@ function interface_init() {
 		{
 			// interface HTML: controls, music, recommendations, label
 			interface.media_music_recommendations_label = document.createElement("p");
-			interface.media_music_recommendations_label.setAttribute("class", "text_color_black");
+			interface.media_music_recommendations_label.setAttribute("class", "text_size_large text_color_black");
 			interface.media_music_recommendations_label.setAttribute("style", "text-align: center");
-			interface.media_music_recommendations_label.innerHTML = "<font class=text_size_large><b>" + TYPE_MUSIC + " Recommendations<b/></font>";
+			interface.media_music_recommendations_label.innerHTML = "<b>" + TYPE_MUSIC + " Recommendations<b/>";
 			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_label);
 
 			// interface HTML: controls, music, recommendations, list
 			interface.media_music_recommendations_list = document.createElement("div");
-			interface.media_music_recommendations_list.setAttribute("class", "text_color_black");
+			interface.media_music_recommendations_list.setAttribute("class", "text_size_medium text_color_black");
 			interface.media_music_recommendations.appendChild(interface.media_music_recommendations_list);
 		}
 	}

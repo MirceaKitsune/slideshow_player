@@ -4,40 +4,44 @@
 	height: 100%;
 	max-width: 100%;
 	max-height: 100%;
+	z-index: 0;
+	pointer-events: none;
 }
 
 .text_size_small {
 	line-height: 16px;
 	font-size: 10px;
 	font-family: sans-serif;
+	z-index: 1;
+	pointer-events: none;
 }
 
 .text_size_medium {
 	line-height: 18px;
 	font-size: 12px;
 	font-family: sans-serif;
+	z-index: 1;
+	pointer-events: none;
 }
 
 .text_size_large {
 	line-height: 20px;
 	font-size: 14px;
 	font-family: sans-serif;
+	z-index: 1;
+	pointer-events: none;
 }
 
 .text_color_black {
 	color: #000000;
 	text-align: center;
 	text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff, 0 0 4px #ffffff;
-	z-index: 1;
-	pointer-events: none;
 }
 
 .text_color_white {
 	color: #ffffff;
 	text-align: center;
 	text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000, 0 0 4px #000000;
-	z-index: 1;
-	pointer-events: none;
 }
 
 .button_size_small {
