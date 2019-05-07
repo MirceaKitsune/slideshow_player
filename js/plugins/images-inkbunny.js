@@ -42,7 +42,7 @@ function parse_inkbunny(data) {
 		this_image.title = String(this_data.title);
 		this_image.author = String(this_data.username);
 		this_image.url = String(this_data_url);
-		this_image.score = 0; // API doesn't provide a score
+		this_image.score = 10; // API doesn't provide a score, assume a below average default compared to plugins that do
 		this_image.tags = []; // API doesn't provide tags
 
 		images_add(this_image);
@@ -58,6 +58,7 @@ function parse_inkbunny_rating(data) {
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 	const keywords_all = parse_keywords(keywords);
 	const type = "1,2,3,4,5,6";
+	const order = "views";
 
 	pages_inkbunny = 0;
 	const pages = Math.max(Math.floor(page_count_inkbunny / keywords_all.length), 1);
@@ -66,7 +67,7 @@ function parse_inkbunny_rating(data) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
-				plugins_get("https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&type=" + type + "&text=" + this_keywords + "&page=" + this_page + "&submissions_per_page=" + page_limit_inkbunny, "parse_inkbunny", false);
+				plugins_get("https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&type=" + type + "&orderby=" + order + "&text=" + this_keywords + "&page=" + this_page + "&submissions_per_page=" + page_limit_inkbunny, "parse_inkbunny", false);
 			}, (pages_inkbunny * delay_inkbunny) * 1000);
 			++pages_inkbunny;
 		}

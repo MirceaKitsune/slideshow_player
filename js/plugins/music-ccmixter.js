@@ -48,6 +48,7 @@ function music_ccmixter() {
 
 	const keywords = plugins_settings_read("keywords", TYPE_MUSIC);
 	const keywords_all = parse_keywords(keywords);
+	const order = "score";
 
 	pages_ccmixter = 0;
 	const pages = Math.max(Math.floor(page_count_ccmixter / keywords_all.length), 1);
@@ -56,7 +57,7 @@ function music_ccmixter() {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
-				plugins_get("http://ccmixter.org/api/query?f=json&tags=" + this_keywords + "&offset=" + this_page + "&limit=" + page_limit_ccmixter, "parse_ccmixter", null);
+				plugins_get("http://ccmixter.org/api/query?f=json&tags=" + this_keywords + "&sort=" + order + "&offset=" + this_page + "&limit=" + page_limit_ccmixter, "parse_ccmixter", null);
 			}, (pages_ccmixter * delay_ccmixter) * 1000);
 			++pages_ccmixter;
 		}

@@ -32,7 +32,7 @@ function parse_sofurry(data) {
 		this_image.title = String(this_data.title);
 		this_image.author = String(this_data.artistName);
 		this_image.url = String(this_data_url);
-		this_image.score = 0; // API doesn't provide a score
+		this_image.score = 10; // API doesn't provide a score, assume a below average default compared to plugins that do
 		this_image.tags = this_data.tags.split(/[\s,]+/);
 
 		images_add(this_image);
@@ -51,6 +51,7 @@ function images_sofurry() {
 	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
 	const keywords_all = parse_keywords(keywords);
 	const type = "artwork";
+	const order = "popularity";
 
 	pages_sofurry = 0;
 	const pages = Math.max(Math.floor(page_count_sofurry / keywords_all.length), 1);
@@ -59,7 +60,7 @@ function images_sofurry() {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
-				plugins_get("https://api2.sofurry.com/browse/search?format=json&search=" + this_keywords + "&filter=" + type + "&page=" + this_page + "&maxlevel=" + nsfw, "parse_sofurry", true);
+				plugins_get("https://api2.sofurry.com/browse/search?format=json&search=" + this_keywords + "&filter=" + type + "&sort=" + order + "&page=" + this_page + "&maxlevel=" + nsfw, "parse_sofurry", true);
 			}, (pages_sofurry * delay_sofurry) * 1000);
 			++pages_sofurry;
 		}
