@@ -19,10 +19,6 @@ const delay_hearthis = 0.1;
 
 // the active and maximum number of pages currently in use
 var pages_hearthis = 0;
-var pages_total_hearthis = 0;
-
-// the script elements for this plugin
-var elements_hearthis = [];
 
 // convert each entry into a music object for the player
 function parse_hearthis(data) {
@@ -42,18 +38,8 @@ function parse_hearthis(data) {
 	}
 
 	--pages_hearthis;
-	if(pages_hearthis <= 0) {
-		for(var page = 1; page <= pages_total_hearthis; page++) {
-			if(document.body.contains(elements_hearthis[page])) {
-				document.body.removeChild(elements_hearthis[page]);
-				elements_hearthis[page] = null;
-			}
-		}
-
-		pages_hearthis = 0;
-		pages_total_hearthis = 0;
+	if(pages_hearthis <= 0)
 		plugins_busy_set(name_hearthis, null);
-	}
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -64,16 +50,13 @@ function music_hearthis() {
 	const keywords_all = parse_keywords(keywords.split(",")[0].split(".")[0]); // only one word is supported for this API
 
 	pages_hearthis = 0;
-	pages_total_hearthis = Math.max(Math.floor(page_count_hearthis / keywords_all.length), 1);
+	const pages = Math.max(Math.floor(page_count_hearthis / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= pages_total_hearthis; page++) {
+		for(var page = 1; page <= pages; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
-				elements_hearthis[page] = document.createElement("script");
-				elements_hearthis[page].type = "text/javascript";
-				elements_hearthis[page].src = parse_jsonp("https://api-v2.hearthis.at/categories/" + this_keywords + "/?page=" + this_page + "&count=" + page_limit_hearthis, "parse_hearthis");
-				document.body.appendChild(elements_hearthis[page]);
+				plugins_get("https://api-v2.hearthis.at/categories/" + this_keywords + "/?page=" + this_page + "&count=" + page_limit_hearthis, "parse_hearthis", null);
 			}, (pages_hearthis * delay_hearthis) * 1000);
 			++pages_hearthis;
 		}

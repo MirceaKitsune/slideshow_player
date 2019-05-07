@@ -19,10 +19,6 @@ const delay_e621 = 0.1;
 
 // the active and maximum number of pages currently in use
 var pages_e621 = 0;
-var pages_total_e621 = 0;
-
-// the script elements for this plugin
-var elements_e621 = [];
 
 // convert each entry into an image object for the player
 function parse_e621(data) {
@@ -43,18 +39,8 @@ function parse_e621(data) {
 	}
 
 	--pages_e621;
-	if(pages_e621 <= 0) {
-		for(var page = 1; page <= pages_total_e621; page++) {
-			if(document.body.contains(elements_e621[page])) {
-				document.body.removeChild(elements_e621[page]);
-				elements_e621[page] = null;
-			}
-		}
-
-		pages_e621 = 0;
-		pages_total_e621 = 0;
+	if(pages_e621 <= 0)
 		plugins_busy_set(name_e621, null);
-	}
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -66,16 +52,13 @@ function images_e621() {
 	const keywords_all = parse_keywords(keywords);
 
 	pages_e621 = 0;
-	pages_total_e621 = Math.max(Math.floor(page_count_e621 / keywords_all.length), 1);
+	const pages = Math.max(Math.floor(page_count_e621 / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= pages_total_e621; page++) {
+		for(var page = 1; page <= pages; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
-				elements_e621[page] = document.createElement("script");
-				elements_e621[page].type = "text/javascript";
-				elements_e621[page].src = "https://" + domain + ".net/post/index.json?tags=" + this_keywords + "&page=" + this_page + "&limit=" + page_limit_e621 + "&callback=parse_e621";
-				document.body.appendChild(elements_e621[page]);
+				plugins_get("https://" + domain + ".net/post/index.json?tags=" + this_keywords + "&page=" + this_page + "&limit=" + page_limit_e621, "parse_e621", false);
 			}, (pages_e621 * delay_e621) * 1000);
 			++pages_e621;
 		}

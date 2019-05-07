@@ -19,10 +19,6 @@ const delay_sofurry = 0.1;
 
 // the active and maximum number of pages currently in use
 var pages_sofurry = 0;
-var pages_total_sofurry = 0;
-
-// the script elements for this plugin
-var elements_sofurry = [];
 
 // convert each entry into an image object for the player
 function parse_sofurry(data) {
@@ -43,18 +39,8 @@ function parse_sofurry(data) {
 	}
 
 	--pages_sofurry;
-	if(pages_sofurry <= 0) {
-		for(var page = 1; page <= pages_total_sofurry; page++) {
-			if(document.body.contains(elements_sofurry[page])) {
-				document.body.removeChild(elements_sofurry[page]);
-				elements_sofurry[page] = null;
-			}
-		}
-
-		pages_sofurry = 0;
-		pages_total_sofurry = 0;
+	if(pages_sofurry <= 0)
 		plugins_busy_set(name_sofurry, null);
-	}
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -67,16 +53,13 @@ function images_sofurry() {
 	const type = "artwork";
 
 	pages_sofurry = 0;
-	pages_total_sofurry = Math.max(Math.floor(page_count_sofurry / keywords_all.length), 1);
+	const pages = Math.max(Math.floor(page_count_sofurry / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= pages_total_sofurry; page++) {
+		for(var page = 1; page <= pages; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
-				elements_sofurry[page] = document.createElement("script");
-				elements_sofurry[page].type = "text/javascript";
-				elements_sofurry[page].src = parse_jsonp("https://api2.sofurry.com/browse/search?format=json&search=" + this_keywords + "&filter=" + type + "&page=" + this_page + "&maxlevel=" + nsfw, "parse_sofurry");
-				document.body.appendChild(elements_sofurry[page]);
+				plugins_get("https://api2.sofurry.com/browse/search?format=json&search=" + this_keywords + "&filter=" + type + "&page=" + this_page + "&maxlevel=" + nsfw, "parse_sofurry", true);
 			}, (pages_sofurry * delay_sofurry) * 1000);
 			++pages_sofurry;
 		}

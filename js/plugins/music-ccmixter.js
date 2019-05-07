@@ -19,10 +19,6 @@ const delay_ccmixter = 0.1;
 
 // the active and maximum number of pages currently in use
 var pages_ccmixter = 0;
-var pages_total_ccmixter = 0;
-
-// the script elements for this plugin
-var elements_ccmixter = [];
 
 // convert each entry into a music object for the player
 function parse_ccmixter(data) {
@@ -42,18 +38,8 @@ function parse_ccmixter(data) {
 	}
 
 	--pages_ccmixter;
-	if(pages_ccmixter <= 0) {
-		for(var page = 1; page <= pages_total_ccmixter; page++) {
-			if(document.body.contains(elements_ccmixter[page])) {
-				document.body.removeChild(elements_ccmixter[page]);
-				elements_ccmixter[page] = null;
-			}
-		}
-
-		pages_ccmixter = 0;
-		pages_total_ccmixter = 0;
+	if(pages_ccmixter <= 0)
 		plugins_busy_set(name_ccmixter, null);	
-	}
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -64,16 +50,13 @@ function music_ccmixter() {
 	const keywords_all = parse_keywords(keywords);
 
 	pages_ccmixter = 0;
-	pages_total_ccmixter = Math.max(Math.floor(page_count_ccmixter / keywords_all.length), 1);
+	const pages = Math.max(Math.floor(page_count_ccmixter / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= pages_total_ccmixter; page++) {
+		for(var page = 1; page <= pages; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
-				elements_ccmixter[page] = document.createElement("script");
-				elements_ccmixter[page].type = "text/javascript";
-				elements_ccmixter[page].src = parse_jsonp("http://ccmixter.org/api/query?f=json&tags=" + this_keywords + "&offset=" + this_page + "&limit=" + page_limit_ccmixter, "parse_ccmixter");
-				document.body.appendChild(elements_ccmixter[page]);
+				plugins_get("http://ccmixter.org/api/query?f=json&tags=" + this_keywords + "&offset=" + this_page + "&limit=" + page_limit_ccmixter, "parse_ccmixter", null);
 			}, (pages_ccmixter * delay_ccmixter) * 1000);
 			++pages_ccmixter;
 		}

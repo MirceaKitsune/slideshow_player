@@ -19,10 +19,6 @@ const delay_derpibooru = 0.1;
 
 // the active and maximum number of pages currently in use
 var pages_derpibooru = 0;
-var pages_total_derpibooru = 0;
-
-// the script elements for this plugin
-var elements_derpibooru = [];
 
 // convert each entry into an image object for the player
 function parse_derpibooru(data) {
@@ -43,18 +39,8 @@ function parse_derpibooru(data) {
 	}
 
 	--pages_derpibooru;
-	if(pages_derpibooru <= 0) {
-		for(var page = 1; page <= pages_total_derpibooru; page++) {
-			if(document.body.contains(elements_derpibooru[page])) {
-				document.body.removeChild(elements_derpibooru[page]);
-				elements_derpibooru[page] = null;
-			}
-		}
-
-		pages_derpibooru = 0;
-		pages_total_derpibooru = 0;
+	if(pages_derpibooru <= 0)
 		plugins_busy_set(name_derpibooru, null);
-	}
 }
 
 // fetch the json object containing the data and execute it as a script
@@ -66,16 +52,13 @@ function images_derpibooru() {
 	const keywords_all = parse_keywords(keywords);
 
 	pages_derpibooru = 0;
-	pages_total_derpibooru = Math.max(Math.floor(page_count_derpibooru / keywords_all.length), 1);
+	const pages = Math.max(Math.floor(page_count_derpibooru / keywords_all.length), 1);
 	for(var item in keywords_all) {
-		for(var page = 1; page <= pages_total_derpibooru; page++) {
+		for(var page = 1; page <= pages; page++) {
 			const this_keywords = keywords_all[item];
 			const this_page = page;
 			setTimeout(function() {
-				elements_derpibooru[page] = document.createElement("script");
-				elements_derpibooru[page].type = "text/javascript";
-				elements_derpibooru[page].src = parse_jsonp("https://derpibooru.org/search.json?q=" + this_keywords + "&page=" + this_page + "&perpage=" + page_limit_derpibooru + "&filter_id=" + filter_id, "parse_derpibooru");
-				document.body.appendChild(elements_derpibooru[page]);
+				plugins_get("https://derpibooru.org/search.json?q=" + this_keywords + "&page=" + this_page + "&perpage=" + page_limit_derpibooru + "&filter_id=" + filter_id, "parse_derpibooru", null);
 			}, (pages_derpibooru * delay_derpibooru) * 1000);
 			++pages_derpibooru;
 		}

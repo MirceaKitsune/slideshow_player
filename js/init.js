@@ -35,13 +35,6 @@ Object.defineProperty(navigator, "userAgent", {
 	}
 });
 
-// parse, json to jsonp
-function parse_jsonp(url, callback) {
-	// since some sources don't offer builtin JSONP support, use a JSON to JSONP converter
-	// json2jsonp.com
-	return "https://json2jsonp.com/?url=" + encodeURIComponent(url + " ") + "&callback=" + callback;
-}
-
 // parse, keywords
 function parse_keywords(keywords) {
 	var search = keywords.toLowerCase();
@@ -174,6 +167,57 @@ function plugins_register(name, type, func) {
 // plugins, functions, load
 function plugins_load(name) {
 	plugins[name].func();
+}
+
+// plugins, get, jsonp
+function plugins_get_jsonp(url, callback, proxy) {
+	// most sources that offer JSON don't offer JSONP support too, meaning the callback parameter will have no effect by default
+	// if so we need to run the URL through a JSON to JSONP converter, which can wrap our response in a callback function
+	// json2jsonp.com provides such a tool
+	var src = "";
+	if(proxy)
+		src = "https://json2jsonp.com/?url=" + encodeURIComponent(url + " ") + "&callback=" + callback;
+	else
+		src = url + "&callback=" + callback;
+
+	// create a script element and give it the new URL
+	var element = document.createElement("script");
+	element.type = "text/javascript";
+	element.src = src;
+	document.body.appendChild(element);
+}
+
+// plugins, get, fetch
+function plugins_get_fetch(url, callback) {
+	// use the builtin fetch function to download the response body
+	fetch(url).then(function(response) {
+		// fetching the resource succeeded
+		// in this case, execute the callback function with the response
+		// as the callback function is delivered as a string, for compatibility with the fallback method below, use eval to call it
+		eval(callback + "(" + response + ")");
+	}).catch(function(error) {
+		// fetching the resource failed
+		// if we're here, the cross-origin policy most likely restricted our attempt to download the response directly
+		// in this case, fallback to embedding the response as JSONP using a proxy
+		plugins_get_jsonp(url, callback, true);
+	});
+}
+
+// plugins, get
+function plugins_get(url, callback, proxy) {
+	// to access the search results returned by an API, we need to fetch and parse the JSON object
+	// this can be complicated as many servers don't add an exception to the cross-origin policy for their responses
+	// as such, we use various methods to get the response as efficiently as possible, based on the capabilities indicated by the plugin
+
+	// proxy is null: the plugin tells us that CORS is supported, attempt to fetch the resource directly
+	// proxy is false: the plugin tells us that CORS is not supported, but jsonp is supported, so embed as JSONP
+	// proxy is true: the plugin tells us that CORS is not supported, and jsonp is not supported either, so embed as JSONP using a proxy
+	if(proxy === null || proxy === undefined)
+		plugins_get_fetch(url, callback);
+	else if(proxy === false)
+		plugins_get_jsonp(url, callback, false);
+	else if(proxy === true)
+		plugins_get_jsonp(url, callback, true);
 }
 
 // plugins, functions, ready
