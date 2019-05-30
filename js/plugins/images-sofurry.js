@@ -6,12 +6,13 @@
 
 // the name string of this plugin
 const name_sofurry = "SoFurry";
-
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_sofurry = 10;
+const page_count_sofurry = 30;
 // this should represent the maximum number of results the API may return per page
 const page_limit_sofurry = 30;
+// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
+const timeout_sofurry = 30;
 
 // the keywords and page currently in use
 var active_keywords_sofurry = 0;
@@ -44,6 +45,10 @@ function parse_sofurry(data) {
 
 // request the json object from the website
 function request_sofurry(bump) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_sofurry))
+		return;
+
 	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "2" : "0";
 	const type = "artwork";
 	const order = "popularity";
@@ -69,7 +74,7 @@ function request_sofurry(bump) {
 
 // fetch the json object containing the data and execute it as a script
 function images_sofurry() {
-	plugins_busy_set(name_sofurry, 30);
+	plugins_busy_set(name_sofurry, timeout_sofurry);
 
 	active_keywords_sofurry = 1;
 	active_page_sofurry = 1;

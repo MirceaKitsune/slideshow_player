@@ -6,12 +6,13 @@
 
 // the name string of this plugin
 const name_inkbunny = "Inkbunny";
-
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_inkbunny = 10;
+const page_count_inkbunny = 30;
 // this should represent the maximum number of results the API may return per page
 const page_limit_inkbunny = 100;
+// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
+const timeout_inkbunny = 30;
 
 // the keywords and page currently in use
 // this site also requires a SID
@@ -73,6 +74,10 @@ function parse_inkbunny_login(data) {
 
 // request the json object from the website
 function request_inkbunny(bump) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_inkbunny))
+		return;
+
 	const type = "1,2,3,4,5,6";
 	const order = "views";
 
@@ -97,7 +102,7 @@ function request_inkbunny(bump) {
 
 // fetch the json object containing the data and execute it as a script
 function images_inkbunny() {
-	plugins_busy_set(name_inkbunny, 30);
+	plugins_busy_set(name_inkbunny, timeout_inkbunny);
 
 	sid_inkbunny = null;
 	plugins_get("https://inkbunny.net/api_login.php?output_mode=json&username=guest", "parse_inkbunny_login", false);

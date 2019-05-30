@@ -6,12 +6,13 @@
 
 // the name string of this plugin
 const name_ccmixter = "CCMixter";
-
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_ccmixter = 10;
+const page_count_ccmixter = 30;
 // this should represent the maximum number of results the API may return per page
 const page_limit_ccmixter = 30;
+// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
+const timeout_ccmixter = 10; // this site returns an invalid object if the given keywords are not found, use a low timeout
 
 // the keywords and page currently in use
 var active_keywords_ccmixter = 0;
@@ -43,6 +44,10 @@ function parse_ccmixter(data) {
 
 // request the json object from the website
 function request_ccmixter(bump) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_ccmixter))
+		return;
+
 	const order = "score";
 
 	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
@@ -66,7 +71,7 @@ function request_ccmixter(bump) {
 
 // fetch the json object containing the data and execute it as a script
 function music_ccmixter() {
-	plugins_busy_set(name_ccmixter, 10); // this site returns an invalid object if the given keywords are not found, use a low timeout
+	plugins_busy_set(name_ccmixter, timeout_ccmixter); // this site returns an invalid object if the given keywords are not found, use a low timeout
 
 	active_keywords_ccmixter = 1;
 	active_page_ccmixter = 1;

@@ -6,12 +6,13 @@
 
 // the name string of this plugin
 const name_derpibooru = "Derpibooru";
-
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_derpibooru = 10;
+const page_count_derpibooru = 30;
 // this should represent the maximum number of results the API may return per page
 const page_limit_derpibooru = 50;
+// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
+const timeout_derpibooru = 30;
 
 // the keywords and page currently in use
 var active_keywords_derpibooru = 0;
@@ -44,6 +45,10 @@ function parse_derpibooru(data) {
 
 // request the json object from the website
 function request_derpibooru(bump) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_derpibooru))
+		return;
+
 	const filter_id = plugins_settings_read("nsfw", TYPE_IMAGES) ? "56027" : "100073"; // pick the appropriate filter from: https://www.derpibooru.org/filters
 
 	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
@@ -67,7 +72,7 @@ function request_derpibooru(bump) {
 
 // fetch the json object containing the data and execute it as a script
 function images_derpibooru() {
-	plugins_busy_set(name_derpibooru, 30);
+	plugins_busy_set(name_derpibooru, timeout_derpibooru);
 
 	active_keywords_derpibooru = 1;
 	active_page_derpibooru = 1;

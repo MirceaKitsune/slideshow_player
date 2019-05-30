@@ -112,7 +112,7 @@ function plugins_ready() {
 	}
 }
 
-// plugins, busy check
+// plugins, busy check for all plugins
 function plugins_busy() {
 	// return true if any plugin is busy
 	var busy = 0;
@@ -121,6 +121,11 @@ function plugins_busy() {
 			++busy;
 	}
 	return busy;
+}
+
+// plugins, busy check
+function plugins_busy_get(name) {
+	return plugins[name].busy;
 }
 
 // plugins, busy set

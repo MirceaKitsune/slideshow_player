@@ -6,12 +6,13 @@
 
 // the name string of this plugin
 const name_e621 = "e621";
-
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_e621 = 10;
+const page_count_e621 = 30;
 // this should represent the maximum number of results the API may return per page
 const page_limit_e621 = 320;
+// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
+const timeout_e621 = 30;
 
 // the keywords and page currently in use
 var active_keywords_e621 = 0;
@@ -44,6 +45,10 @@ function parse_e621(data) {
 
 // request the json object from the website
 function request_e621(bump) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_e621))
+		return;
+
 	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) ? "e621" : "e926"; // e926 is the SFW version of e621
 
 	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
@@ -67,7 +72,7 @@ function request_e621(bump) {
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
-	plugins_busy_set(name_e621, 30);
+	plugins_busy_set(name_e621, timeout_e621);
 
 	active_keywords_e621 = 1;
 	active_page_e621 = 1;
