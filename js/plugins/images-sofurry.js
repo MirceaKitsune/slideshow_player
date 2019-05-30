@@ -12,7 +12,7 @@ const page_count_sofurry = 30;
 // this should represent the maximum number of results the API may return per page
 const page_limit_sofurry = 30;
 // number of seconds after which the plugin stops listening for responses and is no longer marked as busy
-const timeout_sofurry = 30;
+const timeout_sofurry = 60;
 
 // the keywords and page currently in use
 var active_keywords_sofurry = 0;
@@ -20,6 +20,10 @@ var active_page_sofurry = 0;
 
 // convert each entry into an image object for the player
 function parse_sofurry(data) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_sofurry))
+		return;
+
 	const items = data.data.entries;
 	for(var entry in items) {
 		const this_data = items[entry];
@@ -32,23 +36,19 @@ function parse_sofurry(data) {
 		this_image.author = String(this_data.artistName);
 		this_image.url = String(this_data_url);
 		this_image.score = 10; // API doesn't provide a score, assume a below average default compared to plugins that do
-		this_image.tags = this_data.tags.split(/[\s,]+/);
+		this_image.tags = this_data.tags ? this_data.tags.split(/[\s,]+/) : [];
 
 		images_add(this_image);
 	}
 
 	// request the next page from the server
 	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
-	const bump = items.length < page_limit_sofurry;
+	const bump = typeof items !== "object" || items.length < page_limit_sofurry;
 	request_sofurry(bump);
 }
 
 // request the json object from the website
 function request_sofurry(bump) {
-	// stop here if the plugin is no longer working
-	if(!plugins_busy_get(name_sofurry))
-		return;
-
 	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "2" : "0";
 	const type = "artwork";
 	const order = "popularity";

@@ -20,6 +20,10 @@ var active_page_ccmixter = 0;
 
 // convert each entry into a music object for the player
 function parse_ccmixter(data) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_ccmixter))
+		return;
+
 	const items = data;
 	for(var entry in items) {
 		const this_data = items[entry];
@@ -31,23 +35,19 @@ function parse_ccmixter(data) {
 		this_song.author = String(this_data.user_real_name);
 		this_song.url = String(this_data.file_page_url);
 		this_song.score = Number(this_data.upload_num_scores);
-		this_song.tags = this_data.upload_tags.split(",");
+		this_song.tags = this_data.upload_tags ? this_data.upload_tags.split(",") : [];
 
 		music_add(this_song);
 	}
 
 	// request the next page from the server
 	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
-	const bump = items.length < page_limit_ccmixter;
+	const bump = typeof items !== "object" || items.length < page_limit_ccmixter;
 	request_ccmixter(bump);
 }
 
 // request the json object from the website
 function request_ccmixter(bump) {
-	// stop here if the plugin is no longer working
-	if(!plugins_busy_get(name_ccmixter))
-		return;
-
 	const order = "score";
 
 	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair

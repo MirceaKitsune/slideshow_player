@@ -12,7 +12,7 @@ const page_count_e621 = 30;
 // this should represent the maximum number of results the API may return per page
 const page_limit_e621 = 320;
 // number of seconds after which the plugin stops listening for responses and is no longer marked as busy
-const timeout_e621 = 30;
+const timeout_e621 = 60;
 
 // the keywords and page currently in use
 var active_keywords_e621 = 0;
@@ -20,6 +20,10 @@ var active_page_e621 = 0;
 
 // convert each entry into an image object for the player
 function parse_e621(data) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_e621))
+		return;
+
 	const items = data;
 	for(var entry in items) {
 		const this_data = items[entry];
@@ -32,23 +36,19 @@ function parse_e621(data) {
 		this_image.author = String(this_data.artist[0]);
 		this_image.url = String(this_data.source || this_data_url); // prefer the source URL, fallback to submission URL
 		this_image.score = Number(this_data.score);
-		this_image.tags = this_data.tags.split(" ");
+		this_image.tags = this_data.tags ? this_data.tags.split(" ") : [];
 
 		images_add(this_image);
 	}
 
 	// request the next page from the server
 	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
-	const bump = items.length < page_limit_e621;
+	const bump = typeof items !== "object" || items.length < page_limit_e621;
 	request_e621(bump);
 }
 
 // request the json object from the website
 function request_e621(bump) {
-	// stop here if the plugin is no longer working
-	if(!plugins_busy_get(name_e621))
-		return;
-
 	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) ? "e621" : "e926"; // e926 is the SFW version of e621
 
 	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair

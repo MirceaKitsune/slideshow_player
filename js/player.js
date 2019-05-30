@@ -169,6 +169,9 @@ function player_images_indexes() {
 
 // player, images, switching, onerror, previous
 function player_images_next_onerror_previous() {
+	if(!player_available_images() || !player_active_images())
+		return;
+
 	const indexes = player_images_indexes();
 
 	player.images.preloading_previous = false;
@@ -178,6 +181,9 @@ function player_images_next_onerror_previous() {
 
 // player, images, switching, onerror, next
 function player_images_next_onerror_next() {
+	if(!player_available_images() || !player_active_images())
+		return;
+
 	const indexes = player_images_indexes();
 
 	player.images.preloading_next = false;
@@ -187,6 +193,9 @@ function player_images_next_onerror_next() {
 
 // player, images, switching, onerror, current
 function player_images_next_onerror_current() {
+	if(!player_available_images() || !player_active_images())
+		return;
+
 	const indexes = player_images_indexes();
 
 	player.images.preloading_current = false;
@@ -196,6 +205,9 @@ function player_images_next_onerror_current() {
 
 // player, images, switching, onload, previous
 function player_images_next_onload_previous() {
+	if(!player_available_images() || !player_active_images())
+		return;
+
 	player.images.preloading_previous = false;
 
 	if(!player_busy_images())
@@ -204,6 +216,9 @@ function player_images_next_onload_previous() {
 
 // player, images, switching, onload, next
 function player_images_next_onload_next() {
+	if(!player_available_images() || !player_active_images())
+		return;
+
 	player.images.preloading_next = false;
 
 	if(!player_busy_images())
@@ -212,6 +227,9 @@ function player_images_next_onload_next() {
 
 // player, images, switching, onload, current
 function player_images_next_onload_current() {
+	if(!player_available_images() || !player_active_images())
+		return;
+
 	player.images.preloading_current = false;
 
 	if(!player_busy_images())
@@ -362,6 +380,9 @@ function player_images_clear() {
 
 // player, music, switching, onerror
 function player_music_next_onerror() {
+	if(!player_available_music() || !player_active_music())
+		return;
+
 	const index = player.music.index - 1;
 
 	player.music.preloading = false;

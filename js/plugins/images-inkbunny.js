@@ -12,7 +12,7 @@ const page_count_inkbunny = 30;
 // this should represent the maximum number of results the API may return per page
 const page_limit_inkbunny = 100;
 // number of seconds after which the plugin stops listening for responses and is no longer marked as busy
-const timeout_inkbunny = 30;
+const timeout_inkbunny = 60;
 
 // the keywords and page currently in use
 // this site also requires a SID
@@ -21,18 +21,22 @@ var active_page_inkbunny = 0;
 var sid_inkbunny = null;
 
 // indicate that the plugin has finished working
-function parse_inkbunny_ready(data) {
+function parse_inkbunny_ready() {
 	sid_inkbunny = null;
 	plugins_busy_set(name_inkbunny, null);
 }
 
 // close the temporary guest session
-function parse_inkbunny_logout(sid) {
+function parse_inkbunny_logout() {
 	plugins_get("https://inkbunny.net/api_logout.php?output_mode=json&sid=" + sid_inkbunny, "parse_inkbunny_ready", false);
 }
 
 // convert each entry into an image object for the player
 function parse_inkbunny(data) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_inkbunny))
+		return;
+
 	const items = data.submissions;
 	for(var entry in items) {
 		const this_data = items[entry];
@@ -52,7 +56,7 @@ function parse_inkbunny(data) {
 
 	// request the next page from the server
 	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
-	const bump = items.length < page_limit_inkbunny;
+	const bump = typeof items !== "object" || items.length < page_limit_inkbunny;
 	request_inkbunny(bump);
 }
 
@@ -74,10 +78,6 @@ function parse_inkbunny_login(data) {
 
 // request the json object from the website
 function request_inkbunny(bump) {
-	// stop here if the plugin is no longer working
-	if(!plugins_busy_get(name_inkbunny))
-		return;
-
 	const type = "1,2,3,4,5,6";
 	const order = "views";
 

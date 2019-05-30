@@ -16,6 +16,9 @@ var plugins_settings = [];
 plugins_settings[TYPE_IMAGES] = [];
 plugins_settings[TYPE_MUSIC] = [];
 
+// plugins, HTML element storage
+var plugins_jsonp_elements = [];
+
 // plugins, functions, register
 function plugins_register(name, type, url, func) {
 	plugins[name] = {
@@ -59,16 +62,20 @@ function plugins_get_jsonp(url, callback, proxy) {
 	element.type = "text/javascript";
 	element.src = src;
 	document.body.appendChild(element);
+	plugins_jsonp_elements.push(element);
 }
 
 // plugins, get, fetch
 function plugins_get_fetch(url, callback) {
 	// use the builtin fetch function to download the response body
 	fetch(url).then(function(response) {
+		// convert the response to json
+		return response.json();
+	}).then(function(json) {
 		// fetching the resource succeeded
 		// in this case, execute the callback function with the response
 		// as the callback function is delivered as a string, for compatibility with the fallback method below, use eval to call it
-		eval(callback + "(" + response + ")");
+		eval(callback + "(" + JSON.stringify(json) + ")");
 	}).catch(function(error) {
 		// fetching the resource failed
 		// if we're here, the cross-origin policy most likely restricted our attempt to download the response directly
@@ -96,6 +103,15 @@ function plugins_get(url, callback, proxy) {
 
 // plugins, functions, ready
 function plugins_ready() {
+	// remove the HTML elements of jsonp plugin scripts
+	for(var item in plugins_jsonp_elements) {
+		var element = plugins_jsonp_elements[item];
+		if(document.body.contains(element))
+			document.body.removeChild(element);
+	}
+	plugins_jsonp_elements = [];
+
+	// update the appropriate categories
 	if(interface_refresh.images) {
 		images_pick();
 		interface_update_recommendations_images_clear();

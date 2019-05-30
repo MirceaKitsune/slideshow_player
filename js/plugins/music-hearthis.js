@@ -20,6 +20,10 @@ var active_page_hearthis = 0;
 
 // convert each entry into a music object for the player
 function parse_hearthis(data) {
+	// stop here if the plugin is no longer working
+	if(!plugins_busy_get(name_hearthis))
+		return;
+
 	const items = data;
 	for(var entry in items) {
 		const this_data = items[entry];
@@ -38,16 +42,12 @@ function parse_hearthis(data) {
 
 	// request the next page from the server
 	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
-	const bump = items.length < page_limit_hearthis;
+	const bump = typeof items !== "object" || items.length < page_limit_hearthis;
 	request_hearthis(bump);
 }
 
 // request the json object from the website
 function request_hearthis(bump) {
-	// stop here if the plugin is no longer working
-	if(!plugins_busy_get(name_hearthis))
-		return;
-
 	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
 	// in case this is the last keyword pair, stop making requests here
 	const keywords = plugins_settings_read("keywords", TYPE_MUSIC);
