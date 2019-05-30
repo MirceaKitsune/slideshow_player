@@ -13,17 +13,15 @@ const page_count_hearthis = 10;
 // this should represent the maximum number of results the API may return per page
 const page_limit_hearthis = 20;
 
-// the number of seconds between requests made to the server
-// lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_hearthis = 0.1;
-
-// the active and maximum number of pages currently in use
-var pages_hearthis = 0;
+// the keywords and page currently in use
+var active_keywords_hearthis = 0;
+var active_page_hearthis = 0;
 
 // convert each entry into a music object for the player
 function parse_hearthis(data) {
-	for(var entry in data) {
-		const this_data = data[entry];
+	const items = data;
+	for(var entry in items) {
+		const this_data = items[entry];
 		var this_song = {};
 
 		this_song.src = String(this_data.download_url);
@@ -37,30 +35,40 @@ function parse_hearthis(data) {
 		music_add(this_song);
 	}
 
-	--pages_hearthis;
-	if(pages_hearthis <= 0)
-		plugins_busy_set(name_hearthis, null);
+	// request the next page from the server
+	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
+	const bump = items.length < page_limit_hearthis;
+	request_hearthis(bump);
+}
+
+// request the json object from the website
+function request_hearthis(bump) {
+	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
+	// in case this is the last keyword pair, stop making requests here
+	const keywords = plugins_settings_read("keywords", TYPE_MUSIC);
+	const keywords_all = parse_keywords(keywords);
+	const keywords_bump = bump || (active_page_hearthis > Math.floor(page_count_hearthis / keywords_all.length));
+	if(keywords_bump) {
+		++active_keywords_hearthis;
+		active_page_hearthis = 1;
+		if(active_keywords_hearthis > keywords_all.length) {
+			plugins_busy_set(name_hearthis, null);
+			return;
+		}
+	}
+	const keywords_current = keywords_all[active_keywords_hearthis - 1];
+
+	plugins_get("https://api-v2.hearthis.at/categories/" + keywords_current + "/?page=" + active_page_hearthis + "&count=" + page_limit_hearthis, "parse_hearthis", null);
+	++active_page_hearthis;
 }
 
 // fetch the json object containing the data and execute it as a script
 function music_hearthis() {
 	plugins_busy_set(name_hearthis, 10); // this site returns an invalid object if the given keywords are not found, use a low timeout
 
-	const keywords = plugins_settings_read("keywords", TYPE_MUSIC);
-	const keywords_all = parse_keywords(keywords.split(",")[0].split(".")[0]); // only one word is supported for this API
-
-	pages_hearthis = 0;
-	const pages = Math.max(Math.floor(page_count_hearthis / keywords_all.length), 1);
-	for(var item in keywords_all) {
-		for(var page = 1; page <= pages; page++) {
-			const this_keywords = keywords_all[item];
-			const this_page = page;
-			setTimeout(function() {
-				plugins_get("https://api-v2.hearthis.at/categories/" + this_keywords + "/?page=" + this_page + "&count=" + page_limit_hearthis, "parse_hearthis", null);
-			}, (pages_hearthis * delay_hearthis) * 1000);
-			++pages_hearthis;
-		}
-	}
+	active_keywords_hearthis = 1;
+	active_page_hearthis = 1;
+	request_hearthis(false);
 }
 
 // register the plugin

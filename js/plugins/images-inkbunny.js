@@ -13,27 +13,28 @@ const page_count_inkbunny = 10;
 // this should represent the maximum number of results the API may return per page
 const page_limit_inkbunny = 100;
 
-// the number of seconds between requests made to the server
-// lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_inkbunny = 0.1;
-
-// the active and maximum number of pages currently in use
-var pages_inkbunny = 0;
+// the keywords and page currently in use
+// this site also requires a SID
+var active_keywords_inkbunny = 0;
+var active_page_inkbunny = 0;
+var sid_inkbunny = null;
 
 // indicate that the plugin has finished working
 function parse_inkbunny_ready(data) {
+	sid_inkbunny = null;
 	plugins_busy_set(name_inkbunny, null);
 }
 
 // close the temporary guest session
-function parse_inkbunny_logout(data) {
-	plugins_get("https://inkbunny.net/api_logout.php?output_mode=json&sid=" + data.sid, "parse_inkbunny_ready", false);
+function parse_inkbunny_logout(sid) {
+	plugins_get("https://inkbunny.net/api_logout.php?output_mode=json&sid=" + sid_inkbunny, "parse_inkbunny_ready", false);
 }
 
 // convert each entry into an image object for the player
 function parse_inkbunny(data) {
-	for(var entry in data.submissions) {
-		const this_data = data.submissions[entry];
+	const items = data.submissions;
+	for(var entry in items) {
+		const this_data = items[entry];
 		var this_image = {};
 
 		const this_data_url = "https://inkbunny.net/s/" + this_data.submission_id;
@@ -48,43 +49,57 @@ function parse_inkbunny(data) {
 		images_add(this_image);
 	}
 
-	--pages_inkbunny;
-	if(pages_inkbunny <= 0)
-		parse_inkbunny_logout(data);
+	// request the next page from the server
+	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
+	const bump = items.length < page_limit_inkbunny;
+	request_inkbunny(bump);
 }
 
 // change the rating, then call the image parser with the session id
 function parse_inkbunny_rating(data) {
-	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
-	const keywords_all = parse_keywords(keywords);
-	const type = "1,2,3,4,5,6";
-	const order = "views";
+	active_page_inkbunny = 1;
+	active_keywords_inkbunny = 1;
 
-	pages_inkbunny = 0;
-	const pages = Math.max(Math.floor(page_count_inkbunny / keywords_all.length), 1);
-	for(var item in keywords_all) {
-		for(var page = 1; page <= pages; page++) {
-			const this_keywords = keywords_all[item];
-			const this_page = page;
-			setTimeout(function() {
-				plugins_get("https://inkbunny.net/api_search.php?output_mode=json&sid=" + data.sid + "&type=" + type + "&orderby=" + order + "&text=" + this_keywords + "&page=" + this_page + "&submissions_per_page=" + page_limit_inkbunny, "parse_inkbunny", false);
-			}, (pages_inkbunny * delay_inkbunny) * 1000);
-			++pages_inkbunny;
-		}
-	}
+	request_inkbunny(false);
 }
 
 // create a new session as guest, then call the rating api with its session id
 function parse_inkbunny_login(data) {
 	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "yes" : "no";
 
-	plugins_get("https://inkbunny.net/api_userrating.php?output_mode=json&sid=" + data.sid + "&tag[2]=" + nsfw + "&tag[3]=" + nsfw + "&tag[4]=" + nsfw + "&tag[5]=" + nsfw, "parse_inkbunny_rating", false);
+	sid_inkbunny = data.sid;
+	plugins_get("https://inkbunny.net/api_userrating.php?output_mode=json&sid=" + sid_inkbunny + "&tag[2]=" + nsfw + "&tag[3]=" + nsfw + "&tag[4]=" + nsfw + "&tag[5]=" + nsfw, "parse_inkbunny_rating", false);
+}
+
+// request the json object from the website
+function request_inkbunny(bump) {
+	const type = "1,2,3,4,5,6";
+	const order = "views";
+
+	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
+	// in case this is the last keyword pair, stop making requests here
+	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	const keywords_all = parse_keywords(keywords);
+	const keywords_bump = bump || (active_page_inkbunny > Math.floor(page_count_inkbunny / keywords_all.length));
+	if(keywords_bump) {
+		++active_keywords_inkbunny;
+		active_page_inkbunny = 1;
+		if(active_keywords_inkbunny > keywords_all.length) {
+			parse_inkbunny_logout();
+			return;
+		}
+	}
+	const keywords_current = keywords_all[active_keywords_inkbunny - 1];
+
+	plugins_get("https://inkbunny.net/api_search.php?output_mode=json&sid=" + sid_inkbunny + "&type=" + type + "&orderby=" + order + "&text=" + keywords_current + "&page=" + active_page_inkbunny + "&submissions_per_page=" + page_limit_inkbunny, "parse_inkbunny", false);
+	++active_page_inkbunny;
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_inkbunny() {
 	plugins_busy_set(name_inkbunny, 30);
 
+	sid_inkbunny = null;
 	plugins_get("https://inkbunny.net/api_login.php?output_mode=json&username=guest", "parse_inkbunny_login", false);
 }
 

@@ -11,19 +11,17 @@ const name_sofurry = "SoFurry";
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
 const page_count_sofurry = 10;
 // this should represent the maximum number of results the API may return per page
-const page_limit_sofurry = 100;
+const page_limit_sofurry = 30;
 
-// the number of seconds between requests made to the server
-// lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_sofurry = 0.1;
-
-// the active and maximum number of pages currently in use
-var pages_sofurry = 0;
+// the keywords and page currently in use
+var active_keywords_sofurry = 0;
+var active_page_sofurry = 0;
 
 // convert each entry into an image object for the player
 function parse_sofurry(data) {
-	for(var entry in data.data.entries) {
-		const this_data = data.data.entries[entry];
+	const items = data.data.entries;
+	for(var entry in items) {
+		const this_data = items[entry];
 		var this_image = {};
 
 		const this_data_url = "https://www.sofurry.com/view/" + this_data.id;
@@ -38,33 +36,44 @@ function parse_sofurry(data) {
 		images_add(this_image);
 	}
 
-	--pages_sofurry;
-	if(pages_sofurry <= 0)
-		plugins_busy_set(name_sofurry, null);
+	// request the next page from the server
+	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
+	const bump = items.length < page_limit_sofurry;
+	request_sofurry(bump);
+}
+
+// request the json object from the website
+function request_sofurry(bump) {
+	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "2" : "0";
+	const type = "artwork";
+	const order = "popularity";
+
+	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
+	// in case this is the last keyword pair, stop making requests here
+	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	const keywords_all = parse_keywords(keywords);
+	const keywords_bump = bump || (active_page_sofurry > Math.floor(page_count_sofurry / keywords_all.length));
+	if(keywords_bump) {
+		++active_keywords_sofurry;
+		active_page_sofurry = 1;
+		if(active_keywords_sofurry > keywords_all.length) {
+			plugins_busy_set(name_sofurry, null);
+			return;
+		}
+	}
+	const keywords_current = keywords_all[active_keywords_sofurry - 1];
+
+	plugins_get("https://api2.sofurry.com/browse/search?format=json&search=" + keywords_current + "&filter=" + type + "&sort=" + order + "&page=" + active_page_sofurry + "&maxlevel=" + nsfw, "parse_sofurry", true);
+	++active_page_sofurry;
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_sofurry() {
 	plugins_busy_set(name_sofurry, 30);
 
-	const nsfw = plugins_settings_read("nsfw", TYPE_IMAGES) ? "2" : "0";
-	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
-	const keywords_all = parse_keywords(keywords);
-	const type = "artwork";
-	const order = "popularity";
-
-	pages_sofurry = 0;
-	const pages = Math.max(Math.floor(page_count_sofurry / keywords_all.length), 1);
-	for(var item in keywords_all) {
-		for(var page = 1; page <= pages; page++) {
-			const this_keywords = keywords_all[item];
-			const this_page = page;
-			setTimeout(function() {
-				plugins_get("https://api2.sofurry.com/browse/search?format=json&search=" + this_keywords + "&filter=" + type + "&sort=" + order + "&page=" + this_page + "&maxlevel=" + nsfw, "parse_sofurry", true);
-			}, (pages_sofurry * delay_sofurry) * 1000);
-			++pages_sofurry;
-		}
-	}
+	active_keywords_sofurry = 1;
+	active_page_sofurry = 1;
+	request_sofurry(false);
 }
 
 // register the plugin

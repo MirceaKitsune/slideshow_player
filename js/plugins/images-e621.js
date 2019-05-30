@@ -13,17 +13,15 @@ const page_count_e621 = 10;
 // this should represent the maximum number of results the API may return per page
 const page_limit_e621 = 320;
 
-// the number of seconds between requests made to the server
-// lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_e621 = 0.1;
-
-// the active and maximum number of pages currently in use
-var pages_e621 = 0;
+// the keywords and page currently in use
+var active_keywords_e621 = 0;
+var active_page_e621 = 0;
 
 // convert each entry into an image object for the player
 function parse_e621(data) {
-	for(var entry in data) {
-		const this_data = data[entry];
+	const items = data;
+	for(var entry in items) {
+		const this_data = items[entry];
 		var this_image = {};
 
 		const this_data_url = "https://e621.net/post/show/" + this_data.id;
@@ -38,31 +36,42 @@ function parse_e621(data) {
 		images_add(this_image);
 	}
 
-	--pages_e621;
-	if(pages_e621 <= 0)
-		plugins_busy_set(name_e621, null);
+	// request the next page from the server
+	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
+	const bump = items.length < page_limit_e621;
+	request_e621(bump);
+}
+
+// request the json object from the website
+function request_e621(bump) {
+	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) ? "e621" : "e926"; // e926 is the SFW version of e621
+
+	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
+	// in case this is the last keyword pair, stop making requests here
+	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	const keywords_all = parse_keywords(keywords);
+	const keywords_bump = bump || (active_page_e621 > Math.floor(page_count_e621 / keywords_all.length));
+	if(keywords_bump) {
+		++active_keywords_e621;
+		active_page_e621 = 1;
+		if(active_keywords_e621 > keywords_all.length) {
+			plugins_busy_set(name_e621, null);
+			return;
+		}
+	}
+	const keywords_current = keywords_all[active_keywords_e621 - 1];
+
+	plugins_get("https://" + domain + ".net/post/index.json?tags=" + keywords_current + "&page=" + active_page_e621 + "&limit=" + page_limit_e621, "parse_e621", false);
+	++active_page_e621;
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
 	plugins_busy_set(name_e621, 30);
 
-	const domain = plugins_settings_read("nsfw", TYPE_IMAGES) ? "e621" : "e926"; // e926 is the SFW version of e621
-	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
-	const keywords_all = parse_keywords(keywords);
-
-	pages_e621 = 0;
-	const pages = Math.max(Math.floor(page_count_e621 / keywords_all.length), 1);
-	for(var item in keywords_all) {
-		for(var page = 1; page <= pages; page++) {
-			const this_keywords = keywords_all[item];
-			const this_page = page;
-			setTimeout(function() {
-				plugins_get("https://" + domain + ".net/post/index.json?tags=" + this_keywords + "&page=" + this_page + "&limit=" + page_limit_e621, "parse_e621", false);
-			}, (pages_e621 * delay_e621) * 1000);
-			++pages_e621;
-		}
-	}
+	active_keywords_e621 = 1;
+	active_page_e621 = 1;
+	request_e621(false);
 }
 
 // register the plugin

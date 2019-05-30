@@ -11,19 +11,17 @@ const name_ccmixter = "CCMixter";
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
 const page_count_ccmixter = 10;
 // this should represent the maximum number of results the API may return per page
-const page_limit_ccmixter = 15;
+const page_limit_ccmixter = 30;
 
-// the number of seconds between requests made to the server
-// lower values mean less waiting time, but are more likely to trigger the flood protection of servers
-const delay_ccmixter = 0.1;
-
-// the active and maximum number of pages currently in use
-var pages_ccmixter = 0;
+// the keywords and page currently in use
+var active_keywords_ccmixter = 0;
+var active_page_ccmixter = 0;
 
 // convert each entry into a music object for the player
 function parse_ccmixter(data) {
-	for(var entry in data) {
-		const this_data = data[entry];
+	const items = data;
+	for(var entry in items) {
+		const this_data = items[entry];
 		var this_song = {};
 
 		this_song.src = String(this_data.files[0].download_url);
@@ -37,31 +35,42 @@ function parse_ccmixter(data) {
 		music_add(this_song);
 	}
 
-	--pages_ccmixter;
-	if(pages_ccmixter <= 0)
-		plugins_busy_set(name_ccmixter, null);	
+	// request the next page from the server
+	// if this page returned less items than the maximum amount, that means it was the last page, request the next keyword pair
+	const bump = items.length < page_limit_ccmixter;
+	request_ccmixter(bump);
+}
+
+// request the json object from the website
+function request_ccmixter(bump) {
+	const order = "score";
+
+	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
+	// in case this is the last keyword pair, stop making requests here
+	const keywords = plugins_settings_read("keywords", TYPE_MUSIC);
+	const keywords_all = parse_keywords(keywords);
+	const keywords_bump = bump || (active_page_ccmixter > Math.floor(page_count_ccmixter / keywords_all.length));
+	if(keywords_bump) {
+		++active_keywords_ccmixter;
+		active_page_ccmixter = 1;
+		if(active_keywords_ccmixter > keywords_all.length) {
+			plugins_busy_set(name_ccmixter, null);
+			return;
+		}
+	}
+	const keywords_current = keywords_all[active_keywords_ccmixter - 1];
+
+	plugins_get("http://ccmixter.org/api/query?f=json&tags=" + keywords_current + "&sort=" + order + "&offset=" + active_page_ccmixter + "&limit=" + page_limit_ccmixter, "parse_ccmixter", null);
+	++active_page_ccmixter;
 }
 
 // fetch the json object containing the data and execute it as a script
 function music_ccmixter() {
 	plugins_busy_set(name_ccmixter, 10); // this site returns an invalid object if the given keywords are not found, use a low timeout
 
-	const keywords = plugins_settings_read("keywords", TYPE_MUSIC);
-	const keywords_all = parse_keywords(keywords);
-	const order = "score";
-
-	pages_ccmixter = 0;
-	const pages = Math.max(Math.floor(page_count_ccmixter / keywords_all.length), 1);
-	for(var item in keywords_all) {
-		for(var page = 1; page <= pages; page++) {
-			const this_keywords = keywords_all[item];
-			const this_page = page;
-			setTimeout(function() {
-				plugins_get("http://ccmixter.org/api/query?f=json&tags=" + this_keywords + "&sort=" + order + "&offset=" + this_page + "&limit=" + page_limit_ccmixter, "parse_ccmixter", null);
-			}, (pages_ccmixter * delay_ccmixter) * 1000);
-			++pages_ccmixter;
-		}
-	}
+	active_keywords_ccmixter = 1;
+	active_page_ccmixter = 1;
+	request_ccmixter(false);
 }
 
 // register the plugin
