@@ -8,9 +8,10 @@ const FULLSCREEN_MOUSE_FADE = 64;
 // 0 is instant, 1 makes the transition last throughout the full duration of the image
 const TRANSITION = 0.1;
 
-// the zoom strength and size of the magnifier
+// the zoom level, size, and duration of the magnifier
 const ZOOM_FACTOR = 2;
 const ZOOM_SIZE = 0.5;
+const ZOOM_TIME = 5;
 
 // the recommendation algorithm preforms scans this many seconds
 // smaller values offer more accuracy but use more processing power
@@ -36,6 +37,7 @@ var player = {
 		transition: 0,
 		timer_fade: null,
 		timer_next: null,
+		timer_zoom: null,
 		element_previous: null,
 		element_next: null,
 		element_current: null,
@@ -170,6 +172,9 @@ function player_images_zoom_attach() {
 		player.images.element_zoom.setAttribute("class", "player_zoom");
 		player.element.appendChild(player.images.element_zoom);
 	}
+
+	// set the destruction timer
+	player.images.timer_zoom = setTimeout(player_images_zoom_detach, ZOOM_TIME * 1000);
 }
 
 // player, images, zoom, detach
@@ -179,6 +184,9 @@ function player_images_zoom_detach() {
 		player.element.removeChild(player.images.element_zoom);
 		player.images.element_zoom = null;
 	}
+
+	// clear the destruction timer
+	clearTimeout(player.images.timer_zoom);
 }
 
 // player, images, zoom, update
@@ -212,6 +220,10 @@ function player_images_zoom_update(event) {
 	player.images.element_zoom.style["background-image"] = "url(" + player.images.element_current.src + ")";
 	player.images.element_zoom.style["background-size"] = (player.images.element_current.width * ZOOM_FACTOR) + "px " + (player.images.element_current.height * ZOOM_FACTOR) + "px";
 	player.images.element_zoom.style["background-position"] = "-" + ((pos_x * ZOOM_FACTOR) - (size / 2)) + "px -" + ((pos_y * ZOOM_FACTOR) - (size / 2)) + "px";
+
+	// reset the destruction timer
+	clearTimeout(player.images.timer_zoom);
+	player.images.timer_zoom = setTimeout(player_images_zoom_detach, ZOOM_TIME * 1000);
 }
 
 // player, images, get indexes
@@ -657,7 +669,7 @@ function player_attach() {
 	player.images.element_current.setAttribute("src", SRC_BLANK);
 	player.images.element_current.setAttribute("onload", "player_images_next_onload_current()");
 	player.images.element_current.setAttribute("onerror", "player_images_next_onerror_current()");
-	player.images.element_current.setAttribute("onmouseover", "player_images_zoom_attach()");
+	// player.images.element_current.setAttribute("onmouseover", "player_images_zoom_attach()");
 	player.images.element_current.setAttribute("onmouseout", "player_images_zoom_detach()");
 	player.images.element_current.setAttribute("onmousemove", "player_images_zoom_update(event)");
 	player.element.appendChild(player.images.element_current);
