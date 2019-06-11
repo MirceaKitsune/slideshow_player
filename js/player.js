@@ -8,6 +8,10 @@ const FULLSCREEN_MOUSE_FADE = 64;
 // 0 is instant, 1 makes the transition last throughout the full duration of the image
 const TRANSITION = 0.1;
 
+// the zoom strength and size of the magnifier
+const ZOOM_FACTOR = 2;
+const ZOOM_SIZE = 0.5;
+
 // the recommendation algorithm preforms scans this many seconds
 // smaller values offer more accuracy but use more processing power
 const RECOMMENDATIONS_RATE = 1;
@@ -34,7 +38,8 @@ var player = {
 		timer_next: null,
 		element_previous: null,
 		element_next: null,
-		element_current: null
+		element_current: null,
+		element_zoom: null
 	},
 	music: {
 		index: 0,
@@ -44,11 +49,6 @@ var player = {
 		element: null
 	}
 };
-
-// player, images, fullscreen settings
-var fullscreen_timer = null;
-var fullscreen_mouse_start = 0;
-var fullscreen_mouse_end = 0;
 
 // recommendations, timer
 function recommendations_timer() {
@@ -86,6 +86,11 @@ function recommendations_timer() {
 
 	interface_update_media(true, false, false, false, true);
 }
+
+// player, images, fullscreen settings
+var fullscreen_timer = null;
+var fullscreen_mouse_start = 0;
+var fullscreen_mouse_end = 0;
 
 // player, images, timer function for fullscreen
 function player_images_fullscreen_timer() {
@@ -152,6 +157,61 @@ function player_images_fullscreen_toggle(force_to) {
 	// as the fullscreen button moves outside of the mouse cursor when toggling fullscreen, reset its hover effects
 	interface_style_effect_shape(interface.media_controls_fullscreen, false);
 	interface_style_button_color(interface.media_controls_fullscreen, "white");
+
+	// as the image elements are resized and repositioned when toggling fullscreen, detach the zoom element
+	player_images_zoom_detach();
+}
+
+// player, images, zoom, attach
+function player_images_zoom_attach() {
+	// configure the zoom element
+	if(player_active_images() && !player.element.contains(player.images.element_zoom)) {
+		player.images.element_zoom = document.createElement("div");
+		player.images.element_zoom.setAttribute("class", "player_zoom");
+		player.element.appendChild(player.images.element_zoom);
+	}
+}
+
+// player, images, zoom, detach
+function player_images_zoom_detach() {
+	// destroy the zoom element
+	if(player_active_images() && player.element.contains(player.images.element_zoom)) {
+		player.element.removeChild(player.images.element_zoom);
+		player.images.element_zoom = null;
+	}
+}
+
+// player, images, zoom, update
+function player_images_zoom_update(event) {
+	if(!player_active_images())
+		return;
+	if(!player.element.contains(player.images.element_zoom))
+		player_images_zoom_attach();
+
+	const size = Math.min(player.images.element_current.width, player.images.element_current.height) * ZOOM_SIZE;
+	const rect = player.images.element_current.getBoundingClientRect();
+	var pos_x = event.clientX - rect.left;
+	var pos_y = event.clientY - rect.top;
+
+	// bound the magnifier to the limits of the image
+	const border = size / (ZOOM_FACTOR * 2);
+	if(pos_x < border)
+		pos_x = border;
+	if(pos_x > player.images.element_current.width - border)
+		pos_x = player.images.element_current.width - border;
+	if(pos_y < border)
+		pos_y = border;
+	if(pos_y > player.images.element_current.height - border)
+		pos_y = player.images.element_current.height - border;
+
+	// update the zoom element
+	player.images.element_zoom.style["width"] = size + "px";
+	player.images.element_zoom.style["height"] = size + "px";
+	player.images.element_zoom.style["left"] = (rect.left + pos_x - (size / 2)) + "px";
+	player.images.element_zoom.style["top"] = (rect.top + pos_y - (size / 2)) + "px";
+	player.images.element_zoom.style["background-image"] = "url(" + player.images.element_current.src + ")";
+	player.images.element_zoom.style["background-size"] = (player.images.element_current.width * ZOOM_FACTOR) + "px " + (player.images.element_current.height * ZOOM_FACTOR) + "px";
+	player.images.element_zoom.style["background-position"] = "-" + ((pos_x * ZOOM_FACTOR) - (size / 2)) + "px -" + ((pos_y * ZOOM_FACTOR) - (size / 2)) + "px";
 }
 
 // player, images, get indexes
@@ -314,6 +374,10 @@ function player_images_next() {
 		clearInterval(player.images.timer_fade);
 		player.images.timer_fade = setInterval(player_images_next_fade, RATE);
 		player_images_next_fade();
+
+		// since the image elements changed, the zoom element would no longer show the correct image
+		// detach it until the mouse is moved again over the new image
+		player_images_zoom_detach();
 	}
 
 	// refresh recommended tags
@@ -589,10 +653,13 @@ function player_attach() {
 	// configure the current image element
 	player.images.element_current = document.createElement("img");
 	player.images.element_current.setAttribute("class", "player_image");
-	player.images.element_current.setAttribute("style", "opacity: 0; pointer-events: all");
+	player.images.element_current.setAttribute("style", "opacity: 0; pointer-events: all; cursor: none");
 	player.images.element_current.setAttribute("src", SRC_BLANK);
 	player.images.element_current.setAttribute("onload", "player_images_next_onload_current()");
 	player.images.element_current.setAttribute("onerror", "player_images_next_onerror_current()");
+	player.images.element_current.setAttribute("onmouseover", "player_images_zoom_attach()");
+	player.images.element_current.setAttribute("onmouseout", "player_images_zoom_detach()");
+	player.images.element_current.setAttribute("onmousemove", "player_images_zoom_update(event)");
 	player.element.appendChild(player.images.element_current);
 
 	// configure the music element
