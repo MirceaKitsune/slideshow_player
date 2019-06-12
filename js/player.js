@@ -171,10 +171,12 @@ function player_images_zoom_attach() {
 		player.images.element_zoom = document.createElement("div");
 		player.images.element_zoom.setAttribute("class", "player_zoom");
 		player.element.appendChild(player.images.element_zoom);
+
+		player.images.element_current.style["cursor"] = "none";
 	}
 
 	// set the destruction timer
-	player.images.timer_zoom = setTimeout(player_images_zoom_detach, ZOOM_TIME * 1000);
+	// player.images.timer_zoom = setTimeout(player_images_zoom_detach, ZOOM_TIME * 1000);
 }
 
 // player, images, zoom, detach
@@ -183,6 +185,8 @@ function player_images_zoom_detach() {
 	if(player_active_images() && player.element.contains(player.images.element_zoom)) {
 		player.element.removeChild(player.images.element_zoom);
 		player.images.element_zoom = null;
+
+		player.images.element_current.style["cursor"] = "initial";
 	}
 
 	// clear the destruction timer
@@ -191,10 +195,12 @@ function player_images_zoom_detach() {
 
 // player, images, zoom, update
 function player_images_zoom_update(event) {
-	if(!player_active_images())
+	if(!player_active_images() || player.images.preloading_current) {
+		player_images_zoom_detach();
 		return;
-	if(!player.element.contains(player.images.element_zoom))
+	} else if(!player.element.contains(player.images.element_zoom)) {
 		player_images_zoom_attach();
+	}
 
 	const size = Math.min(player.images.element_current.width, player.images.element_current.height) * ZOOM_SIZE;
 	const rect = player.images.element_current.getBoundingClientRect();
@@ -665,7 +671,7 @@ function player_attach() {
 	// configure the current image element
 	player.images.element_current = document.createElement("img");
 	player.images.element_current.setAttribute("class", "player_image");
-	player.images.element_current.setAttribute("style", "opacity: 0; pointer-events: all; cursor: none");
+	player.images.element_current.setAttribute("style", "opacity: 0; pointer-events: all");
 	player.images.element_current.setAttribute("src", SRC_BLANK);
 	player.images.element_current.setAttribute("onload", "player_images_next_onload_current()");
 	player.images.element_current.setAttribute("onerror", "player_images_next_onerror_current()");
