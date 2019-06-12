@@ -240,6 +240,16 @@
 	pointer-events: all;
 }
 
+.item_bar {
+	text-align: center;
+	width: 128px;
+	height: 4px;
+	border-radius: 4px;
+	background-color: #ffffff;
+	z-index: 1;
+	pointer-events: all;
+}
+
 .effect_shape_square {
 	border-radius: 10%;
 	transition: border-radius 0.5s, background-color 0.25s;

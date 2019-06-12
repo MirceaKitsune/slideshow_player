@@ -2,8 +2,8 @@
 // Public Domain / CC0, MirceaKitsune 2018
 
 // style constants
-const STYLE_MEDIA_RING_COLOR_EMPTY = "#ffffff";
-const STYLE_MEDIA_RING_COLOR_FULL = "#00aacc";
+const STYLE_MEDIA_BAR_COLOR_EMPTY = "#ffffff";
+const STYLE_MEDIA_BAR_COLOR_FULL = "#00aacc";
 
 // seconds after which to pull data from websites after settings that require refreshing are changed
 // this needs to be big enough to give users enough time to finish typing and to protect sites against spamming
@@ -54,7 +54,7 @@ function interface_ring_images_timer() {
 		progress = 1 - ((target_ms - current_ms) / duration);
 	}
 
-	interface_style_css_gradient(interface.media_images_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
+	interface_style_css_gradient_radial(interface.media_images_thumb_ring, progress, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
 }
 
 // interface, functions, ring, images, set
@@ -90,7 +90,7 @@ function interface_ring_music_timer() {
 		progress = current_s / target_s;
 	}
 
-	interface_style_css_gradient(interface.media_music_thumb_ring, progress, STYLE_MEDIA_RING_COLOR_EMPTY, STYLE_MEDIA_RING_COLOR_FULL);
+	interface_style_css_gradient_radial(interface.media_music_thumb_ring, progress, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
 }
 
 // interface, functions, ring, music, set
@@ -252,9 +252,16 @@ function interface_play() {
 		player_detach();
 }
 
-// interface, update style, ring, gradient
+// interface, update style, gradient, linear
+function interface_style_css_gradient_linear(element, progress, color_empty, color_full) {
+	progress = Math.min(Math.max(progress, 0), 1) * 100;
+	const gradient_progress = "linear-gradient(90deg, " + color_full + " 0%," + color_full + " " + progress + "%, " + color_empty + " " + progress + "%, " + color_empty + " 100%)";
+	element.style["background-image"] = gradient_progress;
+}
+
+// interface, update style, gradient, radial
 // TODO: use conic-gradient instead of the linear-gradient hack, once the specification is supported by all major web browsers
-function interface_style_css_gradient(element, progress, color_empty, color_full) {
+function interface_style_css_gradient_radial(element, progress, color_empty, color_full) {
 	progress = Math.min(Math.max(progress, 0), 1);
 	const gradient_progress_angle = (progress > 0.5 ? 90 : 270) + (progress * 360);
 	const gradient_progress_color = (progress > 0.5 ? color_full : color_empty);
@@ -292,11 +299,9 @@ function interface_update_attached(attached) {
 	if(attached) {
 		interface.media.style["opacity"] = 1;
 		interface.media.setAttribute("class", "item_media item_media_position_detached item_media_background_detached");
-		interface.media_images_label.setAttribute("class", "text_size_medium text_color_black");
 		interface.media_images_info.setAttribute("class", "text_size_small text_color_black");
-		interface.media_music_label.setAttribute("class", "text_size_medium text_color_black");
 		interface.media_music_info.setAttribute("class", "text_size_small text_color_black");
-		interface.media_controls_label.setAttribute("class", "text_size_large text_color_black");
+		interface.media_controls_label.setAttribute("class", "text_size_medium text_color_black");
 		interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_black");
 		interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_black");
 		interface.media_music_recommendations_label.setAttribute("class", "text_size_large text_color_black");
@@ -306,11 +311,9 @@ function interface_update_attached(attached) {
 	} else {
 		// interface.media.style["opacity"] = 1;
 		interface.media.setAttribute("class", "item_media item_media_position_attached item_media_background_attached");
-		interface.media_images_label.setAttribute("class", "text_size_medium text_color_white");
 		interface.media_images_info.setAttribute("class", "text_size_small text_color_white");
-		interface.media_music_label.setAttribute("class", "text_size_medium text_color_white");
 		interface.media_music_info.setAttribute("class", "text_size_small text_color_white");
-		interface.media_controls_label.setAttribute("class", "text_size_large text_color_white");
+		interface.media_controls_label.setAttribute("class", "text_size_medium text_color_white");
 		interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_white");
 		interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_white");
 		interface.media_music_recommendations_label.setAttribute("class", "text_size_large text_color_white");
@@ -428,13 +431,15 @@ function interface_update_media_images() {
 		if(label_author.length > 16)
 			label_author = label_author.substring(0, 16) + "...";
 
-		interface.media_images_label.innerHTML = "<b>" + player.images.index + " / " + data_images.length + "</b>";
+		interface_style_css_gradient_linear(interface.media_images_bar, player.images.index / data_images.length, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+		interface.media_images_bar.setAttribute("title", player.images.index + " / " + data_images.length);
 		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
 		interface.media_images_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 		interface.player_icon_images.innerHTML = ready ? "" : "⧗";
 	} else {
-		interface.media_images_label.innerHTML = "<b>No images loaded</b>";
+		interface_style_css_gradient_linear(interface.media_images_bar, 0, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+		interface.media_images_bar.removeAttribute("title");
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 		interface.media_images_info.innerHTML = "";
@@ -500,13 +505,15 @@ function interface_update_media_music() {
 		if(label_author.length > 16)
 			label_author = label_author.substring(0, 16) + "...";
 
-		interface.media_music_label.innerHTML = "<b>" + player.music.index + " / " + data_music.length + "</b>";
+		interface_style_css_gradient_linear(interface.media_music_bar, player.music.index / data_music.length, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+		interface.media_music_bar.setAttribute("title", player.music.index + " / " + data_music.length);
 		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
 		interface.media_music_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 		interface.player_icon_music.innerHTML = ready ? "" : "⧖";
 	} else {
-		interface.media_music_label.innerHTML = "<b>No music loaded</b>";
+		interface_style_css_gradient_linear(interface.media_music_bar, 0, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+		interface.media_music_bar.removeAttribute("title");
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 		interface.media_music_info.innerHTML = "";
@@ -1059,11 +1066,11 @@ function interface_init() {
 			interface.media_images_next.innerHTML = "✖";
 			interface.media_images.appendChild(interface.media_images_next);
 
-			// interface HTML: media, images, label
-			interface.media_images_label = document.createElement("p");
-			interface.media_images_label.setAttribute("class", "text_size_medium text_color_black");
-			interface.media_images_label.setAttribute("style", "position: absolute; top: 42px; width: 100%");
-			interface.media_images.appendChild(interface.media_images_label);
+			// interface HTML: media, images, bar
+			interface.media_images_bar = document.createElement("div");
+			interface.media_images_bar.setAttribute("class", "item_bar");
+			interface.media_images_bar.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 58px; left: -64px");
+			interface.media_images.appendChild(interface.media_images_bar);
 
 			// interface HTML: media, images, thumb
 			interface.media_images_thumb = document.createElement("a");
@@ -1081,21 +1088,21 @@ function interface_init() {
 				// interface HTML: media, images, thumb, ring
 				interface.media_images_thumb_ring = document.createElement("div");
 				interface.media_images_thumb_ring.setAttribute("class", "item_thumbnail_ring effect_shape_round");
-				interface.media_images_thumb_ring.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
+				interface.media_images_thumb_ring.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 68px");
 				interface.media_images_thumb.appendChild(interface.media_images_thumb_ring);
 
 				// interface HTML: media, images, thumb, image
 				interface.media_images_thumb_image = document.createElement("img");
 				interface.media_images_thumb_image.setAttribute("class", "item_thumbnail_image effect_shape_round");
 				interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
-				interface.media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
+				interface.media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 72px");
 				interface.media_images_thumb.appendChild(interface.media_images_thumb_image);
 			}
 
 			// interface HTML: media, images, info
 			interface.media_images_info = document.createElement("p");
 			interface.media_images_info.setAttribute("class", "text_size_small text_color_black");
-			interface.media_images_info.setAttribute("style", "position: absolute; top: 164px; width: 100%");
+			interface.media_images_info.setAttribute("style", "position: absolute; top: 156px; width: 100%");
 			interface.media_images.appendChild(interface.media_images_info);
 		}
 
@@ -1116,7 +1123,7 @@ function interface_init() {
 
 			// interface HTML: media, controls, label
 			interface.media_controls_label = document.createElement("p");
-			interface.media_controls_label.setAttribute("class", "text_size_large text_color_black");
+			interface.media_controls_label.setAttribute("class", "text_size_medium text_color_black");
 			interface.media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%");
 			interface.media_controls.appendChild(interface.media_controls_label);
 
@@ -1124,7 +1131,7 @@ function interface_init() {
 			interface.media_controls_fullscreen = document.createElement("div");
 			interface.media_controls_fullscreen.setAttribute("title", "Fullscreen");
 			interface.media_controls_fullscreen.setAttribute("class", "button_size_small button_color_white effect_shape_round");
-			interface.media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 128px");
+			interface.media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 120px");
 			interface.media_controls_fullscreen.setAttribute("onclick", "player_images_fullscreen_toggle()");
 			interface.media_controls_fullscreen.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
 			interface.media_controls_fullscreen.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
@@ -1167,11 +1174,11 @@ function interface_init() {
 			interface.media_music_next.innerHTML = "✖";
 			interface.media_music.appendChild(interface.media_music_next);
 
-			// interface HTML: media, music, label
-			interface.media_music_label = document.createElement("p");
-			interface.media_music_label.setAttribute("class", "text_size_medium text_color_black");
-			interface.media_music_label.setAttribute("style", "position: absolute; top: 42px; width: 100%");
-			interface.media_music.appendChild(interface.media_music_label);
+			// interface HTML: media, music, bar
+			interface.media_music_bar = document.createElement("div");
+			interface.media_music_bar.setAttribute("class", "item_bar");
+			interface.media_music_bar.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 58px; left: -64px");
+			interface.media_music.appendChild(interface.media_music_bar);
 
 			// interface HTML: media, music, thumb
 			interface.media_music_thumb = document.createElement("a");
@@ -1189,21 +1196,21 @@ function interface_init() {
 				// interface HTML: media, music, thumb, ring
 				interface.media_music_thumb_ring = document.createElement("div");
 				interface.media_music_thumb_ring.setAttribute("class", "item_thumbnail_ring effect_shape_round");
-				interface.media_music_thumb_ring.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 76px");
+				interface.media_music_thumb_ring.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 68px");
 				interface.media_music_thumb.appendChild(interface.media_music_thumb_ring);
 
 				// interface HTML: media, music, thumb, song
 				interface.media_music_thumb_song = document.createElement("img");
 				interface.media_music_thumb_song.setAttribute("class", "item_thumbnail_image effect_shape_round");
 				interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
-				interface.media_music_thumb_song.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
+				interface.media_music_thumb_song.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 72px");
 				interface.media_music_thumb.appendChild(interface.media_music_thumb_song);
 			}
 
 			// interface HTML: media, music, info
 			interface.media_music_info = document.createElement("p");
 			interface.media_music_info.setAttribute("class", "text_size_small text_color_black");
-			interface.media_music_info.setAttribute("style", "position: absolute; top: 164px; width: 100%");
+			interface.media_music_info.setAttribute("style", "position: absolute; top: 156px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_info);
 		}
 
