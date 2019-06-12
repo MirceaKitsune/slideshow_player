@@ -1121,22 +1121,22 @@ function interface_init() {
 			interface.media_controls_play.innerHTML = "✖";
 			interface.media_controls.appendChild(interface.media_controls_play);
 
-			// interface HTML: media, controls, label
-			interface.media_controls_label = document.createElement("p");
-			interface.media_controls_label.setAttribute("class", "text_size_medium text_color_black");
-			interface.media_controls_label.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 100%");
-			interface.media_controls.appendChild(interface.media_controls_label);
-
 			// interface HTML: media, controls, fullscreen
 			interface.media_controls_fullscreen = document.createElement("div");
 			interface.media_controls_fullscreen.setAttribute("title", "Fullscreen");
 			interface.media_controls_fullscreen.setAttribute("class", "button_size_small button_color_white effect_shape_round");
-			interface.media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 120px");
+			interface.media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
 			interface.media_controls_fullscreen.setAttribute("onclick", "player_images_fullscreen_toggle()");
 			interface.media_controls_fullscreen.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
 			interface.media_controls_fullscreen.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_controls_fullscreen.innerHTML = "▭";
 			interface.media_controls.appendChild(interface.media_controls_fullscreen);
+
+			// interface HTML: media, controls, label
+			interface.media_controls_label = document.createElement("p");
+			interface.media_controls_label.setAttribute("class", "text_size_medium text_color_black");
+			interface.media_controls_label.setAttribute("style", "position: absolute; top: 104px; left: 0%; width: 100%");
+			interface.media_controls.appendChild(interface.media_controls_label);
 		}
 
 		// interface HTML: media, music
