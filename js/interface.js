@@ -436,7 +436,7 @@ function interface_update_media_images() {
 		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
 		interface.media_images_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
-		interface.player_icon_images.innerHTML = ready ? "" : "⧗";
+		interface.player_icon_images.innerHTML = ready ? "" : (player.images.preloading_current ? "⧗" : "⧖");
 	} else {
 		interface_style_css_gradient_linear(interface.media_images_bar, 0, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
 		interface.media_images_bar.removeAttribute("title");
@@ -510,7 +510,7 @@ function interface_update_media_music() {
 		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
 		interface.media_music_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
-		interface.player_icon_music.innerHTML = ready ? "" : "⧖";
+		interface.player_icon_music.innerHTML = ready ? "" : "⧗";
 	} else {
 		interface_style_css_gradient_linear(interface.media_music_bar, 0, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
 		interface.media_music_bar.removeAttribute("title");
@@ -710,13 +710,13 @@ function interface_init() {
 		// interface HTML: player, icon, images
 		interface.player_icon_images = document.createElement("div");
 		interface.player_icon_images.setAttribute("class", "text_size_large text_color_white");
-		interface.player_icon_images.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 128px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
+		interface.player_icon_images.setAttribute("style", "position: absolute; margin: 0 0 0 0%; top: 0%; left: 0px; width: 64px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
 		interface.player.appendChild(interface.player_icon_images);
 
 		// interface HTML: player, icon, music
 		interface.player_icon_music = document.createElement("div");
 		interface.player_icon_music.setAttribute("class", "text_size_large text_color_white");
-		interface.player_icon_music.setAttribute("style", "position: absolute; top: 64px; left: 0%; width: 128px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
+		interface.player_icon_music.setAttribute("style", "position: absolute; margin: 0 0 0 100%; top: 0%; left: -64px; width: 64px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
 		interface.player.appendChild(interface.player_icon_music);
 	}
 
@@ -1069,7 +1069,7 @@ function interface_init() {
 			// interface HTML: media, images, bar
 			interface.media_images_bar = document.createElement("div");
 			interface.media_images_bar.setAttribute("class", "item_bar");
-			interface.media_images_bar.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 58px; left: -64px");
+			interface.media_images_bar.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 58px");
 			interface.media_images.appendChild(interface.media_images_bar);
 
 			// interface HTML: media, images, thumb
@@ -1102,7 +1102,7 @@ function interface_init() {
 			// interface HTML: media, images, info
 			interface.media_images_info = document.createElement("p");
 			interface.media_images_info.setAttribute("class", "text_size_small text_color_black");
-			interface.media_images_info.setAttribute("style", "position: absolute; top: 156px; width: 100%");
+			interface.media_images_info.setAttribute("style", "position: absolute; top: 164px; width: 100%");
 			interface.media_images.appendChild(interface.media_images_info);
 		}
 
@@ -1177,7 +1177,7 @@ function interface_init() {
 			// interface HTML: media, music, bar
 			interface.media_music_bar = document.createElement("div");
 			interface.media_music_bar.setAttribute("class", "item_bar");
-			interface.media_music_bar.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 58px; left: -64px");
+			interface.media_music_bar.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 58px");
 			interface.media_music.appendChild(interface.media_music_bar);
 
 			// interface HTML: media, music, thumb
@@ -1210,7 +1210,7 @@ function interface_init() {
 			// interface HTML: media, music, info
 			interface.media_music_info = document.createElement("p");
 			interface.media_music_info.setAttribute("class", "text_size_small text_color_black");
-			interface.media_music_info.setAttribute("style", "position: absolute; top: 156px; width: 100%");
+			interface.media_music_info.setAttribute("style", "position: absolute; top: 164px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_info);
 		}
 

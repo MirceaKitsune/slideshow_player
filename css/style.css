@@ -22,6 +22,7 @@
 }
 
 .text_size_small {
+	text-align: center;
 	line-height: 16px;
 	font-size: 10px;
 	font-family: sans-serif;
@@ -30,6 +31,7 @@
 }
 
 .text_size_medium {
+	text-align: center;
 	line-height: 18px;
 	font-size: 12px;
 	font-family: sans-serif;
@@ -38,6 +40,7 @@
 }
 
 .text_size_large {
+	text-align: center;
 	line-height: 20px;
 	font-size: 14px;
 	font-family: sans-serif;
@@ -47,13 +50,11 @@
 
 .text_color_black {
 	color: #000000;
-	text-align: center;
 	text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff, 0 0 4px #ffffff;
 }
 
 .text_color_white {
 	color: #ffffff;
-	text-align: center;
 	text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000, 0 0 4px #000000;
 }
 
@@ -222,9 +223,9 @@
 
 .item_thumbnail_image {
 	text-align: center;
-	width: 88px;
-	height: 88px;
-	left: -44px;
+	width: 96px;
+	height: 96px;
+	left: -48px;
 	background-color: #eeeeee;
 	z-index: 1;
 	pointer-events: all;
@@ -232,9 +233,9 @@
 
 .item_thumbnail_ring {
 	text-align: center;
-	width: 96px;
-	height: 96px;
-	left: -48px;
+	width: 104px;
+	height: 104px;
+	left: -52px;
 	background-color: #ffffff;
 	z-index: 1;
 	pointer-events: all;
@@ -242,8 +243,9 @@
 
 .item_bar {
 	text-align: center;
-	width: 128px;
+	width: 144px;
 	height: 4px;
+	left: -72px;
 	border-radius: 4px;
 	background-color: #ffffff;
 	z-index: 1;

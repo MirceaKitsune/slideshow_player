@@ -32,7 +32,7 @@ function parse_hearthis(data) {
 		this_song.src = String(this_data.download_url);
 		this_song.thumb = String(this_data.thumb);
 		this_song.title = String(this_data.title);
-		this_song.author = String(this_data.user.username);
+		this_song.author = this_data.user ? String(this_data.user.username) : "Unknown";
 		this_song.url = String(this_data.permalink_url);
 		this_song.score = Number(this_data.playback_count);
 		this_song.tags = [this_data.genre];
