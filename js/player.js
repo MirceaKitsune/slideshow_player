@@ -8,10 +8,11 @@ const FULLSCREEN_MOUSE_FADE = 64;
 // 0 is instant, 1 makes the transition last throughout the full duration of the image
 const TRANSITION = 0.1;
 
-// the zoom level, size, and duration of the magnifier
+// the zoom level, size, duration, and background brightness of the magnifier
 const ZOOM_FACTOR = 2;
 const ZOOM_SIZE = 0.5;
 const ZOOM_TIME = 5;
+const ZOOM_BRIGHTNESS = 0.5;
 
 // the recommendation algorithm preforms scans this many seconds
 // smaller values offer more accuracy but use more processing power
@@ -166,12 +167,14 @@ function player_images_fullscreen_toggle(force_to) {
 
 // player, images, zoom, attach
 function player_images_zoom_attach() {
-	// configure the zoom element
 	if(player_active_images() && !player.element.contains(player.images.element_zoom)) {
+		// configure the zoom element
 		player.images.element_zoom = document.createElement("div");
 		player.images.element_zoom.setAttribute("class", "player_zoom");
 		player.element.appendChild(player.images.element_zoom);
 
+		// configure the current image element
+		player.images.element_current.style["opacity"] = ZOOM_BRIGHTNESS;
 		player.images.element_current.style["cursor"] = "none";
 	}
 
@@ -181,11 +184,13 @@ function player_images_zoom_attach() {
 
 // player, images, zoom, detach
 function player_images_zoom_detach() {
-	// destroy the zoom element
 	if(player_active_images() && player.element.contains(player.images.element_zoom)) {
+		// destroy the zoom element
 		player.element.removeChild(player.images.element_zoom);
 		player.images.element_zoom = null;
 
+		// configure the current image element
+		player.images.element_current.style["opacity"] = 1;
 		player.images.element_current.style["cursor"] = "initial";
 	}
 
@@ -195,7 +200,7 @@ function player_images_zoom_detach() {
 
 // player, images, zoom, update
 function player_images_zoom_update(event) {
-	if(!player_active_images() || player.images.preloading_current) {
+	if(!player_active_images() || player.images.preloading_current || player.images.transition > 0) {
 		player_images_zoom_detach();
 		return;
 	} else if(!player.element.contains(player.images.element_zoom)) {
