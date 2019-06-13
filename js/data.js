@@ -103,39 +103,52 @@ function plugins_get(url, callback, proxy) {
 
 // plugins, functions, ready
 function plugins_ready() {
-	// remove the HTML elements of jsonp plugin scripts
-	for(var item in plugins_jsonp_elements) {
-		var element = plugins_jsonp_elements[item];
-		if(document.body.contains(element))
-			document.body.removeChild(element);
-	}
-	plugins_jsonp_elements = [];
+	const busy = plugins_busy();
 
-	// update the appropriate categories
-	if(interface_refresh.images) {
+	// if all plugins have finished or the player is stopped, pick the new items
+	if(interface_refresh.images && (busy[TYPE_IMAGES] == 0 || !player_active())) {
 		images_pick();
 		interface_update_recommendations_images_clear();
 	}
-	if(interface_refresh.music) {
+	if(interface_refresh.music && (busy[TYPE_MUSIC] == 0 || !player_active())) {
 		music_pick();
 		interface_update_recommendations_music_clear();
 	}
 
 	// make sure we don't have another update scheduled before marking images and music as refreshed
 	if(interface_refresh.timer == 0) {
-		interface_refresh.images = false;
-		interface_refresh.music = false;
+		if(busy[TYPE_IMAGES] == 0)
+			interface_refresh.images = false;
+		if(busy[TYPE_MUSIC] == 0)
+			interface_refresh.music = false;
+	}
+
+	// if all plugins finished working, remove the HTML elements of jsonp plugin scripts
+	if(busy[TYPE_IMAGES] == 0 && busy[TYPE_MUSIC] == 0) {
+		for(var item in plugins_jsonp_elements) {
+			var element = plugins_jsonp_elements[item];
+			if(document.body.contains(element))
+				document.body.removeChild(element);
+		}
+		plugins_jsonp_elements = [];
 	}
 }
 
-// plugins, busy check for all plugins
+// plugins, busy check per plugin type
 function plugins_busy() {
-	// return true if any plugin is busy
-	var busy = 0;
+	var busy = {};
+	busy[TYPE_IMAGES] = 0;
+	busy[TYPE_MUSIC] = 0;
+
 	for(var plugin in plugins) {
-		if(plugins[plugin].busy)
-			++busy;
+		if(plugins[plugin].busy) {
+			if(plugins[plugin].type === TYPE_IMAGES)
+				++busy[TYPE_IMAGES];
+			if(plugins[plugin].type === TYPE_MUSIC)
+				++busy[TYPE_MUSIC];
+		}
 	}
+
 	return busy;
 }
 
@@ -155,8 +168,7 @@ function plugins_busy_set(name, timeout) {
 		plugins[name].busy_timeout = setTimeout(function() {
 			plugins_busy_set(name, null);
 		}, timeout * 1000);
-	} else if(plugins_busy() == 0) {
-		// call the ready function if this was the last plugin that finished working
+	} else {
 		plugins_ready();
 	}
 

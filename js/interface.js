@@ -641,7 +641,6 @@ function interface_update_recommendations_music() {
 
 // interface, update HTML, media controls
 function interface_update_media_controls() {
-	const busy = plugins_busy();
 	const total_seconds = data_images.length * settings.images.duration;
 	var total_time = "+1 day";
 	if(total_seconds <= 86400) {
@@ -651,50 +650,61 @@ function interface_update_media_controls() {
 	}
 
 	// label text for player status
-	var label_player =
-		"<b>Images:</b> " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + total_time + "<b>)</b><br/>" +
-		"<b>Music:</b> " + data_music.length + " <b>/</b> " + data_music_all.length;
-
-	// label text for plugin status
-	var label_plugin = "<b>Update needed:</b> ";
-	if(interface_refresh.images)
-		label_plugin += TYPE_IMAGES + " ";
-	if(interface_refresh.music)
-		label_plugin += TYPE_MUSIC + " ";
-	label_plugin += "<br/>Refreshing in " + interface_refresh.timer + " sec";
+	const label =
+		TYPE_IMAGES + " " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + total_time + "<b>)</b> " +
+		TYPE_MUSIC + " " + data_music.length + " <b>/</b> " + data_music_all.length;
 
 	// first configuration, based on player status
 	// configure play / label elements, window title
 	if(player_active()) {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "■";
-		interface.media_controls_label.innerHTML = label_player;
+		interface.media_controls_label.innerHTML = label;
 		interface_style_button_color(interface.media_controls_play, "green");
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ▶";
 	} else if(player_available()) {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "▶";
-		interface.media_controls_label.innerHTML = label_player;
+		interface.media_controls_label.innerHTML = label;
 		interface_style_button_color(interface.media_controls_play, "yellow");
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ■";
 	} else {
 		interface.media_controls_play.removeAttribute("onclick");
 		interface.media_controls_play.innerHTML = "∅";
-		interface.media_controls_label.innerHTML = "<b>No content to play</b>";
+		interface.media_controls_label.innerHTML = "<b>No content</b>";
 		interface_style_button_color(interface.media_controls_play, "red");
 		document.title = "Slideshow Player ∅";
 	}
 
 	// second configuration, based on plugin status
 	// configure play / label elements, window title
-	if(busy > 0) {
-		interface.media_controls_label.innerHTML = "<b>Fetching content:</b> " + busy + " left";
-		interface.media_controls_play.innerHTML += " ⧗";
-		document.title += " ⧗";
-	} else if(interface_refresh.timer > 0) {
-		interface.media_controls_label.innerHTML = label_plugin;
+	const busy = plugins_busy();
+	if(interface_refresh.timer > 0) {
+		{
+			interface.media_controls_label.innerHTML += "<br/>⟳ for ";
+			if(interface_refresh.images)
+				interface.media_controls_label.innerHTML += TYPE_IMAGES + " ";
+			if(interface_refresh.music)
+				interface.media_controls_label.innerHTML += TYPE_MUSIC + " ";
+			interface.media_controls_label.innerHTML += "in " + interface_refresh.timer + " sec";
+		}
 		interface.media_controls_play.innerHTML += " ⟳";
 		document.title += " ⟳";
+	}
+	if(busy[TYPE_IMAGES] > 0 || busy[TYPE_MUSIC] > 0) {
+		{
+			interface.media_controls_label.innerHTML += "<br/>⧗  with ";
+			if(busy[TYPE_IMAGES] > 0)
+				interface.media_controls_label.innerHTML += TYPE_IMAGES + " " + busy[TYPE_IMAGES] + " left";
+			if(busy[TYPE_IMAGES] > 0 && busy[TYPE_MUSIC] > 0)
+				interface.media_controls_label.innerHTML += " ";
+			if(busy[TYPE_MUSIC] > 0)
+				interface.media_controls_label.innerHTML += TYPE_MUSIC + " " + busy[TYPE_MUSIC] + " left";
+			if(player_active() && ((busy[TYPE_IMAGES] > 0 && settings.images.shuffle) || (busy[TYPE_MUSIC] > 0 && settings.music.shuffle)))
+				interface.media_controls_label.innerHTML += "<br/>Shuffling enabled, items will refresh when ready";
+		}
+		interface.media_controls_play.innerHTML += " ⧗";
+		document.title += " ⧗";
 	}
 }
 
