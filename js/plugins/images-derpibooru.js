@@ -12,7 +12,7 @@ const page_count_derpibooru = 50;
 // this should represent the maximum number of results the API may return per page
 const page_limit_derpibooru = 50;
 // number of seconds to wait for a response from the server before the plugin times out
-const timeout_derpibooru = 5;
+const timeout_derpibooru = 10;
 
 // the keywords and page currently in use
 var active_keywords_derpibooru = 0;
@@ -71,6 +71,7 @@ function request_derpibooru(bump) {
 
 	// we made a new request to the server, reset the timeout in which we wait for the response
 	plugins_busy_set(name_derpibooru, timeout_derpibooru);
+	plugins_update(TYPE_IMAGES);
 }
 
 // fetch the json object containing the data and execute it as a script

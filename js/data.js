@@ -101,26 +101,30 @@ function plugins_get(url, callback, proxy) {
 		plugins_get_jsonp(url, callback, true);
 }
 
-// plugins, functions, ready
-function plugins_ready() {
+// plugins, functions, update items
+function plugins_update(type) {
 	const busy = plugins_busy();
+	const type_images = type === TYPE_IMAGES || type === null || type === undefined;
+	const type_music = type === TYPE_MUSIC || type === null || type === undefined;
 
-	// if all plugins have finished or the player is stopped, pick the new items
-	if(interface_refresh.images && (busy[TYPE_IMAGES] == 0 || !player_active())) {
+	// pick the new items added by the plugin, if either it was the final plugin or the player is stopped
+	if(type_images && interface_refresh.images && (busy[TYPE_IMAGES] == 0 || !player_active())) {
+		// make sure we don't have another update scheduled before marking the item as refreshed
+		if(busy[TYPE_IMAGES] == 0 && interface_refresh.timer == 0)
+			interface_refresh.images = false;
+
 		images_pick();
 		interface_update_recommendations_images_clear();
+		interface_update_media(false, true, true, false, false);
 	}
-	if(interface_refresh.music && (busy[TYPE_MUSIC] == 0 || !player_active())) {
+	if(type_music && interface_refresh.music && (busy[TYPE_MUSIC] == 0 || !player_active())) {
+		// make sure we don't have another update scheduled before marking the item as refreshed
+		if(busy[TYPE_MUSIC] == 0 && interface_refresh.timer == 0)
+			interface_refresh.music = false;
+
 		music_pick();
 		interface_update_recommendations_music_clear();
-	}
-
-	// make sure we don't have another update scheduled before marking images and music as refreshed
-	if(interface_refresh.timer == 0) {
-		if(busy[TYPE_IMAGES] == 0)
-			interface_refresh.images = false;
-		if(busy[TYPE_MUSIC] == 0)
-			interface_refresh.music = false;
+		interface_update_media(false, false, true, true, false);
 	}
 
 	// if all plugins finished working, remove the HTML elements of jsonp plugin scripts
@@ -169,7 +173,7 @@ function plugins_busy_set(name, timeout) {
 			plugins_busy_set(name, null);
 		}, timeout * 1000);
 	} else {
-		plugins_ready();
+		plugins_update(null);
 	}
 
 	interface_update_media(false, false, true, false, false);

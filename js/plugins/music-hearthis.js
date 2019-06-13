@@ -12,7 +12,7 @@ const page_count_hearthis = 50;
 // this should represent the maximum number of results the API may return per page
 const page_limit_hearthis = 20;
 // number of seconds to wait for a response from the server before the plugin times out
-const timeout_hearthis = 5;
+const timeout_hearthis = 10;
 
 // the keywords and page currently in use
 var active_keywords_hearthis = 0;
@@ -68,6 +68,7 @@ function request_hearthis(bump) {
 
 	// we made a new request to the server, reset the timeout in which we wait for the response
 	plugins_busy_set(name_hearthis, timeout_hearthis);
+	plugins_update(TYPE_MUSIC);
 }
 
 // fetch the json object containing the data and execute it as a script

@@ -231,7 +231,7 @@ function interface_load(pull) {
 			}
 		} else {
 			// if there are no items available, clear everything
-			plugins_ready();
+			plugins_update(null);
 			player_detach();
 			data_images = [];
 			data_music = [];
@@ -649,29 +649,26 @@ function interface_update_media_controls() {
 		total_time = total_date.toISOString().substr(11, 8);
 	}
 
-	// label text for player status
-	const label =
+	// configure the label element
+	interface.media_controls_label.innerHTML =
 		TYPE_IMAGES + " " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + total_time + "<b>)</b> " +
 		TYPE_MUSIC + " " + data_music.length + " <b>/</b> " + data_music_all.length;
 
 	// first configuration, based on player status
-	// configure play / label elements, window title
+	// configure play element, window title
 	if(player_active()) {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "■";
-		interface.media_controls_label.innerHTML = label;
 		interface_style_button_color(interface.media_controls_play, "green");
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ▶";
 	} else if(player_available()) {
 		interface.media_controls_play.setAttribute("onclick", "interface_play()");
 		interface.media_controls_play.innerHTML = "▶";
-		interface.media_controls_label.innerHTML = label;
 		interface_style_button_color(interface.media_controls_play, "yellow");
 		document.title = "Slideshow Player - " + TYPE_IMAGES + " " + data_images.length + " ↺ " + settings.images.duration + " sec ■";
 	} else {
 		interface.media_controls_play.removeAttribute("onclick");
 		interface.media_controls_play.innerHTML = "∅";
-		interface.media_controls_label.innerHTML = "<b>No content</b>";
 		interface_style_button_color(interface.media_controls_play, "red");
 		document.title = "Slideshow Player ∅";
 	}
@@ -1136,7 +1133,7 @@ function interface_init() {
 			interface.media_controls_fullscreen.setAttribute("title", "Fullscreen");
 			interface.media_controls_fullscreen.setAttribute("class", "button_size_small button_color_white effect_shape_round");
 			interface.media_controls_fullscreen.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 80px");
-			interface.media_controls_fullscreen.setAttribute("onclick", "player_images_fullscreen_toggle()");
+			interface.media_controls_fullscreen.setAttribute("onclick", "player_fullscreen_toggle()");
 			interface.media_controls_fullscreen.setAttribute("onmouseover", "interface_style_effect_shape(this, true)");
 			interface.media_controls_fullscreen.setAttribute("onmouseout", "interface_style_effect_shape(this, false)");
 			interface.media_controls_fullscreen.innerHTML = "▭";

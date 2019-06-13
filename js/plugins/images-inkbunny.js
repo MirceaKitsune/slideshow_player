@@ -12,7 +12,7 @@ const page_count_inkbunny = 50;
 // this should represent the maximum number of results the API may return per page
 const page_limit_inkbunny = 100;
 // number of seconds to wait for a response from the server before the plugin times out
-const timeout_inkbunny = 5;
+const timeout_inkbunny = 10;
 
 // the keywords and page currently in use
 // this site also requires a SID
@@ -101,6 +101,7 @@ function request_inkbunny(bump) {
 
 	// we made a new request to the server, reset the timeout in which we wait for the response
 	plugins_busy_set(name_inkbunny, timeout_inkbunny);
+	plugins_update(TYPE_IMAGES);
 }
 
 // fetch the json object containing the data and execute it as a script

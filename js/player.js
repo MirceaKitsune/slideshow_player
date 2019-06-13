@@ -8,6 +8,9 @@ const FULLSCREEN_MOUSE_FADE = 64;
 // 0 is instant, 1 makes the transition last throughout the full duration of the image
 const TRANSITION = 0.1;
 
+// the cursor is hidden after this many seconds if positioned over the player without being moved
+const CURSOR_TIME = 3;
+
 // the zoom level, size, duration, and background brightness of the magnifier
 const ZOOM_FACTOR = 2;
 const ZOOM_SIZE = 0.5;
@@ -27,6 +30,7 @@ var recommendations = {
 
 // player, global object
 var player = {
+	timer_cursor: null,
 	element: null,
 	images: {
 		index: 0,
@@ -90,35 +94,35 @@ function recommendations_timer() {
 	interface_update_media(true, false, false, false, true);
 }
 
-// player, images, fullscreen settings
+// player, fullscreen settings
 var fullscreen_timer = null;
 var fullscreen_mouse_start = 0;
 var fullscreen_mouse_end = 0;
 
-// player, images, timer function for fullscreen
-function player_images_fullscreen_timer() {
+// player, timer function for fullscreen
+function player_fullscreen_timer() {
 	// check whether fullscreen was exited without informing the code and detach if so
-	if(!player_images_fullscreen_has())
-		player_images_fullscreen_toggle(false);
+	if(!player_fullscreen_has())
+		player_fullscreen_toggle(false);
 }
 
-// player, images, has fullscreen
-function player_images_fullscreen_has() {
+// player, has fullscreen
+function player_fullscreen_has() {
 	return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
 }
 
-// player, images, fullscreen mouse movement
-function player_images_fullscreen_mouse(event) {
+// player, fullscreen mouse movement
+function player_fullscreen_mouse(event) {
 	const opacity = Math.min(Math.max((event.clientY / fullscreen_mouse_start - 1) / (fullscreen_mouse_end / fullscreen_mouse_start - 1), 0), 1);
 	interface.media.style["opacity"] = opacity;
 }
 
-// player, images, toggle fullscreen
-function player_images_fullscreen_toggle(force_to) {
-	if(typeof force_to === "boolean" ? !force_to : player_images_fullscreen_has()) {
+// player, toggle fullscreen
+function player_fullscreen_toggle(force_to) {
+	if(typeof force_to === "boolean" ? !force_to : player_fullscreen_has()) {
 		// cancel fullscreen mode
 		const method_cancel = document.cancelFullScreen || document.webkitCancelFullScreen || document.mozCancelFullScreen || document.msCancelFullScreen;
-		if(method_cancel && player_images_fullscreen_has())
+		if(method_cancel && player_fullscreen_has())
 			method_cancel.call(document);
 		// else
 			// return;
@@ -145,7 +149,7 @@ function player_images_fullscreen_toggle(force_to) {
 
 		// configure player / media / media_images_label / media_images_info / media_controls_label elements
 		interface.player.setAttribute("class", "item_player item_player_position_attached");
-		interface.player.setAttribute("onmousemove", "player_images_fullscreen_mouse(event)");
+		interface.player.setAttribute("onmousemove", "player_fullscreen_mouse(event)");
 		if(interface.player && document.body && document.body.contains(interface.media))
 			interface_update_attached(false);
 
@@ -154,7 +158,7 @@ function player_images_fullscreen_toggle(force_to) {
 		fullscreen_mouse_end = interface.player.offsetHeight - interface.media.offsetHeight;
 
 		// start the periodic fullscreen check
-		fullscreen_timer = setInterval(player_images_fullscreen_timer, 100);
+		fullscreen_timer = setInterval(player_fullscreen_timer, 100);
 	}
 
 	// as the fullscreen button moves outside of the mouse cursor when toggling fullscreen, reset its hover effects
@@ -163,6 +167,17 @@ function player_images_fullscreen_toggle(force_to) {
 
 	// as the image elements are resized and repositioned when toggling fullscreen, detach the zoom element
 	player_images_zoom_detach();
+}
+
+// player, update cursor
+function player_cursor(active) {
+	clearTimeout(player.timer_cursor);
+	player.element.style["cursor"] = "initial";
+	if(active) {
+		player.timer_cursor = setTimeout(function() {
+			player.element.style["cursor"] = "none";
+		}, CURSOR_TIME * 1000);
+	}
 }
 
 // player, images, zoom, attach
@@ -191,7 +206,7 @@ function player_images_zoom_detach() {
 
 		// configure the current image element
 		player.images.element_current.style["opacity"] = 1;
-		player.images.element_current.style["cursor"] = "initial";
+		player.images.element_current.style["cursor"] = "none";
 	}
 
 	// clear the destruction timer
@@ -653,6 +668,9 @@ function player_attach() {
 	// create the player element
 	player.element = document.createElement("div");
 	player.element.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center");
+	// player.element.setAttribute("onmouseover", "player_cursor(true)");
+	player.element.setAttribute("onmouseout", "player_cursor(false)");
+	player.element.setAttribute("onmousemove", "player_cursor(true)");
 	interface.player.appendChild(player.element);
 
 	// configure the previous image element
