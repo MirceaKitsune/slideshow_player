@@ -8,11 +8,11 @@
 const name_hearthis = "HearThis";
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_hearthis = 30;
+const page_count_hearthis = 50;
 // this should represent the maximum number of results the API may return per page
 const page_limit_hearthis = 20;
-// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
-const timeout_hearthis = 10; // this site returns an invalid object if the given keywords are not found, use a low timeout
+// number of seconds to wait for a response from the server before the plugin times out
+const timeout_hearthis = 5;
 
 // the keywords and page currently in use
 var active_keywords_hearthis = 0;
@@ -65,12 +65,13 @@ function request_hearthis(bump) {
 
 	plugins_get("https://api-v2.hearthis.at/categories/" + keywords_current + "/?page=" + active_page_hearthis + "&count=" + page_limit_hearthis, "parse_hearthis", null);
 	++active_page_hearthis;
+
+	// we made a new request to the server, reset the timeout in which we wait for the response
+	plugins_busy_set(name_hearthis, timeout_hearthis);
 }
 
 // fetch the json object containing the data and execute it as a script
 function music_hearthis() {
-	plugins_busy_set(name_hearthis, timeout_hearthis); // this site returns an invalid object if the given keywords are not found, use a low timeout
-
 	active_keywords_hearthis = 1;
 	active_page_hearthis = 1;
 	request_hearthis(false);

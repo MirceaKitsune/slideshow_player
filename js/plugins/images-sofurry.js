@@ -8,11 +8,11 @@
 const name_sofurry = "SoFurry";
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_sofurry = 30;
+const page_count_sofurry = 50;
 // this should represent the maximum number of results the API may return per page
 const page_limit_sofurry = 30;
-// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
-const timeout_sofurry = 60;
+// number of seconds to wait for a response from the server before the plugin times out
+const timeout_sofurry = 5;
 
 // the keywords and page currently in use
 var active_keywords_sofurry = 0;
@@ -70,12 +70,13 @@ function request_sofurry(bump) {
 
 	plugins_get("https://api2.sofurry.com/browse/search?format=json&search=" + keywords_current + "&filter=" + type + "&sort=" + order + "&page=" + active_page_sofurry + "&maxlevel=" + nsfw, "parse_sofurry", true);
 	++active_page_sofurry;
+
+	// we made a new request to the server, reset the timeout in which we wait for the response
+	plugins_busy_set(name_sofurry, timeout_sofurry);
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_sofurry() {
-	plugins_busy_set(name_sofurry, timeout_sofurry);
-
 	active_keywords_sofurry = 1;
 	active_page_sofurry = 1;
 	request_sofurry(false);

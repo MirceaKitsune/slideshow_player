@@ -8,11 +8,11 @@
 const name_e621 = "e621";
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_e621 = 30;
+const page_count_e621 = 50;
 // this should represent the maximum number of results the API may return per page
 const page_limit_e621 = 320;
-// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
-const timeout_e621 = 60;
+// number of seconds to wait for a response from the server before the plugin times out
+const timeout_e621 = 5;
 
 // the keywords and page currently in use
 var active_keywords_e621 = 0;
@@ -68,12 +68,13 @@ function request_e621(bump) {
 
 	plugins_get("https://" + domain + ".net/post/index.json?tags=" + keywords_current + "&page=" + active_page_e621 + "&limit=" + page_limit_e621, "parse_e621", false);
 	++active_page_e621;
+
+	// we made a new request to the server, reset the timeout in which we wait for the response
+	plugins_busy_set(name_e621, timeout_e621);
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_e621() {
-	plugins_busy_set(name_e621, timeout_e621);
-
 	active_keywords_e621 = 1;
 	active_page_e621 = 1;
 	request_e621(false);

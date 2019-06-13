@@ -8,11 +8,11 @@
 const name_derpibooru = "Derpibooru";
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_derpibooru = 30;
+const page_count_derpibooru = 50;
 // this should represent the maximum number of results the API may return per page
 const page_limit_derpibooru = 50;
-// number of seconds after which the plugin stops listening for responses and is no longer marked as busy
-const timeout_derpibooru = 60;
+// number of seconds to wait for a response from the server before the plugin times out
+const timeout_derpibooru = 5;
 
 // the keywords and page currently in use
 var active_keywords_derpibooru = 0;
@@ -68,12 +68,13 @@ function request_derpibooru(bump) {
 
 	plugins_get("https://derpibooru.org/search.json?q=" + keywords_current + "&page=" + active_page_derpibooru + "&perpage=" + page_limit_derpibooru + "&filter_id=" + filter_id, "parse_derpibooru", null);
 	++active_page_derpibooru;
+
+	// we made a new request to the server, reset the timeout in which we wait for the response
+	plugins_busy_set(name_derpibooru, timeout_derpibooru);
 }
 
 // fetch the json object containing the data and execute it as a script
 function images_derpibooru() {
-	plugins_busy_set(name_derpibooru, timeout_derpibooru);
-
 	active_keywords_derpibooru = 1;
 	active_page_derpibooru = 1;
 	request_derpibooru(false);
