@@ -172,8 +172,8 @@ function player_fullscreen_toggle(force_to) {
 // player, update cursor
 function player_cursor(active) {
 	clearTimeout(player.timer_cursor);
-	player.element.style["cursor"] = "initial";
 	if(active) {
+		player.element.style["cursor"] = "initial";
 		player.timer_cursor = setTimeout(function() {
 			player.element.style["cursor"] = "none";
 		}, CURSOR_TIME * 1000);
@@ -190,7 +190,6 @@ function player_images_zoom_attach() {
 
 		// configure the current image element
 		player.images.element_current.style["opacity"] = ZOOM_BRIGHTNESS;
-		player.images.element_current.style["cursor"] = "none";
 	}
 
 	// set the destruction timer
@@ -206,7 +205,6 @@ function player_images_zoom_detach() {
 
 		// configure the current image element
 		player.images.element_current.style["opacity"] = 1;
-		player.images.element_current.style["cursor"] = "none";
 	}
 
 	// clear the destruction timer
@@ -676,7 +674,7 @@ function player_attach() {
 	// configure the previous image element
 	player.images.element_previous = document.createElement("img");
 	player.images.element_previous.setAttribute("class", "player_image");
-	player.images.element_previous.setAttribute("style", "opacity: 0; pointer-events: none");
+	player.images.element_previous.setAttribute("style", "opacity: 0; pointer-events: none; cursor: initial");
 	player.images.element_previous.setAttribute("src", SRC_BLANK);
 	player.images.element_previous.setAttribute("onload", "player_images_next_onload_previous()");
 	player.images.element_previous.setAttribute("onerror", "player_images_next_onerror_previous()");
@@ -685,7 +683,7 @@ function player_attach() {
 	// configure the next image element
 	player.images.element_next = document.createElement("img");
 	player.images.element_next.setAttribute("class", "player_image");
-	player.images.element_next.setAttribute("style", "opacity: 0; pointer-events: none");
+	player.images.element_next.setAttribute("style", "opacity: 0; pointer-events: none; cursor: initial");
 	player.images.element_next.setAttribute("src", SRC_BLANK);
 	player.images.element_next.setAttribute("onload", "player_images_next_onload_next()");	
 	player.images.element_next.setAttribute("onerror", "player_images_next_onerror_next()");
@@ -694,7 +692,7 @@ function player_attach() {
 	// configure the current image element
 	player.images.element_current = document.createElement("img");
 	player.images.element_current.setAttribute("class", "player_image");
-	player.images.element_current.setAttribute("style", "opacity: 0; pointer-events: all");
+	player.images.element_current.setAttribute("style", "opacity: 0; pointer-events: all; cursor: none");
 	player.images.element_current.setAttribute("src", SRC_BLANK);
 	player.images.element_current.setAttribute("onload", "player_images_next_onload_current()");
 	player.images.element_current.setAttribute("onerror", "player_images_next_onerror_current()");

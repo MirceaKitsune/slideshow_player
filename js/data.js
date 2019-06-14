@@ -104,27 +104,34 @@ function plugins_get(url, callback, proxy) {
 // plugins, functions, update items
 function plugins_update(type) {
 	const busy = plugins_busy();
-	const type_images = type === TYPE_IMAGES || type === null || type === undefined;
-	const type_music = type === TYPE_MUSIC || type === null || type === undefined;
+	const update_images = type === TYPE_IMAGES || type === null || type === undefined;
+	const update_music = type === TYPE_MUSIC || type === null || type === undefined;
 
-	// pick the new items added by the plugin, if either it was the final plugin or the player is stopped
-	if(type_images && interface_refresh.images && (busy[TYPE_IMAGES] == 0 || !player_active())) {
-		// make sure we don't have another update scheduled before marking the item as refreshed
-		if(busy[TYPE_IMAGES] == 0 && interface_refresh.timer == 0)
+	// pick the items added by the plugin, if either it was the final plugin of its type or the player is stopped
+	// this offers availability as soon as possible once the player loads, but without refreshing the items constantly while the viewer is watching
+	if(update_images && interface_refresh.images) {
+		// if this was the last image plugin, we've finished refreshing images
+		if(busy[TYPE_IMAGES] == 0)
 			interface_refresh.images = false;
 
-		images_pick();
-		interface_update_recommendations_images_clear();
-		interface_update_media(false, true, true, false, false);
+		// pick the new images added by the plugin
+		if(busy[TYPE_IMAGES] == 0 || !player_active()) {
+			images_pick();
+			interface_update_recommendations_images_clear();
+			interface_update_media(false, true, true, false, false);
+		}
 	}
-	if(type_music && interface_refresh.music && (busy[TYPE_MUSIC] == 0 || !player_active())) {
-		// make sure we don't have another update scheduled before marking the item as refreshed
-		if(busy[TYPE_MUSIC] == 0 && interface_refresh.timer == 0)
+	if(update_music && interface_refresh.music) {
+		// if this was the last music plugin, we've finished refreshing music
+		if(busy[TYPE_MUSIC] == 0)
 			interface_refresh.music = false;
 
-		music_pick();
-		interface_update_recommendations_music_clear();
-		interface_update_media(false, false, true, true, false);
+		// pick the new songs added by the plugin
+		if(busy[TYPE_MUSIC] == 0 || !player_active()) {
+			music_pick();
+			interface_update_recommendations_music_clear();
+			interface_update_media(false, false, true, true, false);
+		}
 	}
 
 	// if all plugins finished working, remove the HTML elements of jsonp plugin scripts
