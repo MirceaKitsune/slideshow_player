@@ -29,6 +29,9 @@ function parse_ccmixter(data) {
 		const this_data = items[entry];
 		var this_song = {};
 
+		if(this_data === null || this_data === undefined || typeof this_data !== "object")
+			continue;
+
 		this_song.src = String(this_data.files[0].download_url);
 		this_song.thumb = String(this_data.license_logo_url); // API doesn't provide a thumbnail, use the logo instead
 		this_song.title = String(this_data.upload_name);

@@ -697,8 +697,8 @@ function interface_update_media_controls() {
 				interface.media_controls_label.innerHTML += " ";
 			if(busy[TYPE_MUSIC] > 0)
 				interface.media_controls_label.innerHTML += TYPE_MUSIC + " " + busy[TYPE_MUSIC] + " left";
-			if(player_active() && ((busy[TYPE_IMAGES] > 0 && settings.images.shuffle) || (busy[TYPE_MUSIC] > 0 && settings.music.shuffle)))
-				interface.media_controls_label.innerHTML += "<br/>Shuffling enabled, items will refresh when ready";
+			if(player_active() && (busy[TYPE_IMAGES] > 0 || busy[TYPE_MUSIC] > 0))
+				interface.media_controls_label.innerHTML += "<br/>Items may refresh when ready";
 		}
 		interface.media_controls_play.innerHTML += " ⧗";
 		document.title += " ⧗";

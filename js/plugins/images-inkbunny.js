@@ -42,6 +42,9 @@ function parse_inkbunny(data) {
 		const this_data = items[entry];
 		var this_image = {};
 
+		if(this_data === null || this_data === undefined || typeof this_data !== "object")
+			continue;
+
 		const this_data_url = "https://inkbunny.net/s/" + this_data.submission_id;
 		this_image.src = String(this_data.file_url_full);
 		this_image.thumb = String(this_data.thumbnail_url_huge || this_data.file_url_preview); // some entries don't provide a thumbnail, use the file preview if so

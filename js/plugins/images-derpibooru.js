@@ -29,6 +29,9 @@ function parse_derpibooru(data) {
 		const this_data = items[entry];
 		var this_image = {};
 
+		if(this_data === null || this_data === undefined || typeof this_data !== "object")
+			continue;
+
 		const this_data_url = "https://derpibooru.org/" + this_data.id;
 		this_image.src = "https:" + String(this_data.representations.large); // representations.full is better but occasionally causes errors
 		this_image.thumb = "https:" + String(this_data.representations.thumb);

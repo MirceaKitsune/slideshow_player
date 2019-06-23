@@ -29,6 +29,9 @@ function parse_e621(data) {
 		const this_data = items[entry];
 		var this_image = {};
 
+		if(this_data === null || this_data === undefined || typeof this_data !== "object")
+			continue;
+
 		const this_data_url = "https://e621.net/post/show/" + this_data.id;
 		this_image.src = String(this_data.file_url);
 		this_image.thumb = String(this_data.preview_url);

@@ -29,6 +29,9 @@ function parse_hearthis(data) {
 		const this_data = items[entry];
 		var this_song = {};
 
+		if(this_data === null || this_data === undefined || typeof this_data !== "object")
+			continue;
+
 		this_song.src = String(this_data.download_url);
 		this_song.thumb = String(this_data.thumb);
 		this_song.title = String(this_data.title);

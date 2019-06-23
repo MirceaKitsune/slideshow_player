@@ -29,6 +29,9 @@ function parse_sofurry(data) {
 		const this_data = items[entry];
 		var this_image = {};
 
+		if(this_data === null || this_data === undefined || typeof this_data !== "object")
+			continue;
+
 		const this_data_url = "https://www.sofurry.com/view/" + this_data.id;
 		this_image.src = String(this_data.full) + "/";
 		this_image.thumb = String(this_data.thumbnail) + "/";
