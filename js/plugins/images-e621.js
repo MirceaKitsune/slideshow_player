@@ -13,6 +13,10 @@ const page_count_e621 = 50;
 const page_limit_e621 = 320;
 // number of seconds to wait for a response from the server before the plugin times out
 const timeout_e621 = 10;
+// the score multiplier for this source
+// this value must be balanced between plugins, so that the score of an average submission is maintained at roughly 100
+// if the API doesn't provide a score per submission, this value should be estimated at a bit below average
+const score_e621 = 5;
 
 // the keywords and page currently in use
 var active_keywords_e621 = 0;
@@ -38,7 +42,7 @@ function parse_e621(data) {
 		this_image.title = String(this_data.id); // API doesn't provide the title, use the ID instead
 		this_image.author = String(this_data.artist[0]);
 		this_image.url = String(this_data.source || this_data_url); // prefer the source URL, fallback to submission URL
-		this_image.score = Number(this_data.score);
+		this_image.score = Number(this_data.score) * score_e621;
 		this_image.tags = this_data.tags ? this_data.tags.split(" ") : [];
 
 		images_add(this_image);

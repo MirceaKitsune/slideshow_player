@@ -13,6 +13,10 @@ const page_count_ccmixter = 50;
 const page_limit_ccmixter = 30;
 // number of seconds to wait for a response from the server before the plugin times out
 const timeout_ccmixter = 10;
+// the score multiplier for this source
+// this value must be balanced between plugins, so that the score of an average submission is maintained at roughly 100
+// if the API doesn't provide a score per submission, this value should be estimated at a bit below average
+const score_ccmixter = 10;
 
 // the keywords and page currently in use
 var active_keywords_ccmixter = 0;
@@ -37,7 +41,7 @@ function parse_ccmixter(data) {
 		this_song.title = String(this_data.upload_name);
 		this_song.author = String(this_data.user_real_name);
 		this_song.url = String(this_data.file_page_url);
-		this_song.score = Number(this_data.upload_num_scores);
+		this_song.score = Number(this_data.upload_num_scores) * score_ccmixter;
 		this_song.tags = this_data.upload_tags ? this_data.upload_tags.split(",") : [];
 
 		music_add(this_song);

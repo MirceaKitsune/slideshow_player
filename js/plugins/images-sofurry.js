@@ -13,6 +13,10 @@ const page_count_sofurry = 50;
 const page_limit_sofurry = 30;
 // number of seconds to wait for a response from the server before the plugin times out
 const timeout_sofurry = 10;
+// the score multiplier for this source
+// this value must be balanced between plugins, so that the score of an average submission is maintained at roughly 100
+// if the API doesn't provide a score per submission, this value should be estimated at a bit below average
+const score_sofurry = 100;
 
 // the keywords and page currently in use
 var active_keywords_sofurry = 0;
@@ -38,7 +42,7 @@ function parse_sofurry(data) {
 		this_image.title = String(this_data.title);
 		this_image.author = String(this_data.artistName);
 		this_image.url = String(this_data_url);
-		this_image.score = 10; // API doesn't provide a score, assume a below average default compared to plugins that do
+		this_image.score = score_sofurry; // API doesn't provide a score, assume the default one
 		this_image.tags = this_data.tags ? this_data.tags.split(/[\s,]+/) : [];
 
 		images_add(this_image);

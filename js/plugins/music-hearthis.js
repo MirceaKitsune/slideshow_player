@@ -13,6 +13,10 @@ const page_count_hearthis = 50;
 const page_limit_hearthis = 20;
 // number of seconds to wait for a response from the server before the plugin times out
 const timeout_hearthis = 10;
+// the score multiplier for this source
+// this value must be balanced between plugins, so that the score of an average submission is maintained at roughly 100
+// if the API doesn't provide a score per submission, this value should be estimated at a bit below average
+const score_hearthis = 5;
 
 // the keywords and page currently in use
 var active_keywords_hearthis = 0;
@@ -37,7 +41,7 @@ function parse_hearthis(data) {
 		this_song.title = String(this_data.title);
 		this_song.author = this_data.user ? String(this_data.user.username) : "Unknown";
 		this_song.url = String(this_data.permalink_url);
-		this_song.score = Number(this_data.playback_count);
+		this_song.score = Number(this_data.playback_count) * score_hearthis;
 		this_song.tags = [this_data.genre];
 
 		music_add(this_song);

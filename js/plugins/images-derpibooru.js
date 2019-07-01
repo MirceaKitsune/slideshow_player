@@ -13,6 +13,10 @@ const page_count_derpibooru = 50;
 const page_limit_derpibooru = 50;
 // number of seconds to wait for a response from the server before the plugin times out
 const timeout_derpibooru = 10;
+// the score multiplier for this source
+// this value must be balanced between plugins, so that the score of an average submission is maintained at roughly 100
+// if the API doesn't provide a score per submission, this value should be estimated at a bit below average
+const score_derpibooru = 1;
 
 // the keywords and page currently in use
 var active_keywords_derpibooru = 0;
@@ -38,7 +42,7 @@ function parse_derpibooru(data) {
 		this_image.title = String(this_data.id); // API doesn't provide the title, use the ID instead
 		this_image.author = String(this_data.uploader);
 		this_image.url = String(this_data_url);
-		this_image.score = Number(this_data.score);
+		this_image.score = Number(this_data.score) * score_derpibooru;
 		this_image.tags = this_data.tags ? this_data.tags.split(/[\s,]+/) : [];
 
 		images_add(this_image);
