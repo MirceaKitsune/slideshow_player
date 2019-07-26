@@ -8,7 +8,7 @@
 const name_sofurry = "SoFurry";
 // the maximum number of total pages to return, adjusted to fit the number of keyword pairs
 // remember that each page issues a new request, keep this low to avoid flooding the server and long waiting times
-const page_count_sofurry = 50;
+const page_count_sofurry = 60;
 // this should represent the maximum number of results the API may return per page
 const page_limit_sofurry = 30;
 // number of seconds to wait for a response from the server before the plugin times out
