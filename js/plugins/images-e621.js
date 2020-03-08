@@ -28,7 +28,7 @@ function parse_e621(data) {
 	if(!plugins_busy_get(name_e621))
 		return;
 
-	const items = data;
+	const items = data.posts;
 	for(var entry in items) {
 		const this_data = items[entry];
 		var this_image = {};
@@ -37,13 +37,13 @@ function parse_e621(data) {
 			continue;
 
 		const this_data_url = "https://e621.net/post/show/" + this_data.id;
-		this_image.src = String(this_data.file_url);
-		this_image.thumb = String(this_data.preview_url);
+		this_image.src = String(this_data.file.url);
+		this_image.thumb = String(this_data.preview.url);
 		this_image.title = String(this_data.id); // API doesn't provide the title, use the ID instead
-		this_image.author = String(this_data.artist[0]);
-		this_image.url = String(this_data.source || this_data_url); // prefer the source URL, fallback to submission URL
+		this_image.author = String(this_data.tags.artist[0]);
+		this_image.url = String(this_data.sources[0] || this_data_url); // prefer the source URL, fallback to submission URL
 		this_image.score = Number(this_data.score) * score_e621;
-		this_image.tags = this_data.tags ? this_data.tags.split(" ") : [];
+		this_image.tags = this_data.tags.general;
 
 		images_add(this_image);
 	}
@@ -73,7 +73,7 @@ function request_e621(bump) {
 	}
 	const keywords_current = keywords_all[active_keywords_e621 - 1];
 
-	plugins_get("https://" + domain + ".net/post/index.json?tags=" + keywords_current + "&page=" + active_page_e621 + "&limit=" + page_limit_e621, "parse_e621", false);
+	plugins_get("https://" + domain + ".net/posts.json?tags=" + keywords_current + "&page=" + active_page_e621 + "&limit=" + page_limit_e621, "parse_e621", null);
 	++active_page_e621;
 
 	// we made a new request to the server, reset the timeout in which we wait for the response
