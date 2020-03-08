@@ -42,7 +42,7 @@ function parse_e621(data) {
 		this_image.title = String(this_data.id); // API doesn't provide the title, use the ID instead
 		this_image.author = String(this_data.tags.artist[0]);
 		this_image.url = String(this_data.sources[0] || this_data_url); // prefer the source URL, fallback to submission URL
-		this_image.score = Number(this_data.score) * score_e621;
+		this_image.score = Number(this_data.score.total) * score_e621;
 		this_image.tags = this_data.tags.general;
 
 		images_add(this_image);
