@@ -28,7 +28,7 @@ function parse_derpibooru(data) {
 	if(!plugins_busy_get(name_derpibooru))
 		return;
 
-	const items = data.search;
+	const items = data.images;
 	for(var entry in items) {
 		const this_data = items[entry];
 		var this_image = {};
@@ -37,13 +37,13 @@ function parse_derpibooru(data) {
 			continue;
 
 		const this_data_url = "https://derpibooru.org/" + this_data.id;
-		this_image.src = "https:" + String(this_data.representations.large); // representations.full is better but occasionally causes errors
-		this_image.thumb = "https:" + String(this_data.representations.thumb);
-		this_image.title = String(this_data.id); // API doesn't provide the title, use the ID instead
+		this_image.src = String(this_data.representations.large); // representations.full is better but occasionally causes errors
+		this_image.thumb = String(this_data.representations.thumb);
+		this_image.title = String(this_data.name);
 		this_image.author = String(this_data.uploader);
-		this_image.url = String(this_data_url);
+		this_image.url = String(this_data.source_url || this_data_url); // prefer the source URL, fallback to submission URL
 		this_image.score = Number(this_data.score) * score_derpibooru;
-		this_image.tags = this_data.tags ? this_data.tags.split(/[\s,]+/) : [];
+		this_image.tags = this_data.tags;
 
 		images_add(this_image);
 	}
@@ -73,7 +73,7 @@ function request_derpibooru(bump) {
 	}
 	const keywords_current = keywords_all[active_keywords_derpibooru - 1];
 
-	plugins_get("https://derpibooru.org/search.json?q=" + keywords_current + "&page=" + active_page_derpibooru + "&perpage=" + page_limit_derpibooru + "&filter_id=" + filter_id, "parse_derpibooru", null);
+	plugins_get("https://derpibooru.org/api/v1/json/search?q=" + keywords_current + "&page=" + active_page_derpibooru + "&per_page=" + page_limit_derpibooru + "&filter_id=" + filter_id, "parse_derpibooru", null);
 	++active_page_derpibooru;
 
 	// we made a new request to the server, reset the timeout in which we wait for the response
