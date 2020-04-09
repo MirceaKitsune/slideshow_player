@@ -60,7 +60,8 @@ function request_e621(bump) {
 
 	// if we reached the maximum number of pages per keyword pair, fetch the next keyword pair
 	// in case this is the last keyword pair, stop making requests here
-	const keywords = plugins_settings_read("keywords", TYPE_IMAGES);
+	// due to the search system of this API "," must be converted to " "
+	const keywords = plugins_settings_read("keywords", TYPE_IMAGES).replace(/,/g, encodeURIComponent(" "));
 	const keywords_all = parse_keywords(keywords);
 	const keywords_bump = bump || (active_page_e621 > Math.floor(page_count_e621 / keywords_all.length));
 	if(keywords_bump) {
