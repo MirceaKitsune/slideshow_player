@@ -3,7 +3,7 @@
 
 // animation update rate in milliseconds (1000 = 1 second)
 // lower values are smoother but use more system resources
-const RATE = 1000 / 60; // 60 FPS, the refresh rate of most screens
+const RATE = 1000 / 120; // 120 FPS
 
 // to avoid broken image warnings, img elements are initialized using this fake 1x1px transparent gif
 const SRC_BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
