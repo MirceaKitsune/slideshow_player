@@ -36,7 +36,7 @@ function parse_hearthis(data) {
 		if(this_data === null || this_data === undefined || typeof this_data !== "object")
 			continue;
 
-		this_song.src = String(this_data.download_url);
+		this_song.src = String(this_data.stream_url) + "/";
 		this_song.thumb = String(this_data.thumb);
 		this_song.title = String(this_data.title);
 		this_song.author = this_data.user ? String(this_data.user.username) : "Unknown";
