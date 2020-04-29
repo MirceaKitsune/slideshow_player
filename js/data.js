@@ -79,8 +79,8 @@ function plugins_get_fetch(url, callback) {
 	}).catch(function(error) {
 		// fetching the resource failed
 		// if we're here, the cross-origin policy most likely restricted our attempt to download the response directly
-		// in this case, fallback to embedding the response as JSONP using a proxy
-		plugins_get_jsonp(url, callback, true);
+		// as in some cases this may be a page issue, the best approach is running the callback without any data to keep the chain going
+		eval(callback + "([])");
 	});
 }
 
