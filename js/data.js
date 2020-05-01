@@ -61,6 +61,7 @@ function plugins_get_jsonp(url, callback, proxy) {
 	var element = document.createElement("script");
 	element.type = "text/javascript";
 	element.src = src;
+	element.onerror = "eval(" + callback + "({}))";
 	document.body.appendChild(element);
 	plugins_jsonp_elements.push(element);
 }
@@ -80,7 +81,7 @@ function plugins_get_fetch(url, callback) {
 		// fetching the resource failed
 		// if we're here, the cross-origin policy most likely restricted our attempt to download the response directly
 		// as in some cases this may be a page issue, the best approach is running the callback without any data to keep the chain going
-		eval(callback + "([])");
+		eval(callback + "({})");
 	});
 }
 
