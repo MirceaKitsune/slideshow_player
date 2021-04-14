@@ -278,11 +278,8 @@ function images_pick() {
 
 		// refresh the image player if there are changes to apply
 		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index - 1].src !== current_image.src) {
-			// the order and availability of images has changed, disable the transition effect for this turn
 			player.images.transition = 1;
-
-			if(player.images.index <= 0 || player.images.index >= data_images.length)
-				player.images.index = 1;
+			player.images.index = 1;
 			player_images_skip(player.images.index);
 
 			// immediately mark images as preloading
@@ -374,8 +371,7 @@ function music_pick() {
 
 		// refresh the music player if there are changes to apply
 		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index - 1].src !== current_song.src) {
-			if(player.music.index <= 0 || player.music.index >= data_music.length)
-				player.music.index = 1;
+			player.music.index = 1;
 			player_music_skip(player.music.index);
 
 			// immediately mark songs as preloading
