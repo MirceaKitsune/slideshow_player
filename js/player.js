@@ -326,7 +326,7 @@ function player_images_next_onload_current() {
 	clearTimeout(player.images.timer_next);
 	if(!player.images.stopped) {
 		player.images.timer_next = setTimeout(player_images_next, settings.images.duration * 1000);
-		interface_ring_images_set(player.images.stopped ? null : settings.images.duration);
+		interface_ring_images_set(settings.images.duration);
 	}
 
 	player.images.preloading_current = false;
@@ -450,11 +450,13 @@ function player_images_play() {
 	clearTimeout(player.images.timer_next);
 	if(player.images.stopped) {
 		player.images.stopped = false;
-		player_images_next();
+		player.images.timer_next = setTimeout(player_images_next, settings.images.duration * 1000);
+		interface_ring_images_set(settings.images.duration);
 	} else {
 		player.images.stopped = true;
-		interface_update_media(false, true, false, false, false);
 	}
+
+	interface_update_media(false, true, false, false, false);
 }
 
 // player, images, clear
