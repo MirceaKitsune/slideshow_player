@@ -67,8 +67,8 @@ function recommendations_timer() {
 	// oppositely, the less you like an item, the faster it's assumed you're going to switch away from it
 	// if the player is busy, don't increment the rating of a tag, since that doesn't count as deliberately selecting an item
 	if(player_available_images() && player_active_images() && player.images.index > 0) {
-		for(var tag in data_images[player.images.index - 1].tags) {
-			const tag_name = data_images[player.images.index - 1].tags[tag].toLowerCase();
+		for(var tag in images_current().tags) {
+			const tag_name = images_current().tags[tag].toLowerCase();
 			if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
 				continue;
 
@@ -79,8 +79,8 @@ function recommendations_timer() {
 		}
 	}
 	if(player_available_music() && player_active_music() && player.music.index > 0) {
-		for(var tag in data_music[player.music.index - 1].tags) {
-			const tag_name = data_music[player.music.index - 1].tags[tag].toLowerCase();
+		for(var tag in music_current().tags) {
+			const tag_name = music_current().tags[tag].toLowerCase();
 			if(tag_name == null || tag_name == undefined || tag_name == "" || tag_name == " ")
 				continue;
 
@@ -534,7 +534,7 @@ function player_music_next() {
 
 	// apply the current song
 	if(player.music.index > 0) {
-		player.music.element.setAttribute("src", data_music[player.music.index - 1].src);
+		player.music.element.setAttribute("src", music_current().src);
 		player.music.element.volume = settings.music.volume;
 
 		interface_ring_music_set(null);

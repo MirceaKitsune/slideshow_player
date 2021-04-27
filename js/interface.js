@@ -1,10 +1,6 @@
 // Slideshow Viewer, Interface
 // Public Domain / CC0, MirceaKitsune 2018
 
-// style constants
-const STYLE_MEDIA_BAR_COLOR_EMPTY = "#ffffff";
-const STYLE_MEDIA_BAR_COLOR_FULL = "#00aacc";
-
 // seconds after which to pull data from websites after settings that require refreshing are changed
 // this needs to be big enough to give users enough time to finish typing and to protect sites against spamming
 const AUTOREFRESH = 5;
@@ -38,6 +34,7 @@ var interface_ring = {
 
 // interface, functions, ring, images, timer
 function interface_ring_images_timer() {
+	const score = images_current() ? images_current().score / score_images_best : 0;
 	const duration = interface_ring.images.duration * 1000;
 	const current_date = new Date();
 	const current_ms = current_date.getTime();
@@ -54,7 +51,7 @@ function interface_ring_images_timer() {
 		progress = 1 - ((target_ms - current_ms) / duration);
 	}
 
-	interface_style_gradient(interface.media_images_thumb_ring, true, progress, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+	interface_style_gradient(interface.media_images_thumb_ring, true, progress, score);
 }
 
 // interface, functions, ring, images, set
@@ -76,6 +73,7 @@ function interface_ring_images_set(duration) {
 
 // interface, functions, ring, music, timer
 function interface_ring_music_timer() {
+	const score = music_current() ? music_current().score / score_images_best : 0;
 	const current_s = document.body.contains(interface_ring.music.element) ? interface_ring.music.element.currentTime : 0;
 	const target_s = document.body.contains(interface_ring.music.element) ? interface_ring.music.element.duration : 0;
 
@@ -90,7 +88,7 @@ function interface_ring_music_timer() {
 		progress = current_s / target_s;
 	}
 
-	interface_style_gradient(interface.media_music_thumb_ring, true, progress, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+	interface_style_gradient(interface.media_music_thumb_ring, true, progress, score);
 }
 
 // interface, functions, ring, music, set
@@ -220,21 +218,19 @@ function interface_load(pull) {
 
 			// if there are no items of the given type, clear that category
 			if(interface_refresh.images && !has_images) {
-				data_images = [];
-				images_pick();
+				images_clear_active();
 				interface_update_recommendations_images_clear();
 			}
 			if(interface_refresh.music && !has_music) {
-				data_music = [];
-				music_pick();
+				music_clear_active();
 				interface_update_recommendations_music_clear();
 			}
 		} else {
 			// if there are no items available, clear everything
 			plugins_update(null);
 			player_detach();
-			data_images = [];
-			data_music = [];
+			images_clear_active();
+			music_clear_active();
 			interface_update_recommendations_images_clear();
 			interface_update_recommendations_music_clear();
 		}
@@ -253,10 +249,16 @@ function interface_play() {
 }
 
 // interface, update style, gradient
-function interface_style_gradient(element, radial, blend, color_empty, color_full) {
+function interface_style_gradient(element, radial, blend_bar, blend_color) {
+	// a color is picked from the array representing the value of the blend color
+	const colors = ["#ff4040", "#ff8040", "#e0e040", "#40e040", "#40e0e0", "#4080ff", "#8040ff", "#ff40ff"];
+	const colors_index = Math.round((colors.length - 1) * blend_color);
+	const color_empty = "#ffffff";
+	const color_full = colors[colors_index];
+
 	const pos_start = " 0%";
 	const pos_end = " 100%";
-	const pos_blend = " " + (Math.min(Math.max(blend, 0), 1) * 100) + "%";
+	const pos_blend = " " + (Math.min(Math.max(blend_bar, 0), 1) * 100) + "%";
 
 	const gradient_type = radial ? "conic-gradient" : "linear-gradient";
 	const gradient_dir = radial ? "from 0deg" : "90deg";
@@ -408,21 +410,21 @@ function interface_update_media_images() {
 
 	// configure label / thumb / info elements
 	if(active && player.images.index > 0) {
-		var label_title = data_images[player.images.index - 1].title;
+		var label_title = images_current().title;
 		if(label_title.length > 32)
 			label_title = label_title.substring(0, 32) + "...";
 
-		var label_author = data_images[player.images.index - 1].author;
+		var label_author = images_current().author;
 		if(label_author.length > 16)
 			label_author = label_author.substring(0, 16) + "...";
 
-		interface_style_gradient(interface.media_images_bar, false, player.images.index / data_images.length, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+		interface_style_gradient(interface.media_images_bar, false, player.images.index / data_images.length, score_images_average / score_images_best);
 		interface.media_images_bar.setAttribute("title", player.images.index + " / " + data_images.length);
-		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
-		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
+		interface.media_images_thumb.setAttribute("href", images_current().url);
+		interface.media_images_thumb_image.setAttribute("src", images_current().thumb);
 		interface.media_images_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 	} else {
-		interface_style_gradient(interface.media_images_bar, false, 0, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+		interface_style_gradient(interface.media_images_bar, false, 0, 0);
 		interface.media_images_bar.removeAttribute("title");
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
@@ -480,21 +482,21 @@ function interface_update_media_music() {
 
 	// configure label / thumb / info elements
 	if(active && player.music.index > 0) {
-		var label_title = data_music[player.music.index - 1].title;
+		var label_title = music_current().title;
 		if(label_title.length > 32)
 			label_title = label_title.substring(0, 32) + "...";
 
-		var label_author = data_music[player.music.index - 1].author;
+		var label_author = music_current().author;
 		if(label_author.length > 16)
 			label_author = label_author.substring(0, 16) + "...";
 
-		interface_style_gradient(interface.media_music_bar, false, player.music.index / data_music.length, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+		interface_style_gradient(interface.media_music_bar, false, player.music.index / data_music.length, score_music_average / score_music_best);
 		interface.media_music_bar.setAttribute("title", player.music.index + " / " + data_music.length);
-		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
-		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
+		interface.media_music_thumb.setAttribute("href", music_current().url);
+		interface.media_music_thumb_song.setAttribute("src", music_current().thumb);
 		interface.media_music_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 	} else {
-		interface_style_gradient(interface.media_music_bar, false, 0, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
+		interface_style_gradient(interface.media_music_bar, false, 0, 0);
 		interface.media_music_bar.removeAttribute("title");
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
@@ -550,7 +552,7 @@ function interface_update_recommendations_images() {
 			// tags that are present on this item will be underlined
 			// tags that match the keyword in use will be bold
 			tag_element.innerHTML = tag_name;
-			if(player_available_images() && player_active_images() && player.images.index > 0 && data_images[player.images.index - 1].tags.indexOf(tag_name) >= 0)
+			if(player_available_images() && player_active_images() && player.images.index > 0 && images_current().tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
 			if(current_tag.toLowerCase().includes(tag_name))
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";
@@ -606,7 +608,7 @@ function interface_update_recommendations_music() {
 			// tags that are present on this item will be underlined
 			// tags that match the keyword in use will be bold
 			tag_element.innerHTML = tag_name;
-			if(player_available_music() && player_active_music() && player.music.index > 0 && data_music[player.music.index - 1].tags.indexOf(tag_name) >= 0)
+			if(player_available_music() && player_active_music() && player.music.index > 0 && music_current().tags.indexOf(tag_name) >= 0)
 				tag_element.innerHTML = "<u>" + tag_element.innerHTML + "</u>";
 			if(current_tag.toLowerCase().includes(tag_name))
 				tag_element.innerHTML = "<b>" + tag_element.innerHTML + "</b>";

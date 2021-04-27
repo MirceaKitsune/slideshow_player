@@ -210,10 +210,26 @@ function plugins_settings_used(name, type) {
 
 // data, images, global list
 var data_images_all = data_images = [];
+var score_images_best = 0;
+var score_images_average = 0;
+
+// data, images, get current
+function images_current() {
+	if(data_images.length >= player.images.index)
+		return data_images[player.images.index - 1];
+	return null;
+}
 
 // data, images, functions, clear
 function images_clear() {
 	data_images_all = [];
+	interface_update_media(false, true, true, false, false);
+}
+
+// data, images, functions, clear active
+function images_clear_active() {
+	data_images = [];
+	images_pick();
 	interface_update_media(false, true, true, false, false);
 }
 
@@ -261,12 +277,22 @@ function images_add(item) {
 
 // data, images, functions, pick
 function images_pick() {
-	const current_image = data_images[player.images.index - 1];
+	const current_image = images_current();
 
 	// pick the images with the highest score
 	data_images = data_images_all.slice();
 	data_images.sort(function(a, b) { return b.score - a.score });
 	data_images.splice(settings.images.count);
+
+	// update global score
+	score_images_best = 0;
+	score_images_average = 0;
+	for(image in data_images) {
+		const score = data_images[image].score;
+		if(score > score_images_best)
+			score_images_best = score;
+		score_images_average = image > 0 ? (score_images_average + score) / 2 : score;
+	}
 
 	if(!player_available_images()) {
 		// if the player is active and no images are left, clear the image player
@@ -277,7 +303,7 @@ function images_pick() {
 		images_shuffle();
 
 		// refresh the image player if there are changes to apply
-		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || data_images[player.images.index - 1].src !== current_image.src) {
+		if(player.images.index >= data_images.length || current_image === null || current_image === undefined || images_current().src !== current_image.src) {
 			player.images.transition = 1;
 			player.images.index = 1;
 			player_images_skip(player.images.index);
@@ -303,10 +329,26 @@ function images_shuffle() {
 
 // data, music, global list
 var data_music_all = data_music = [];
+var score_music_best = 0;
+var score_music_average = 0;
+
+// data, music, get current
+function music_current() {
+	if(data_music.length >= player.music.index)
+		return data_music[player.music.index - 1];
+	return null;
+}
 
 // data, music, functions, clear
 function music_clear() {
 	data_music_all = [];
+	interface_update_media(false, false, true, true, false);
+}
+
+// data, music, functions, clear active
+function music_clear_active() {
+	data_music = [];
+	music_pick();
 	interface_update_media(false, false, true, true, false);
 }
 
@@ -354,12 +396,22 @@ function music_add(item) {
 
 // data, music, functions, pick
 function music_pick() {
-	const current_song = data_music[player.music.index - 1];
+	const current_song = music_current();
 
 	// pick the songs with the highest score
 	data_music = data_music_all.slice();
 	data_music.sort(function(a, b) { return b.score - a.score });
 	data_music.splice(settings.music.count);
+
+	// update global score
+	score_music_best = 0;
+	score_music_average = 0;
+	for(song in data_music) {
+		const score = data_music[song].score;
+		if(score > score_music_best)
+			score_music_best = score;
+		score_music_average = song > 0 ? (score_music_average + score) / 2 : score;
+	}
 
 	if(!player_available_music()) {
 		// if the player is active and no songs are left, clear the music player
@@ -370,7 +422,7 @@ function music_pick() {
 		music_shuffle();
 
 		// refresh the music player if there are changes to apply
-		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || data_music[player.music.index - 1].src !== current_song.src) {
+		if(player.music.index >= data_music.length || current_song === null || current_song === undefined || music_current().src !== current_song.src) {
 			player.music.index = 1;
 			player_music_skip(player.music.index);
 
