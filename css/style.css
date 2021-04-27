@@ -58,46 +58,47 @@
 	text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000, 0 0 4px #000000;
 }
 
-.button_size_small {
+.button {
 	text-align: center;
-	line-height: 28px;
-	font-size: 8px;
 	font-weight: bold;
 	font-family: sans-serif;
+	border-radius: 100%;
+	cursor: pointer;
+	z-index: 1;
+	pointer-events: all;
+	transition: border-radius 0.5s, background-color 0.25s;
+}
+
+.button:hover {
+	border-radius: 10%;
+}
+
+.button:active {
+	border-radius: 0%;
+}
+
+.button_size_small {
+	line-height: 28px;
+	font-size: 8px;
 	width: 32px;
 	height: 32px;
 	left: -16px;
-	cursor: pointer;
-	z-index: 1;
-	pointer-events: all;
 }
 
 .button_size_medium {
-	text-align: center;
 	line-height: 40px;
 	font-size: 16px;
-	font-weight: bold;
-	font-family: sans-serif;
 	width: 48px;
 	height: 48px;
 	left: -24px;
-	cursor: pointer;
-	z-index: 1;
-	pointer-events: all;
 }
 
 .button_size_large {
-	text-align: center;
 	line-height: 56px;
 	font-size: 24px;
-	font-weight: bold;
-	font-family: sans-serif;
 	width: 64px;
 	height: 64px;
 	left: -32px;
-	cursor: pointer;
-	z-index: 1;
-	pointer-events: all;
 }
 
 .button_color_black {
@@ -177,6 +178,8 @@
 	line-height: 20px;
 	font-size: 14px;
 	font-family: sans-serif;
+	z-index: 1;
+	pointer-events: all;
 }
 
 .item_media_position_attached {
@@ -226,9 +229,19 @@
 	width: 96px;
 	height: 96px;
 	left: -48px;
+	border-radius: 100%;
 	background-color: #eeeeee;
 	z-index: 1;
-	pointer-events: all;
+	pointer-events: none;
+	transition: border-radius 0.5s, background-color 0.25s;
+}
+
+.item_thumbnail_ring:hover ~ .item_thumbnail_image {
+	border-radius: 10%;
+}
+
+.item_thumbnail_ring:active ~ .item_thumbnail_image {
+	border-radius: 0%;
 }
 
 .item_thumbnail_ring {
@@ -236,9 +249,19 @@
 	width: 104px;
 	height: 104px;
 	left: -52px;
+	border-radius: 100%;
 	background-color: #ffffff;
 	z-index: 1;
 	pointer-events: all;
+	transition: border-radius 0.5s, background-color 0.25s;
+}
+
+.item_thumbnail_ring:hover {
+	border-radius: 10%;
+}
+
+.item_thumbnail_ring:active {
+	border-radius: 0%;
 }
 
 .item_bar {
@@ -250,14 +273,4 @@
 	background-color: #ffffff;
 	z-index: 1;
 	pointer-events: all;
-}
-
-.effect_shape_square {
-	border-radius: 10%;
-	transition: border-radius 0.5s, background-color 0.25s;
-}
-
-.effect_shape_round {
-	border-radius: 100%;
-	transition: border-radius 0.5s, background-color 0.25s;
 }

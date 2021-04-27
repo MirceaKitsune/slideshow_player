@@ -161,10 +161,6 @@ function player_fullscreen_toggle(force_to) {
 		fullscreen_timer = setInterval(player_fullscreen_timer, 100);
 	}
 
-	// as the fullscreen button moves outside of the mouse cursor when toggling fullscreen, reset its hover effects
-	interface_style_effect_shape(interface.media_controls_fullscreen, false);
-	interface_style_button_color(interface.media_controls_fullscreen, "white");
-
 	// as the image elements are resized and repositioned when toggling fullscreen, detach the zoom element
 	player_images_zoom_detach();
 }
