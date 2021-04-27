@@ -305,7 +305,8 @@ function player_images_next_onload_previous() {
 		return;
 
 	player.images.preloading_previous = false;
-	interface_update_media(false, true, false, false, false);
+	if(!player_busy_images())
+		interface_update_media(false, true, false, false, false);
 }
 
 // player, images, switching, onload, next
@@ -314,7 +315,8 @@ function player_images_next_onload_next() {
 		return;
 
 	player.images.preloading_next = false;
-	interface_update_media(false, true, false, false, false);
+	if(!player_busy_images())
+		interface_update_media(false, true, false, false, false);
 }
 
 // player, images, switching, onload, current
@@ -330,7 +332,8 @@ function player_images_next_onload_current() {
 	}
 
 	player.images.preloading_current = false;
-	interface_update_media(false, true, false, false, false);
+	if(!player_busy_images())
+		interface_update_media(false, true, false, false, false);
 }
 
 // player, images, switching, fade
