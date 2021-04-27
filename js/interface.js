@@ -421,7 +421,7 @@ function interface_update_media_images() {
 		interface_style_button_color(interface.media_images_next, "red");
 	}
 
-	// configure label / thumb / info / player_icon elements
+	// configure label / thumb / info elements
 	if(active && player.images.index > 0) {
 		var label_title = data_images[player.images.index - 1].title;
 		if(label_title.length > 32)
@@ -436,14 +436,12 @@ function interface_update_media_images() {
 		interface.media_images_thumb.setAttribute("href", data_images[player.images.index - 1].url);
 		interface.media_images_thumb_image.setAttribute("src", data_images[player.images.index - 1].thumb);
 		interface.media_images_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
-		interface.player_icon_images.innerHTML = ready ? "" : (player.images.preloading_current ? "⧗" : "⧖");
 	} else {
 		interface_style_css_gradient_linear(interface.media_images_bar, 0, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
 		interface.media_images_bar.removeAttribute("title");
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
 		interface.media_images_info.innerHTML = "";
-		interface.player_icon_images.innerHTML = "";
 	}
 
 	// update the ring element
@@ -495,7 +493,7 @@ function interface_update_media_music() {
 		interface_style_button_color(interface.media_music_next, "red");
 	}
 
-	// configure label / thumb / info / player_icon elements
+	// configure label / thumb / info elements
 	if(active && player.music.index > 0) {
 		var label_title = data_music[player.music.index - 1].title;
 		if(label_title.length > 32)
@@ -510,14 +508,12 @@ function interface_update_media_music() {
 		interface.media_music_thumb.setAttribute("href", data_music[player.music.index - 1].url);
 		interface.media_music_thumb_song.setAttribute("src", data_music[player.music.index - 1].thumb);
 		interface.media_music_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
-		interface.player_icon_music.innerHTML = ready ? "" : "⧗";
 	} else {
 		interface_style_css_gradient_linear(interface.media_music_bar, 0, STYLE_MEDIA_BAR_COLOR_EMPTY, STYLE_MEDIA_BAR_COLOR_FULL);
 		interface.media_music_bar.removeAttribute("title");
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
 		interface.media_music_info.innerHTML = "";
-		interface.player_icon_music.innerHTML = "";
 	}
 
 	// update the ring element
@@ -713,19 +709,6 @@ function interface_init() {
 	interface.player = document.createElement("div");
 	interface.player.setAttribute("class", "item_player item_player_position_detached");
 	document.body.appendChild(interface.player);
-	{
-		// interface HTML: player, icon, images
-		interface.player_icon_images = document.createElement("div");
-		interface.player_icon_images.setAttribute("class", "text_size_large text_color_white");
-		interface.player_icon_images.setAttribute("style", "position: absolute; margin: 0 0 0 0%; top: 0%; left: 0px; width: 64px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
-		interface.player.appendChild(interface.player_icon_images);
-
-		// interface HTML: player, icon, music
-		interface.player_icon_music = document.createElement("div");
-		interface.player_icon_music.setAttribute("class", "text_size_large text_color_white");
-		interface.player_icon_music.setAttribute("style", "position: absolute; margin: 0 0 0 100%; top: 0%; left: -64px; width: 64px; height: 64px; z-index: 1; line-height: 32px; font-size: 48px");
-		interface.player.appendChild(interface.player_icon_music);
-	}
 
 	// interface HTML: controls
 	interface.controls = document.createElement("div");
