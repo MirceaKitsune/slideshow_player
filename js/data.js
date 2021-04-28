@@ -235,12 +235,6 @@ function images_clear_active() {
 
 // data, images, functions, add
 function images_add(item) {
-	// check that this image doesn't already exist
-	for(image in data_images_all) {
-		if(data_images_all[image].src === item.src)
-			return;
-	}
-
 	// check that all mandatory fields are set
 	if(typeof item.src !== "string")
 		return;
@@ -354,12 +348,6 @@ function music_clear_active() {
 
 // data, music, functions, add
 function music_add(item) {
-	// check that this song doesn't already exist
-	for(song in data_music_all) {
-		if(data_music_all[song].src === item.src)
-			return;
-	}
-
 	// check that all mandatory fields are set
 	if(typeof item.src !== "string")
 		return;
