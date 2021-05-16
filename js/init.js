@@ -19,6 +19,11 @@ const KEY_MUSIC_PLAY = "\\";
 const KEY_MUSIC_NEXT = "ArrowUp";
 const KEY_MUSIC_OPEN = "`";
 
+// percent
+function percent(value) {
+	return Math.round(value * 100) + "%";
+}
+
 // parse, keywords
 function parse_keywords(keywords) {
 	var search = keywords.toLowerCase();

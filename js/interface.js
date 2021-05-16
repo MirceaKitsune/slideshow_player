@@ -256,9 +256,9 @@ function interface_style_gradient(element, radial, blend_bar, blend_color) {
 	const color_empty = "#ffffff";
 	const color_full = colors[colors_index];
 
-	const pos_start = " 0%";
-	const pos_end = " 100%";
-	const pos_blend = " " + (Math.min(Math.max(blend_bar, 0), 1) * 100) + "%";
+	const pos_start = " " + percent(0);
+	const pos_end = " " + percent(1);
+	const pos_blend = " " + percent(Math.min(Math.max(blend_bar, 0), 1));
 
 	const gradient_type = radial ? "conic-gradient" : "linear-gradient";
 	const gradient_dir = radial ? "from 0deg" : "90deg";
@@ -318,7 +318,7 @@ function interface_update_controls_images() {
 // interface, update HTML, controls, music
 function interface_update_controls_music() {
 	// refresh the volume of the audio element
-	interface.controls_music_volume_label.innerHTML = settings.music.volume.toFixed(2);
+	interface.controls_music_volume_label.innerHTML = percent(settings.music.volume);
 	if(document.body.contains(player.music.element))
 		player.music.element.volume = settings.music.volume;
 }
@@ -424,7 +424,7 @@ function interface_update_media_images() {
 		interface.media_images_bar.setAttribute("title", player.images.index + " / " + data_images.length);
 		interface.media_images_thumb.setAttribute("href", images_current().url);
 		interface.media_images_thumb_image.setAttribute("src", images_current().thumb);
-		interface.media_images_thumb_score.innerHTML = score_current.toFixed(2) + " / " + score_average.toFixed(2);
+		interface.media_images_thumb_score.innerHTML = percent(score_current) + " / " + percent(score_average);
 		interface.media_images_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 	} else {
 		interface_style_gradient(interface.media_images_bar, false, 0, 0);
@@ -500,7 +500,7 @@ function interface_update_media_music() {
 		interface.media_music_bar.setAttribute("title", player.music.index + " / " + data_music.length);
 		interface.media_music_thumb.setAttribute("href", music_current().url);
 		interface.media_music_thumb_song.setAttribute("src", music_current().thumb);
-		interface.media_music_thumb_score.innerHTML = score_current.toFixed(2) + " / " + score_average.toFixed(2);
+		interface.media_music_thumb_score.innerHTML = percent(score_current) + " / " + percent(score_average);
 		interface.media_music_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 	} else {
 		interface_style_gradient(interface.media_music_bar, false, 0, 0);
@@ -671,23 +671,26 @@ function interface_update_media_controls() {
 		{
 			interface.media_controls_label.innerHTML += "<br/>⟳ for ";
 			if(interface_refresh.images)
-				interface.media_controls_label.innerHTML += TYPE_IMAGES + " ";
+				interface.media_controls_label.innerHTML += TYPE_IMAGES;
+			if(interface_refresh.images && interface_refresh.music)
+				interface.media_controls_label.innerHTML += " and ";
 			if(interface_refresh.music)
-				interface.media_controls_label.innerHTML += TYPE_MUSIC + " ";
-			interface.media_controls_label.innerHTML += "in " + interface_refresh.timer + " sec";
+				interface.media_controls_label.innerHTML += TYPE_MUSIC;
+			interface.media_controls_label.innerHTML += " in " + interface_refresh.timer + " sec";
 		}
 		interface.media_controls_play.innerHTML += " ⟳";
 		document.title += " ⟳";
 	}
 	if(busy[TYPE_IMAGES] > 0 || busy[TYPE_MUSIC] > 0) {
 		{
-			interface.media_controls_label.innerHTML += "<br/>⧗  with ";
+			interface.media_controls_label.innerHTML += "<br/>⧗ with ";
 			if(busy[TYPE_IMAGES] > 0)
-				interface.media_controls_label.innerHTML += TYPE_IMAGES + " " + busy[TYPE_IMAGES] + " left";
+				interface.media_controls_label.innerHTML += TYPE_IMAGES + " " + busy[TYPE_IMAGES];
 			if(busy[TYPE_IMAGES] > 0 && busy[TYPE_MUSIC] > 0)
-				interface.media_controls_label.innerHTML += " ";
+				interface.media_controls_label.innerHTML += " and ";
 			if(busy[TYPE_MUSIC] > 0)
-				interface.media_controls_label.innerHTML += TYPE_MUSIC + " " + busy[TYPE_MUSIC] + " left";
+				interface.media_controls_label.innerHTML += TYPE_MUSIC + " " + busy[TYPE_MUSIC];
+			interface.media_controls_label.innerHTML += " sources";
 			if(player_active() && (busy[TYPE_IMAGES] > 0 || busy[TYPE_MUSIC] > 0))
 				interface.media_controls_label.innerHTML += "<br/>Items may refresh when ready";
 		}
@@ -967,7 +970,7 @@ function interface_init() {
 
 				// interface HTML: controls, music, volume, label
 				interface.controls_music_volume_label = document.createElement("label");
-				interface.controls_music_volume_label.innerHTML = settings.music.volume.toFixed(2);
+				interface.controls_music_volume_label.innerHTML = percent(settings.music.volume);
 				interface.controls_music_volume.appendChild(interface.controls_music_volume_label);
 			}
 		}
