@@ -38,9 +38,9 @@ function parse_keywords(keywords) {
 const settings_default = {
 	sites: [],
 	images: {
-		keywords: "anthro",
+		keywords: "comic",
 		count: 1000,
-		duration: 10,
+		duration: 15,
 		nsfw: false,
 		loop: true,
 		shuffle: true

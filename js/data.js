@@ -7,7 +7,7 @@ const TYPE_MUSIC = "♫";
 const TYPE_SOURCES = "✉";
 
 // valid extensions, "/" is included to support redirect URL's
-const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif", "/"];
+const EXTENSIONS_IMG = ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "svgz", "/"];
 const EXTENSIONS_SND = ["mp3", "ogg", "wav", "flac", "/"];
 
 // plugins, global object

@@ -6,10 +6,10 @@ const FULLSCREEN_MOUSE_FADE = 64;
 
 // amount of time it takes to transition between images
 // 0 is instant, 1 makes the transition last throughout the full duration of the image
-const TRANSITION = 0.1;
+const TRANSITION = 0.05;
 
 // the cursor is hidden after this many seconds if positioned over the player without being moved
-const CURSOR_TIME = 3;
+const CURSOR_TIME = 1;
 
 // the zoom level, size, duration, and background brightness of the magnifier
 const ZOOM_FACTOR = 2;
