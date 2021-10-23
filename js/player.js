@@ -34,6 +34,7 @@ var player = {
 	element: null,
 	images: {
 		index: 0,
+		brightness: 1,
 		preloading_previous: false,
 		preloading_next: false,
 		preloading_current: false,
@@ -56,7 +57,7 @@ var player = {
 		timer_next: null,
 		element: null
 	}
-};
+}
 
 // recommendations, timer
 function recommendations_timer() {
@@ -713,6 +714,10 @@ function player_attach() {
 	// start the music player, music_pick will take care executing player_music_next
 	player.music.index = 0;
 	music_pick();
+
+	// set the initial brightness and volume
+	player.element.style["opacity"] = player.images.brightness;
+	player.music.element.volume = player.music.volume;
 
 	// set the recommendations interval
 	recommendations.timer = setInterval(recommendations_timer, RECOMMENDATIONS_RATE * 1000);

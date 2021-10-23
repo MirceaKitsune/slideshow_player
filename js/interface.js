@@ -189,10 +189,6 @@ function interface_load(pull) {
 	if(settings.music.count !== old_music_count || settings.music.shuffle !== old_music_shuffle)
 		music_pick();
 
-	// update the image and music controls
-	interface_update_controls_images();
-	interface_update_controls_music();
-
 	// load the plugins if we have any sources enabled
 	if(pull) {
 		if(interface_refresh.images)
@@ -287,6 +283,7 @@ function interface_update_attached(attached) {
 		interface.media_images_info.setAttribute("class", "text_size_small text_color_black");
 		interface.media_music_info.setAttribute("class", "text_size_small text_color_black");
 		interface.media_controls_label.setAttribute("class", "text_size_medium text_color_black");
+		interface.media_images_controls_brightness_label.setAttribute("class", "text_size_medium text_color_black");
 		interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_black");
 		interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_black");
 		interface.media_music_controls_volume_label.setAttribute("class", "text_size_medium text_color_black");
@@ -300,6 +297,7 @@ function interface_update_attached(attached) {
 		interface.media_images_info.setAttribute("class", "text_size_small text_color_white");
 		interface.media_music_info.setAttribute("class", "text_size_small text_color_white");
 		interface.media_controls_label.setAttribute("class", "text_size_medium text_color_white");
+		interface.media_images_controls_brightness_label.setAttribute("class", "text_size_medium text_color_white");
 		interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_white");
 		interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_white");
 		interface.media_music_controls_volume_label.setAttribute("class", "text_size_medium text_color_white");
@@ -310,17 +308,23 @@ function interface_update_attached(attached) {
 	}
 }
 
-// interface, update HTML, controls, images
-function interface_update_controls_images() {
+// interface, update HTML, controls, images, brightness
+function interface_update_controls_images_brightness() {
+	const elements_controls_media_images = document.forms["controls_media_images"].elements;
+	player.images.brightness = Number(elements_controls_media_images["controls_media_images_brightness"].value);
+	player.images.brightness = Math.max(Math.min(player.images.brightness, 1), 0);
 
+	interface.media_images_controls_brightness_label.innerHTML = percent(player.images.brightness);
+	if(document.body.contains(player.element))
+		player.element.style["opacity"] = player.images.brightness;
 }
 
-// interface, update HTML, controls, music
-function interface_update_controls_music() {
-	// change the volume of the audio element
+// interface, update HTML, controls, music, volume
+function interface_update_controls_music_volume() {
 	const elements_controls_media_music = document.forms["controls_media_music"].elements;
 	player.music.volume = Number(elements_controls_media_music["controls_media_music_volume"].value);
 	player.music.volume = Math.max(Math.min(player.music.volume, 1), 0);
+
 	interface.media_music_controls_volume_label.innerHTML = percent(player.music.volume);
 	if(document.body.contains(player.music.element))
 		player.music.element.volume = player.music.volume;
@@ -1065,6 +1069,41 @@ function interface_init() {
 			interface.media_images_info.setAttribute("class", "text_size_small text_color_black");
 			interface.media_images_info.setAttribute("style", "position: absolute; top: 164px; width: 100%");
 			interface.media_images.appendChild(interface.media_images_info);
+
+			// interface HTML: media, images, controls
+			interface.media_images_controls = document.createElement("form");
+			interface.media_images_controls.setAttribute("id", "controls_media_images");
+			interface.media_images.appendChild(interface.media_images_controls);
+			{
+				// interface HTML: media, images, controls, brightness
+				interface.media_images_controls_brightness = document.createElement("p");
+				interface.media_images_controls_brightness.setAttribute("style", "position: absolute; top: 180px; width: 100%");
+				interface.media_images_controls.appendChild(interface.media_images_controls_brightness);
+				{
+					// interface HTML: media, images, controls, brightness, slider
+					interface.media_images_controls_brightness_input = document.createElement("input");
+					interface.media_images_controls_brightness_input.setAttribute("id", "controls_media_images_brightness");
+					interface.media_images_controls_brightness_input.setAttribute("title", "Image brightness");
+					interface.media_images_controls_brightness_input.setAttribute("type", "range");
+					interface.media_images_controls_brightness_input.setAttribute("value", player.images.brightness);
+					interface.media_images_controls_brightness_input.setAttribute("step", "0.01");
+					interface.media_images_controls_brightness_input.setAttribute("min", "0");
+					interface.media_images_controls_brightness_input.setAttribute("max", "1");
+					interface.media_images_controls_brightness_input.setAttribute("onclick", "interface_update_controls_images_brightness()");
+					interface.media_images_controls_brightness_input.setAttribute("oninput", "interface_update_controls_images_brightness()");
+					interface.media_images_controls_brightness.appendChild(interface.media_images_controls_brightness_input);
+
+					// interface HTML: media, images, controls, brightness, br
+					interface.media_images_controls_br = document.createElement("br");
+					interface.media_images_controls_brightness.appendChild(interface.media_images_controls_br);
+
+					// interface HTML: media, images, controls, brightness, label
+					interface.media_images_controls_brightness_label = document.createElement("label");
+					interface.media_images_controls_brightness_label.setAttribute("class", "text_size_medium text_color_black");
+					interface.media_images_controls_brightness_label.innerHTML = percent(player.images.brightness);
+					interface.media_images_controls_brightness.appendChild(interface.media_images_controls_brightness_label);
+				}
+			}
 		}
 
 		// interface HTML: media, controls
@@ -1177,14 +1216,14 @@ function interface_init() {
 					// interface HTML: media, music, controls, volume, slider
 					interface.media_music_controls_volume_input = document.createElement("input");
 					interface.media_music_controls_volume_input.setAttribute("id", "controls_media_music_volume");
-					interface.media_music_controls_volume_input.setAttribute("title", "Audio volume for music");
+					interface.media_music_controls_volume_input.setAttribute("title", "Music volume");
 					interface.media_music_controls_volume_input.setAttribute("type", "range");
 					interface.media_music_controls_volume_input.setAttribute("value", player.music.volume);
 					interface.media_music_controls_volume_input.setAttribute("step", "0.01");
 					interface.media_music_controls_volume_input.setAttribute("min", "0");
 					interface.media_music_controls_volume_input.setAttribute("max", "1");
-					interface.media_music_controls_volume_input.setAttribute("onclick", "interface_update_controls_music()");
-					interface.media_music_controls_volume_input.setAttribute("oninput", "interface_update_controls_music()");
+					interface.media_music_controls_volume_input.setAttribute("onclick", "interface_update_controls_music_volume()");
+					interface.media_music_controls_volume_input.setAttribute("oninput", "interface_update_controls_music_volume()");
 					interface.media_music_controls_volume.appendChild(interface.media_music_controls_volume_input);
 
 					// interface HTML: media, music, controls, volume, br
