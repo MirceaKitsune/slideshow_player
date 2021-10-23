@@ -54,8 +54,7 @@ const settings_default = {
 		keywords: "trance",
 		count: 100,
 		loop: true,
-		shuffle: true,
-		volume: 1
+		shuffle: true
 	}
 };
 

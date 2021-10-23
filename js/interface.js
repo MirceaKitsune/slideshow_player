@@ -145,8 +145,8 @@ function interface_preload(name, type) {
 
 // interface, functions, plugin loader
 function interface_load(pull) {
-	const elements_settings_images = document.forms["controls_images"].elements;
-	const elements_settings_music = document.forms["controls_music"].elements;
+	const elements_controls_images = document.forms["controls_images"].elements;
+	const elements_controls_music = document.forms["controls_music"].elements;
 	const elements_list = document.forms["controls_sites"].elements;
 
 	// store some old settings to compare them later below
@@ -161,17 +161,16 @@ function interface_load(pull) {
 		if(elements_list[i].checked)
 			settings.sites.push(elements_list[i].name);
 	}
-	settings.images.keywords = elements_settings_images["controls_images_search_keywords"].value;
-	settings.images.nsfw = Boolean(elements_settings_images["controls_images_search_nsfw"].checked);
-	settings.images.count = Number(elements_settings_images["controls_images_count"].value);
-	settings.images.duration = Number(elements_settings_images["controls_images_duration"].value);
-	settings.images.loop = Boolean(elements_settings_images["controls_images_play_loop"].checked);
-	settings.images.shuffle = Boolean(elements_settings_images["controls_images_play_shuffle"].checked);
-	settings.music.keywords = elements_settings_music["controls_music_search_keywords"].value;
-	settings.music.count = Number(elements_settings_music["controls_music_count"].value);
-	settings.music.loop = Boolean(elements_settings_music["controls_music_play_loop"].checked);
-	settings.music.shuffle = Boolean(elements_settings_music["controls_music_play_shuffle"].checked);
-	settings.music.volume = Number(elements_settings_music["controls_music_volume"].value);
+	settings.images.keywords = elements_controls_images["controls_images_search_keywords"].value;
+	settings.images.nsfw = Boolean(elements_controls_images["controls_images_search_nsfw"].checked);
+	settings.images.count = Number(elements_controls_images["controls_images_count"].value);
+	settings.images.duration = Number(elements_controls_images["controls_images_duration"].value);
+	settings.images.loop = Boolean(elements_controls_images["controls_images_play_loop"].checked);
+	settings.images.shuffle = Boolean(elements_controls_images["controls_images_play_shuffle"].checked);
+	settings.music.keywords = elements_controls_music["controls_music_search_keywords"].value;
+	settings.music.count = Number(elements_controls_music["controls_music_count"].value);
+	settings.music.loop = Boolean(elements_controls_music["controls_music_play_loop"].checked);
+	settings.music.shuffle = Boolean(elements_controls_music["controls_music_play_shuffle"].checked);
 
 	// limit the settings to acceptable values
 	// should match the limits defined on the corresponding HTML elements
@@ -180,7 +179,6 @@ function interface_load(pull) {
 	settings.images.duration = Math.max(Math.min(settings.images.duration, 1000), 5);
 	settings.music.keywords = settings.music.keywords.substring(0, 100);
 	settings.music.count = Math.max(Math.min(settings.music.count, 1000000), 0);
-	settings.music.volume = Math.max(Math.min(settings.music.volume, 1), 0);
 
 	// update the settings url
 	settings_url_set();
@@ -291,6 +289,7 @@ function interface_update_attached(attached) {
 		interface.media_controls_label.setAttribute("class", "text_size_medium text_color_black");
 		interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_black");
 		interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_black");
+		interface.media_music_controls_volume_label.setAttribute("class", "text_size_medium text_color_black");
 		interface.media_music_recommendations_label.setAttribute("class", "text_size_large text_color_black");
 		interface.media_music_recommendations_list.setAttribute("class", "text_size_medium text_color_black");
 		interface.player.removeChild(interface.media);
@@ -303,6 +302,7 @@ function interface_update_attached(attached) {
 		interface.media_controls_label.setAttribute("class", "text_size_medium text_color_white");
 		interface.media_images_recommendations_label.setAttribute("class", "text_size_large text_color_white");
 		interface.media_images_recommendations_list.setAttribute("class", "text_size_medium text_color_white");
+		interface.media_music_controls_volume_label.setAttribute("class", "text_size_medium text_color_white");
 		interface.media_music_recommendations_label.setAttribute("class", "text_size_large text_color_white");
 		interface.media_music_recommendations_list.setAttribute("class", "text_size_medium text_color_white");
 		document.body.removeChild(interface.media);
@@ -317,10 +317,13 @@ function interface_update_controls_images() {
 
 // interface, update HTML, controls, music
 function interface_update_controls_music() {
-	// refresh the volume of the audio element
-	interface.controls_music_volume_label.innerHTML = percent(settings.music.volume);
+	// change the volume of the audio element
+	const elements_controls_media_music = document.forms["controls_media_music"].elements;
+	player.music.volume = Number(elements_controls_media_music["controls_media_music_volume"].value);
+	player.music.volume = Math.max(Math.min(player.music.volume, 1), 0);
+	interface.media_music_controls_volume_label.innerHTML = percent(player.music.volume);
 	if(document.body.contains(player.music.element))
-		player.music.element.volume = settings.music.volume;
+		player.music.element.volume = player.music.volume;
 }
 
 // interface, update HTML, controls, sites
@@ -949,30 +952,6 @@ function interface_init() {
 				interface.controls_music_play_shuffle_label.innerHTML = "Shuffle<br/>";
 				interface.controls_music_play.appendChild(interface.controls_music_play_shuffle_label);
 			}
-
-			// interface HTML: controls, music, volume
-			interface.controls_music_volume = document.createElement("p");
-			interface.controls_music_volume.innerHTML = "<b>Volume:<b/><br/>";
-			interface.controls_music.appendChild(interface.controls_music_volume);
-			{
-				// interface HTML: controls, music, volume, input
-				interface.controls_music_volume_input = document.createElement("input");
-				interface.controls_music_volume_input.setAttribute("id", "controls_music_volume");
-				interface.controls_music_volume_input.setAttribute("title", "Audio volume of the music");
-				interface.controls_music_volume_input.setAttribute("type", "range");
-				interface.controls_music_volume_input.setAttribute("value", settings.music.volume);
-				interface.controls_music_volume_input.setAttribute("step", "0.01");
-				interface.controls_music_volume_input.setAttribute("min", "0");
-				interface.controls_music_volume_input.setAttribute("max", "1");
-				interface.controls_music_volume_input.setAttribute("onclick", "interface_preload(\"volume\", TYPE_MUSIC)");
-				interface.controls_music_volume_input.setAttribute("oninput", "interface_preload(\"volume\", TYPE_MUSIC)");
-				interface.controls_music_volume.appendChild(interface.controls_music_volume_input);
-
-				// interface HTML: controls, music, volume, label
-				interface.controls_music_volume_label = document.createElement("label");
-				interface.controls_music_volume_label.innerHTML = percent(settings.music.volume);
-				interface.controls_music_volume.appendChild(interface.controls_music_volume_label);
-			}
 		}
 
 		// interface HTML: controls, hr
@@ -1184,6 +1163,41 @@ function interface_init() {
 			interface.media_music_info.setAttribute("class", "text_size_small text_color_black");
 			interface.media_music_info.setAttribute("style", "position: absolute; top: 164px; width: 100%");
 			interface.media_music.appendChild(interface.media_music_info);
+
+			// interface HTML: media, music, controls
+			interface.media_music_controls = document.createElement("form");
+			interface.media_music_controls.setAttribute("id", "controls_media_music");
+			interface.media_music.appendChild(interface.media_music_controls);
+			{
+				// interface HTML: media, music, controls, volume
+				interface.media_music_controls_volume = document.createElement("p");
+				interface.media_music_controls_volume.setAttribute("style", "position: absolute; top: 180px; width: 100%");
+				interface.media_music_controls.appendChild(interface.media_music_controls_volume);
+				{
+					// interface HTML: media, music, controls, volume, slider
+					interface.media_music_controls_volume_input = document.createElement("input");
+					interface.media_music_controls_volume_input.setAttribute("id", "controls_media_music_volume");
+					interface.media_music_controls_volume_input.setAttribute("title", "Audio volume for music");
+					interface.media_music_controls_volume_input.setAttribute("type", "range");
+					interface.media_music_controls_volume_input.setAttribute("value", player.music.volume);
+					interface.media_music_controls_volume_input.setAttribute("step", "0.01");
+					interface.media_music_controls_volume_input.setAttribute("min", "0");
+					interface.media_music_controls_volume_input.setAttribute("max", "1");
+					interface.media_music_controls_volume_input.setAttribute("onclick", "interface_update_controls_music()");
+					interface.media_music_controls_volume_input.setAttribute("oninput", "interface_update_controls_music()");
+					interface.media_music_controls_volume.appendChild(interface.media_music_controls_volume_input);
+
+					// interface HTML: media, music, controls, volume, br
+					interface.media_music_controls_br = document.createElement("br");
+					interface.media_music_controls_volume.appendChild(interface.media_music_controls_br);
+
+					// interface HTML: media, music, controls, volume, label
+					interface.media_music_controls_volume_label = document.createElement("label");
+					interface.media_music_controls_volume_label.setAttribute("class", "text_size_medium text_color_black");
+					interface.media_music_controls_volume_label.innerHTML = percent(player.music.volume);
+					interface.media_music_controls_volume.appendChild(interface.media_music_controls_volume_label);
+				}
+			}
 		}
 
 		// interface HTML: media, music, recommendations

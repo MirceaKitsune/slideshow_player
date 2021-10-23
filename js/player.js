@@ -50,6 +50,7 @@ var player = {
 	},
 	music: {
 		index: 0,
+		volume: 1,
 		preloading: false,
 		stopped: false,
 		timer_next: null,
@@ -535,7 +536,7 @@ function player_music_next() {
 	// apply the current song
 	if(player.music.index > 0) {
 		player.music.element.setAttribute("src", music_current().src);
-		player.music.element.volume = settings.music.volume;
+		player.music.element.volume = player.music.volume;
 
 		interface_ring_music_set(null);
 		interface_update_media(false, false, false, true, false);
