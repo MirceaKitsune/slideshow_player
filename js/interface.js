@@ -961,7 +961,7 @@ function interface_init() {
 				interface.controls_music_volume_input.setAttribute("title", "Audio volume of the music");
 				interface.controls_music_volume_input.setAttribute("type", "range");
 				interface.controls_music_volume_input.setAttribute("value", settings.music.volume);
-				interface.controls_music_volume_input.setAttribute("step", "0.05");
+				interface.controls_music_volume_input.setAttribute("step", "0.01");
 				interface.controls_music_volume_input.setAttribute("min", "0");
 				interface.controls_music_volume_input.setAttribute("max", "1");
 				interface.controls_music_volume_input.setAttribute("onclick", "interface_preload(\"volume\", TYPE_MUSIC)");
