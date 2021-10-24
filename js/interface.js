@@ -165,6 +165,7 @@ function interface_load(pull) {
 	settings.images.nsfw = Boolean(elements_controls_images["controls_images_search_nsfw"].checked);
 	settings.images.count = Number(elements_controls_images["controls_images_count"].value);
 	settings.images.duration = Number(elements_controls_images["controls_images_duration"].value);
+	settings.images.score = Boolean(elements_controls_images["controls_images_duration_score"].checked);
 	settings.images.loop = Boolean(elements_controls_images["controls_images_play_loop"].checked);
 	settings.images.shuffle = Boolean(elements_controls_images["controls_images_play_shuffle"].checked);
 	settings.music.keywords = elements_controls_music["controls_music_search_keywords"].value;
@@ -831,6 +832,25 @@ function interface_init() {
 				interface.controls_images_duration_input.setAttribute("onclick", "interface_preload(\"duration\", TYPE_IMAGES)");
 				interface.controls_images_duration_input.setAttribute("onkeyup", "interface_preload(\"duration\", TYPE_IMAGES)");
 				interface.controls_images_duration.appendChild(interface.controls_images_duration_input);
+
+				// interface HTML: controls, images, duration, br
+				interface.controls_images_duration_br = document.createElement("br");
+				interface.controls_images_duration.appendChild(interface.controls_images_duration_br);
+
+				// interface HTML: controls, images, duration, score, input
+				interface.controls_images_duration_score_input = document.createElement("input");
+				interface.controls_images_duration_score_input.setAttribute("id", "controls_images_duration_score");
+				interface.controls_images_duration_score_input.setAttribute("title", "Duration may be halved or doubled based on image score");
+				interface.controls_images_duration_score_input.setAttribute("type", "checkbox");
+				if(settings.images.score)
+					interface.controls_images_duration_score_input.setAttribute("checked", true);
+				interface.controls_images_duration_score_input.setAttribute("onclick", "interface_preload(\"score\", TYPE_IMAGES)");
+				interface.controls_images_duration.appendChild(interface.controls_images_duration_score_input);
+
+				// interface HTML: controls, images, duration, score, label
+				interface.controls_images_duration_score_label = document.createElement("label");
+				interface.controls_images_duration_score_label.innerHTML = "Offset by score<br/>";
+				interface.controls_images_duration.appendChild(interface.controls_images_duration_score_label);
 			}
 
 			// interface HTML: controls, images, play

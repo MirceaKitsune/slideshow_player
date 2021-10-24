@@ -325,13 +325,24 @@ function player_images_next_onload_current() {
 	// schedule the next image
 	clearTimeout(player.images.timer_next);
 	if(!player.images.stopped) {
-		player.images.timer_next = setTimeout(player_images_next, settings.images.duration * 1000);
-		interface_ring_images_set(settings.images.duration);
+		const duration = player_images_next_duration();
+		player.images.timer_next = setTimeout(player_images_next, duration * 1000);
+		interface_ring_images_set(duration);
 	}
 
 	player.images.preloading_current = false;
 	if(!player_busy_images())
 		interface_update_media(false, true, false, false, false);
+}
+
+// player, images, switching, duration
+function player_images_next_duration() {
+	var duration = settings.images.duration;
+	if(settings.images.score) {
+		const score = images_current().score / score_images_average;
+		duration = Math.max(Math.min(settings.images.duration * score, settings.images.duration * 2), settings.images.duration / 2);
+	}
+	return duration;
 }
 
 // player, images, switching, fade
@@ -351,7 +362,8 @@ function player_images_next_fade() {
 
 	// advance or stop the transition
 	if(player.images.transition < 1) {
-		player.images.transition = Math.min(player.images.transition + (((1 / settings.images.duration) / (1000 * TRANSITION)) * RATE), 1);
+		const duration = player_images_next_duration();
+		player.images.transition = Math.min(player.images.transition + (((1 / duration) / (1000 * TRANSITION)) * RATE), 1);
 	} else {
 		clearInterval(player.images.timer_fade);
 		player.images.transition = 0;
@@ -450,9 +462,10 @@ function player_images_play() {
 
 	clearTimeout(player.images.timer_next);
 	if(player.images.stopped) {
+		const duration = player_images_next_duration();
 		player.images.stopped = false;
-		player.images.timer_next = setTimeout(player_images_next, settings.images.duration * 1000);
-		interface_ring_images_set(settings.images.duration);
+		player.images.timer_next = setTimeout(player_images_next, duration * 1000);
+		interface_ring_images_set(duration);
 	} else {
 		player.images.stopped = true;
 	}

@@ -44,9 +44,10 @@ const settings_default = {
 	sites: [],
 	images: {
 		keywords: "comic",
+		nsfw: false,
 		count: 1000,
 		duration: 15,
-		nsfw: false,
+		score: true,
 		loop: true,
 		shuffle: true
 	},
