@@ -111,6 +111,18 @@ function interface_ring_music_set(element) {
 	}
 }
 
+// interface, functions, date
+function interface_time(sec) {
+	// if time is less than a day, return string in hh:mm:ss format
+	var time = "+1 day";
+	if(sec <= 86400) {
+		var date = new Date(null);
+		date.setSeconds(sec);
+		time = date.toISOString().substr(11, 8);
+	}
+	return time;
+}
+
 // interface, functions, autorefresh
 function interface_autorefresh() {
 	// if the timer has reached 0, clear it and pull new data from source websites
@@ -177,7 +189,7 @@ function interface_load(pull) {
 	// should match the limits defined on the corresponding HTML elements
 	settings.images.keywords = settings.images.keywords.substring(0, 100);
 	settings.images.count = Math.max(Math.min(settings.images.count, 1000000), 0);
-	settings.images.duration = Math.max(Math.min(settings.images.duration, 1000), 5);
+	settings.images.duration = Math.max(Math.min(settings.images.duration, 86400), 5);
 	settings.music.keywords = settings.music.keywords.substring(0, 100);
 	settings.music.count = Math.max(Math.min(settings.music.count, 1000000), 0);
 
@@ -426,20 +438,21 @@ function interface_update_media_images() {
 		if(label_author.length > 16)
 			label_author = label_author.substring(0, 16) + "...";
 
+		const time = interface_time(interface_ring.images.duration);
 		const score_current = images_current().score / score_images_best;
 		const score_average = score_images_average / score_images_best;
 		interface_style_gradient(interface.media_images_bar, false, player.images.index / data_images.length, score_average);
 		interface.media_images_bar.setAttribute("title", player.images.index + " / " + data_images.length);
 		interface.media_images_thumb.setAttribute("href", images_current().url);
 		interface.media_images_thumb_image.setAttribute("src", images_current().thumb);
-		interface.media_images_thumb_score.innerHTML = percent(score_current) + " / " + percent(score_average);
+		interface.media_images_thumb_info.innerHTML = time + "<br/>" + percent(score_current) + " / " + percent(score_average);
 		interface.media_images_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 	} else {
 		interface_style_gradient(interface.media_images_bar, false, 0, 0);
 		interface.media_images_bar.removeAttribute("title");
 		interface.media_images_thumb.removeAttribute("href");
 		interface.media_images_thumb_image.setAttribute("src", SRC_BLANK);
-		interface.media_images_thumb_score.innerHTML = "";
+		interface.media_images_thumb_info.innerHTML = "";
 		interface.media_images_info.innerHTML = "";
 	}
 
@@ -502,20 +515,21 @@ function interface_update_media_music() {
 		if(label_author.length > 16)
 			label_author = label_author.substring(0, 16) + "...";
 
+		const time = interface_time(player.music.element.duration);
 		const score_current = music_current().score / score_music_best;
 		const score_average = score_music_average / score_music_best;
 		interface_style_gradient(interface.media_music_bar, false, player.music.index / data_music.length, score_average);
 		interface.media_music_bar.setAttribute("title", player.music.index + " / " + data_music.length);
 		interface.media_music_thumb.setAttribute("href", music_current().url);
 		interface.media_music_thumb_song.setAttribute("src", music_current().thumb);
-		interface.media_music_thumb_score.innerHTML = percent(score_current) + " / " + percent(score_average);
+		interface.media_music_thumb_info.innerHTML = time + "<br/>" + percent(score_current) + " / " + percent(score_average);
 		interface.media_music_info.innerHTML = "<b>" + label_title + "</b> by <b>" + label_author + "</b>";
 	} else {
 		interface_style_gradient(interface.media_music_bar, false, 0, 0);
 		interface.media_music_bar.removeAttribute("title");
 		interface.media_music_thumb.removeAttribute("href");
 		interface.media_music_thumb_song.setAttribute("src", SRC_BLANK);
-		interface.media_music_thumb_score.innerHTML = "";
+		interface.media_music_thumb_info.innerHTML = "";
 		interface.media_music_info.innerHTML = "";
 	}
 
@@ -640,17 +654,10 @@ function interface_update_recommendations_music() {
 
 // interface, update HTML, media controls
 function interface_update_media_controls() {
-	const total_seconds = data_images.length * settings.images.duration;
-	var total_time = "+1 day";
-	if(total_seconds <= 86400) {
-		var total_date = new Date(null);
-		total_date.setSeconds(total_seconds);
-		total_time = total_date.toISOString().substr(11, 8);
-	}
-
 	// configure the label element
+	const time = interface_time(data_images.length * settings.images.duration);
 	interface.media_controls_label.innerHTML =
-		TYPE_IMAGES + " " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + total_time + "<b>)</b> " +
+		TYPE_IMAGES + " " + data_images.length + " <b>/</b> " + data_images_all.length + " <b>↺</b> " + settings.images.duration + " sec <b>(</b>" + time + "<b>)</b> " +
 		TYPE_MUSIC + " " + data_music.length + " <b>/</b> " + data_music_all.length;
 
 	// first configuration, based on player status
@@ -1077,11 +1084,11 @@ function interface_init() {
 				interface.media_images_thumb_image.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 72px");
 				interface.media_images_thumb.appendChild(interface.media_images_thumb_image);
 
-				// interface HTML: media, images, thumb, score
-				interface.media_images_thumb_score = document.createElement("p");
-				interface.media_images_thumb_score.setAttribute("class", "text_size_small text_color_white");
-				interface.media_images_thumb_score.setAttribute("style", "position: absolute; top: 128px; width: 100%");
-				interface.media_images_thumb.appendChild(interface.media_images_thumb_score);
+				// interface HTML: media, images, thumb, info
+				interface.media_images_thumb_info = document.createElement("p");
+				interface.media_images_thumb_info.setAttribute("class", "text_size_small text_color_white");
+				interface.media_images_thumb_info.setAttribute("style", "position: absolute; top: 104px; width: 100%");
+				interface.media_images_thumb.appendChild(interface.media_images_thumb_info);
 			}
 
 			// interface HTML: media, images, info
@@ -1210,11 +1217,11 @@ function interface_init() {
 				interface.media_music_thumb_song.setAttribute("style", "position: absolute; margin: 0 0 0 50%; top: 72px");
 				interface.media_music_thumb.appendChild(interface.media_music_thumb_song);
 
-				// interface HTML: media, music, thumb, score
-				interface.media_music_thumb_score = document.createElement("p");
-				interface.media_music_thumb_score.setAttribute("class", "text_size_small text_color_white");
-				interface.media_music_thumb_score.setAttribute("style", "position: absolute; top: 128px; width: 100%");
-				interface.media_music_thumb.appendChild(interface.media_music_thumb_score);
+				// interface HTML: media, music, thumb, info
+				interface.media_music_thumb_info = document.createElement("p");
+				interface.media_music_thumb_info.setAttribute("class", "text_size_small text_color_white");
+				interface.media_music_thumb_info.setAttribute("style", "position: absolute; top: 104px; width: 100%");
+				interface.media_music_thumb.appendChild(interface.media_music_thumb_info);
 			}
 
 			// interface HTML: media, music, info

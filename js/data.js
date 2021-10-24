@@ -288,7 +288,7 @@ function images_pick() {
 			score_images_best = score;
 		score_all += score;
 	}
-	score_images_average = Math.round(score_all / data_images.length);
+	score_images_average = score_all / data_images.length;
 
 	if(!player_available_images()) {
 		// if the player is active and no images are left, clear the image player
@@ -403,7 +403,7 @@ function music_pick() {
 			score_music_best = score;
 		score_all += score;
 	}
-	score_music_average = Math.round(score_all / data_music.length);
+	score_music_average = score_all / data_music.length;
 
 	if(!player_available_music()) {
 		// if the player is active and no songs are left, clear the music player

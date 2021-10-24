@@ -339,8 +339,8 @@ function player_images_next_onload_current() {
 function player_images_next_duration() {
 	var duration = settings.images.duration;
 	if(settings.images.score) {
-		const score_average = Math.max(score_images_average / score_images_best, 0);
 		const score_this = Math.max(images_current().score / score_images_best, 0);
+		const score_average = Math.max(score_images_average / score_images_best, 0);
 		const score = 1 + (score_this - score_average);
 		duration *= score;
 	}
