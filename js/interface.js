@@ -840,7 +840,7 @@ function interface_init() {
 				// interface HTML: controls, images, duration, score, input
 				interface.controls_images_duration_score_input = document.createElement("input");
 				interface.controls_images_duration_score_input.setAttribute("id", "controls_images_duration_score");
-				interface.controls_images_duration_score_input.setAttribute("title", "Duration may be halved or doubled based on image score");
+				interface.controls_images_duration_score_input.setAttribute("title", "Duration is reduced or doubled based on image score");
 				interface.controls_images_duration_score_input.setAttribute("type", "checkbox");
 				if(settings.images.score)
 					interface.controls_images_duration_score_input.setAttribute("checked", true);
@@ -849,7 +849,7 @@ function interface_init() {
 
 				// interface HTML: controls, images, duration, score, label
 				interface.controls_images_duration_score_label = document.createElement("label");
-				interface.controls_images_duration_score_label.innerHTML = "Offset by score<br/>";
+				interface.controls_images_duration_score_label.innerHTML = "Score<br/>";
 				interface.controls_images_duration.appendChild(interface.controls_images_duration_score_label);
 			}
 
