@@ -281,12 +281,14 @@ function images_pick() {
 	// update global score
 	score_images_best = 0;
 	score_images_average = 0;
+	var score_all = 0;
 	for(image in data_images) {
 		const score = data_images[image].score;
 		if(score > score_images_best)
 			score_images_best = score;
-		score_images_average = image > 0 ? (score_images_average + score) / 2 : score;
+		score_all += score;
 	}
+	score_images_average = Math.round(score_all / data_images.length);
 
 	if(!player_available_images()) {
 		// if the player is active and no images are left, clear the image player
@@ -394,12 +396,14 @@ function music_pick() {
 	// update global score
 	score_music_best = 0;
 	score_music_average = 0;
+	var score_all = 0;
 	for(song in data_music) {
 		const score = data_music[song].score;
 		if(score > score_music_best)
 			score_music_best = score;
-		score_music_average = song > 0 ? (score_music_average + score) / 2 : score;
+		score_all += score;
 	}
+	score_music_average = Math.round(score_all / data_music.length);
 
 	if(!player_available_music()) {
 		// if the player is active and no songs are left, clear the music player
