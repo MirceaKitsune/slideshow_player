@@ -201,7 +201,7 @@ function interface_load(pull) {
 
 	// update the images and songs if a runtime setting has changed
 	if(settings.images.effects != old_images_effects || settings.images.duration != old_images_duration)
-		player_effects();
+		player_images_effects();
 	if(settings.images.count !== old_images_count || settings.images.shuffle !== old_images_shuffle)
 		images_pick();
 	if(settings.music.count !== old_music_count || settings.music.shuffle !== old_music_shuffle)
@@ -903,7 +903,7 @@ function interface_init() {
 				// interface HTML: controls, images, play, effects, input
 				interface.controls_images_play_effects_input = document.createElement("input");
 				interface.controls_images_play_effects_input.setAttribute("id", "controls_images_play_effects");
-				interface.controls_images_play_effects_input.setAttribute("title", "Whether to enable player effects");
+				interface.controls_images_play_effects_input.setAttribute("title", "Whether to enable image effects");
 				interface.controls_images_play_effects_input.setAttribute("type", "checkbox");
 				if(settings.images.effects)
 					interface.controls_images_play_effects_input.setAttribute("checked", true);

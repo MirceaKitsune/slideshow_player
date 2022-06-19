@@ -11,14 +11,14 @@ const TRANSITION = 0.05;
 // the cursor is hidden after this many seconds if positioned over the player without being moved
 const CURSOR_TIME = 1;
 
+// the speed of image effects, multiplied by the image duration setting
+const EFFECTS_TIME = 0.25;
+
 // the zoom level, size, duration, and background brightness of the magnifier
 const ZOOM_FACTOR = 2;
 const ZOOM_SIZE = 0.5;
 const ZOOM_TIME = 5;
 const ZOOM_BRIGHTNESS = 0.5;
-
-// the speed of player effects, multiplied by the image duration setting
-const EFFECTS = 0.25;
 
 // the recommendation algorithm preforms scans this many seconds
 // smaller values offer more accuracy but use more processing power
@@ -181,10 +181,12 @@ function player_cursor(active) {
 	}
 }
 
-// player, update effects
-function player_effects() {
-	if(player_active())
-		player.element.style.animation = settings.images.effects ? "player_effects " + (settings.images.duration * EFFECTS) + "s infinite" : "";
+// player, images, update effects
+function player_images_effects() {
+	if(!player_active_images())
+		return;
+	const effects = settings.images.effects ? "player_effects " + (settings.images.duration * EFFECTS_TIME) + "s infinite ease-in-out" : "";
+	player.images.element_previous.style.animation = player.images.element_next.style.animation = player.images.element_current.style.animation = effects;
 }
 
 // player, images, zoom, attach
@@ -734,6 +736,7 @@ function player_attach() {
 	// start the image player, images_pick will take care executing player_images_next
 	player.images.index = 0;
 	images_pick();
+	player_images_effects();
 
 	// start the music player, music_pick will take care executing player_music_next
 	player.music.index = 0;
@@ -746,7 +749,6 @@ function player_attach() {
 	// set the recommendations interval
 	recommendations.timer = setInterval(recommendations_timer, RECOMMENDATIONS_RATE * 1000);
 
-	player_effects();
 	interface_update_media(false, true, true, true, false);
 }
 
