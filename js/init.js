@@ -49,7 +49,8 @@ const settings_default = {
 		duration: 15,
 		score: true,
 		loop: true,
-		shuffle: true
+		shuffle: true,
+		effects: true
 	},
 	music: {
 		keywords: "trance",

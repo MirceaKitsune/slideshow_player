@@ -163,7 +163,9 @@ function interface_load(pull) {
 
 	// store some old settings to compare them later below
 	const old_images_count = settings.images.count;
+	const old_images_duration = settings.images.duration;
 	const old_images_shuffle = settings.images.shuffle;
+	const old_images_effects = settings.images.effects;
 	const old_music_count = settings.music.count;
 	const old_music_shuffle = settings.music.shuffle;
 
@@ -180,6 +182,7 @@ function interface_load(pull) {
 	settings.images.score = Boolean(elements_controls_images["controls_images_duration_score"].checked);
 	settings.images.loop = Boolean(elements_controls_images["controls_images_play_loop"].checked);
 	settings.images.shuffle = Boolean(elements_controls_images["controls_images_play_shuffle"].checked);
+	settings.images.effects = Boolean(elements_controls_images["controls_images_play_effects"].checked);
 	settings.music.keywords = elements_controls_music["controls_music_search_keywords"].value;
 	settings.music.count = Number(elements_controls_music["controls_music_count"].value);
 	settings.music.loop = Boolean(elements_controls_music["controls_music_play_loop"].checked);
@@ -196,7 +199,9 @@ function interface_load(pull) {
 	// update the settings url
 	settings_url_set();
 
-	// update the images and songs if a setting affecting the list changed
+	// update the images and songs if a runtime setting has changed
+	if(settings.images.effects != old_images_effects || settings.images.duration != old_images_duration)
+		player_effects();
 	if(settings.images.count !== old_images_count || settings.images.shuffle !== old_images_shuffle)
 		images_pick();
 	if(settings.music.count !== old_music_count || settings.music.shuffle !== old_music_shuffle)
@@ -894,6 +899,21 @@ function interface_init() {
 				interface.controls_images_play_shuffle_label = document.createElement("label");
 				interface.controls_images_play_shuffle_label.innerHTML = "Shuffle<br/>";
 				interface.controls_images_play.appendChild(interface.controls_images_play_shuffle_label);
+
+				// interface HTML: controls, images, play, effects, input
+				interface.controls_images_play_effects_input = document.createElement("input");
+				interface.controls_images_play_effects_input.setAttribute("id", "controls_images_play_effects");
+				interface.controls_images_play_effects_input.setAttribute("title", "Whether to enable player effects");
+				interface.controls_images_play_effects_input.setAttribute("type", "checkbox");
+				if(settings.images.effects)
+					interface.controls_images_play_effects_input.setAttribute("checked", true);
+				interface.controls_images_play_effects_input.setAttribute("onclick", "interface_preload(\"effects\", TYPE_IMAGES)");
+				interface.controls_images_play.appendChild(interface.controls_images_play_effects_input);
+
+				// interface HTML: controls, images, play, effects, label
+				interface.controls_images_play_effects_label = document.createElement("label");
+				interface.controls_images_play_effects_label.innerHTML = "Effects<br/>";
+				interface.controls_images_play.appendChild(interface.controls_images_play_effects_label);
 			}
 		}
 

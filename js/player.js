@@ -17,6 +17,9 @@ const ZOOM_SIZE = 0.5;
 const ZOOM_TIME = 5;
 const ZOOM_BRIGHTNESS = 0.5;
 
+// the speed of player effects, multiplied by the image duration setting
+const EFFECTS = 0.25;
+
 // the recommendation algorithm preforms scans this many seconds
 // smaller values offer more accuracy but use more processing power
 const RECOMMENDATIONS_RATE = 1;
@@ -176,6 +179,12 @@ function player_cursor(active) {
 			player.element.style["cursor"] = "none";
 		}, CURSOR_TIME * 1000);
 	}
+}
+
+// player, update effects
+function player_effects() {
+	if(player_active())
+		player.element.style.animation = settings.images.effects ? "player_effects " + (settings.images.duration * EFFECTS) + "s infinite" : "";
 }
 
 // player, images, zoom, attach
@@ -680,7 +689,7 @@ function player_attach() {
 
 	// create the player element
 	player.element = document.createElement("div");
-	player.element.setAttribute("style", "position: absolute; top: 0%; left: 0%; width: 100%; height: 100%; display: flex; justify-content: center");
+	player.element.setAttribute("class", "player");
 	// player.element.setAttribute("onmouseover", "player_cursor(true)");
 	player.element.setAttribute("onmouseout", "player_cursor(false)");
 	player.element.setAttribute("onmousemove", "player_cursor(true)");
@@ -737,6 +746,7 @@ function player_attach() {
 	// set the recommendations interval
 	recommendations.timer = setInterval(recommendations_timer, RECOMMENDATIONS_RATE * 1000);
 
+	player_effects();
 	interface_update_media(false, true, true, true, false);
 }
 

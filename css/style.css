@@ -1,3 +1,21 @@
+@keyframes player_effects {
+	0% { transform: translate(0, 0) rotate(0deg) skewX(0deg); }
+	25% { transform: translate(5px, 5px) rotate(1deg) skewX(1deg); }
+	50% { transform: translate(0, 0) rotate(0eg) skewX(0deg); }
+	75% { transform: translate(-5px, -5px) rotate(-1deg) skewX(-1deg); }
+	100% { transform: translate(0, 0) rotate(0deg) skewX(0deg); }
+}
+
+.player {
+	position: absolute;
+	display: flex;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+}
+
 .player_image {
 	position: absolute;
 	width: auto;
